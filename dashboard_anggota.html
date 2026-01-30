@@ -14,7 +14,7 @@
     <meta name="msapplication-TileColor" content="#4285f4">
     
     <!-- Manifest untuk PWA (DIUPDATE: Menggunakan 512B.png) -->
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIkJHVCBQUk8iLCAic2hvcnRfbmFtZSI6ICJCR1QgUFJPIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLCAidGhlbWVfY29sb3IiOiAiIzQyODVmNCIsICJpY29ucyI6IFt7InNyYyI6ICI1MTJCLnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIn1dfQ==">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQkdUIFBSTIiwic2hvcnRfbmFtZSI6ICJCR1QgUFJPIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLCAidGhlbWVfY29sb3IiOiAiIzQyODVmNCIsICJpY29ucyI6IFt7InNyYyI6ICI1MTJCLnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIn1dfQ==">
     
     <!-- Apple Touch Icons (DIUPDATE: Menggunakan 512B.png) -->
     <link rel="apple-touch-icon" href="512B.png">
@@ -950,15 +950,14 @@
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
-            // Show the install banner
-            showInstallPrompt();
+            // Note: showInstallPrompt() will handle showing the banner
         });
 
         function showInstallPrompt() {
-            // Show install prompt after 3 seconds
+            // PERBAIKAN: Tampilkan BANNER meskipun deferredPrompt kosong (untuk iOS/User Info)
             setTimeout(() => {
                 const installPrompt = document.getElementById('installPrompt');
-                if (installPrompt && deferredPrompt) {
+                if (installPrompt) {
                     installPrompt.style.display = 'flex';
                 }
             }, 3000);
@@ -974,31 +973,29 @@
             const installPrompt = document.getElementById('installPrompt');
             installPrompt.style.display = 'none';
             
-            if (!deferredPrompt) {
-                showToast('Install prompt tidak tersedia');
-                return;
-            }
-            
-            // Show the install prompt
-            deferredPrompt.prompt();
-            
-            // Wait for the user to respond to the prompt
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response to the install prompt: ${outcome}`);
-            
-            // We've used the prompt, and can't use it again, throw it away
-            deferredPrompt = null;
-            
-            if (outcome === 'accepted') {
-                localStorage.setItem('bgtProInstalled', 'true');
-                showToast('Aplikasi berhasil diinstall!');
+            if (deferredPrompt) {
+                // Native install supported (Chrome/Edge Android/Desktop)
+                deferredPrompt.prompt();
+                
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                
+                deferredPrompt = null;
+                
+                if (outcome === 'accepted') {
+                    localStorage.setItem('bgtProInstalled', 'true');
+                    showToast('Aplikasi berhasil diinstall!');
+                }
+            } else {
+                // Fallback for iOS or unsupported browsers
+                // iOS Safari tidak mendukung beforeinstallprompt
+                showToast('Untuk install di iPhone/iPad: Tekan tombol Share > Add to Home Screen');
             }
         }
 
         // --- REGISTER SERVICE WORKER FOR PWA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Create a simple service worker inline
                 const swCode = `
                     self.addEventListener('install', event => {
                         console.log('Service Worker installing...');
@@ -1031,24 +1028,15 @@
         // --- HANDLE BACK BUTTON ON MOBILE ---
         // Prevent default back button behavior
         window.addEventListener('popstate', (event) => {
-            // Prevent the default back button behavior
             event.preventDefault();
-            
-            // Instead of going back, just stop the navigation
             window.history.pushState(null, null, window.location.href);
-            
-            // Optionally show a toast or do nothing
-            // showToast('Gunakan tombol Kembali di dalam aplikasi');
         });
-        
-        // Push a new state to the history stack
         window.history.pushState(null, null, window.location.href);
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
         function showMainContent() {
             document.getElementById('main-content').style.display = 'block';
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-            // Reset nav item ke 'Home'
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             document.querySelector('.nav-item').classList.add('active');
         }
@@ -1057,7 +1045,6 @@
             document.getElementById('main-content').style.display = 'none';
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
             document.getElementById('profile-page').classList.add('active');
-            // Reset nav item ke 'Profile'
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             document.querySelectorAll('.nav-item')[3].classList.add('active');
         }
@@ -1066,7 +1053,6 @@
             document.getElementById('main-content').style.display = 'none';
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
             document.getElementById('kas-page').classList.add('active');
-            // Load data kas
             loadKasData();
         }
 
@@ -1074,7 +1060,6 @@
             document.getElementById('main-content').style.display = 'none';
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
             document.getElementById('promo-page').classList.add('active');
-            // Load data promo
             loadPromoDetails();
         }
 
@@ -1082,11 +1067,15 @@
             document.getElementById('main-content').style.display = 'none';
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
             document.getElementById('peta-page').classList.add('active');
-            // Initialize map
+            
+            // Coba meminta lokasi lagi saat membuka Peta (User Interaction)
+            if (navigator.geolocation) {
+                startLocationTracking();
+            }
+
             if (!map) {
                 initializeMap();
             } else {
-                // Refresh map size when page is shown
                 setTimeout(() => {
                     map.invalidateSize();
                     centerMapOnUser();
@@ -1098,7 +1087,6 @@
             document.getElementById('main-content').style.display = 'none';
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
             document.getElementById('pesan-page').classList.add('active');
-            // Load messages
             loadMessages();
         }
 
@@ -1116,7 +1104,6 @@
 
         // --- FUNGSI UNTUK MEMUAT DATA USER DAN MENAMPILKANNYA ---
         function loadUserDataIntoUI(userData) {
-            // Update foto profil di header
             const headerProfilePhoto = document.getElementById('headerProfilePhoto');
             const profilePageAvatar = document.getElementById('profilePageAvatar');
             const profilePageUsername = document.getElementById('profilePageUsername');
@@ -1143,9 +1130,6 @@
         // --- FUNGSI UNTUK MENANGANI DISRUPSI ---
         function triggerDisruption() {
             document.getElementById('disruption-overlay').classList.add('active');
-            // Mainkan suara gangguan jika ada (opsional, membutuhkan file audio)
-            // const audio = new Audio('path/to/static-noise.mp3');
-            // audio.play();
         }
 
         function stopDisruption() {
@@ -1154,49 +1138,37 @@
 
         // --- FUNGSI UNTUK NOTIFIKASI SUARA ---
         function playNotificationSound(type = 'default') {
-            // Create audio context for sound generation
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Create oscillator for sound
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
-            // Connect nodes
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // Set sound parameters based on type
             switch(type) {
                 case 'event':
-                    // Event notification - urgent sound
-                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // Higher pitch
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); // Louder
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
                     oscillator.type = 'square';
                     break;
                 case 'promo':
-                    // Promo notification - friendly sound
                     oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
                     gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
                     oscillator.type = 'sine';
                     break;
                 case 'message':
-                    // Message notification - gentle sound
                     oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
                     gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
                     oscillator.type = 'triangle';
                     break;
                 default:
-                    // Default notification
                     oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
                     gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
                     oscillator.type = 'sine';
             }
             
-            // Play sound
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.2); // Play for 200ms
+            oscillator.stop(audioContext.currentTime + 0.2);
             
-            // Create a second beep for emphasis
             setTimeout(() => {
                 const oscillator2 = audioContext.createOscillator();
                 const gainNode2 = audioContext.createGain();
@@ -1215,7 +1187,6 @@
         // --- FUNGSI UNTUK MENANGANI DATA KAS ---
         async function loadKasData() {
             try {
-                // Load total kas
                 const kasSnapshot = await db.collection('kas').get();
                 let totalKas = 0;
                 const kasList = document.getElementById('kasList');
@@ -1242,7 +1213,6 @@
                 
                 document.getElementById('totalKasAmount').textContent = `Rp ${totalKas.toLocaleString('id-ID')}`;
                 
-                // Load pinjaman
                 const pinjamanSnapshot = await db.collection('pinjaman').get();
                 let totalPinjaman = 0;
                 const pinjamanList = document.getElementById('pinjamanList');
@@ -1269,7 +1239,6 @@
                 
                 document.getElementById('pinjamanAmount').textContent = `Rp ${totalPinjaman.toLocaleString('id-ID')}`;
                 
-                // Load belum bayar kas
                 const belumBayarSnapshot = await db.collection('belum_bayar_kas').get();
                 let totalBelumBayar = 0;
                 const belumBayarList = document.getElementById('belumBayarList');
@@ -1296,7 +1265,6 @@
                 
                 document.getElementById('belumBayarAmount').textContent = `Rp ${totalBelumBayar.toLocaleString('id-ID')}`;
                 
-                // Load iuran
                 const iuranSnapshot = await db.collection('iuran').get();
                 let totalIuran = 0;
                 const iuranList = document.getElementById('iuranList');
@@ -1352,7 +1320,6 @@
                     const imageUrl = promo.imageUrl || '';
                     const expiryDate = promo.expiryDate ? new Date(promo.expiryDate.toDate()).toLocaleDateString('id-ID') : 'Tidak ada batas waktu';
                     
-                    // PERBAIKAN: Menangani gambar base64
                     let imageHtml = '';
                     if (imageUrl) {
                         if (imageUrl.startsWith('data:image')) {
@@ -1630,10 +1597,7 @@
                 refreshLocations();
             });
             
-            // Start tracking user location
             startLocationTracking();
-            
-            // Load other users' locations
             loadUserLocations();
         }
         
@@ -1643,18 +1607,23 @@
                 return;
             }
             
-            // Get current position
+            // Mendapatkan posisi saat ini
             navigator.geolocation.getCurrentPosition(
                 position => {
                     updateUserLocation(position.coords.latitude, position.coords.longitude);
                 },
                 error => {
+                    // PERBAIKAN: Menangani error lokasi
                     console.error("Error getting location:", error);
-                    showToast('Gagal mendapatkan lokasi Anda');
+                    if (error.code === error.PERMISSION_DENIED) {
+                        showToast("Izin lokasi ditolak. Buka menu Peta untuk mengaktifkan.");
+                    } else {
+                        showToast("Gagal mendapatkan lokasi. Cek pengaturan browser.");
+                    }
                 }
             );
             
-            // Watch position for real-time updates
+            // Watch position untuk update real-time
             locationWatchId = navigator.geolocation.watchPosition(
                 position => {
                     updateUserLocation(position.coords.latitude, position.coords.longitude);
@@ -1674,7 +1643,6 @@
             const user = auth.currentUser;
             if (!user) return;
             
-            // Update or create user marker
             if (userMarker) {
                 userMarker.setLatLng([lat, lng]);
             } else {
@@ -1692,10 +1660,8 @@
                 .openPopup();
             }
             
-            // Center map on user location
             map.setView([lat, lng], 15);
             
-            // Save location to Firebase
             saveUserLocationToFirebase(lat, lng);
         }
         
@@ -2407,7 +2373,8 @@
                 
                 localStorage.setItem('bgtProSession', 'active');
                 
-                // 1. Minta lokasi OTOMATIS saat login
+                // 1. Minta lokasi OTOMATIS saat login (Best effort)
+                // Browser modern mungkin memblokir ini, tapi kita coba
                 if (navigator.geolocation) {
                     startLocationTracking();
                 }
