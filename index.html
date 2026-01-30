@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Anggota</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Ikon Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --success-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 15px 35px rgba(50,50,93,.1), 0 5px 15px rgba(0,0,0,.07);
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .logo-area h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .logo-area p {
+            color: var(--dark-color);
+            margin: 0.5rem 0 0 0;
+        }
+
+        .tabs { display: flex; margin-bottom: 2rem; border-bottom: 1px solid #e3e6f0; }
+        .tab-button { 
+            background: none; 
+            border: none; 
+            padding: 1rem; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            color: var(--dark-color); 
+            flex-grow: 1; 
+            transition: all 0.3s ease-in-out;
+        }
+        .tab-button.active { 
+            color: var(--primary-color); 
+            border-bottom: 3px solid var(--primary-color); 
+            margin-bottom: -1px;
+        }
+
+        .form-container { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .form-container.active { display: block; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: var(--dark-color); 
+            font-weight: 600;
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 0.75rem 1rem; 
+            border: 1px solid #d1d3e2; 
+            border-radius: 0.5rem; 
+            box-sizing: border-box; 
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+            outline: none;
+        }
+        
+        .btn { 
+            width: 100%; 
+            padding: 0.75rem 1rem; 
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover { background-color: #2e59d9; }
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn .spinner { 
+            display: none; 
+            width: 1rem; 
+            height: 1rem; 
+            border: 2px solid #ffffff; 
+            border-top-color: transparent; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-left: 0.5rem;
+        }
+
+        .message { 
+            text-align: center; 
+            padding: 1rem; 
+            margin-bottom: 1.5rem; 
+            border-radius: 0.5rem; 
+            display: none; 
+            font-weight: 600;
+        }
+        .message.success { background-color: #d1f2eb; color: #0e5c3f; border: 1px solid #0e5c3f; }
+        .message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .forgot-password-link { 
+            display: block; 
+            text-align: center; 
+            margin-top: 1.5rem; 
+            color: var(--primary-color); 
+            text-decoration: none; 
+            cursor: pointer; 
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .forgot-password-link:hover { color: #2e59d9; text-decoration: underline; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-area">
+        <h1>Portal Anggota</h1>
+        <p>Selamat datang di sistem kami</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab(event, 'login')">Masuk</button>
+        <button class="tab-button" onclick="openTab(event, 'register')">Daftar</button>
+    </div>
+
+    <div id="message-box" class="message"></div>
+
+    <!-- Form Login Anggota -->
+    <div id="login" class="form-container active">
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="login-email"><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="login-email" placeholder="nama@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="login-password" placeholder="Masukkan password" required>
+            </div>
+            <button type="submit" class="btn" id="loginBtn">
+                <span>Masuk</span>
+                <div class="spinner"></div>
+            </button>
+        </form>
+        <a class="forgot-password-link" onclick="resetPassword()">Lupa Password?</a>
+    </div>
+
+    <!-- Form Register Anggota -->
+    <div id="register" class="form-container">
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="register-username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="register-username" placeholder="Buat username" required>
+            </div>
+            <div class="form-group">
+                <label for="register-email"><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="register-email" placeholder="nama@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="register-password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="register-password" placeholder="Buat password" required>
+            </div>
+            <div class="form-group">
+                <label for="register-profile-pic"><i class="fas fa-image"></i> Foto Profil (Opsional)</label>
+                <input type="file" id="register-profile-pic" accept="image/png, image/jpeg">
+            </div>
+            <button type="submit" class="btn" id="registerBtn">
+                <span>Daftar</span>
+                <div class="spinner"></div>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Firebase SDK (TANPA STORAGE SDK) -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCahZIFKFXMCokFNxCpFokNSVtKzN4llus",
+      authDomain: "cedar-setup-425414-d7.firebaseapp.com",
+      databaseURL: "https://cedar-setup-425414-d7-default-rtdb.firebaseio.com",
+      projectId: "cedar-setup-425414-d7",
+      storageBucket: "cedar-setup-425414-d7.firebasestorage.app",
+      messagingSenderId: "723545991983",
+      appId: "1:723545991983:web:379548d2b425a502a60fda",
+      measurementId: "G-FPL6PF3KWJ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    // TIDAK PERLU inisialisasi Firebase Storage
+
+    // Elemen DOM
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginSpinner = loginBtn.querySelector('.spinner');
+    const registerSpinner = registerBtn.querySelector('.spinner');
+
+    function showMessage(msg, type) {
+        const messageBox = document.getElementById('message-box');
+        messageBox.textContent = msg;
+        messageBox.className = `message ${type}`;
+        messageBox.style.display = 'block';
+        setTimeout(() => { messageBox.style.display = 'none'; }, 5000);
+    }
+
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.form-container').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+
+    function setLoading(button, isLoading) {
+        const spinner = button.querySelector('.spinner');
+        const text = button.querySelector('span');
+        if (isLoading) {
+            button.disabled = true;
+            spinner.style.display = 'block';
+            text.textContent = 'Memproses...';
+        } else {
+            button.disabled = false;
+            spinner.style.display = 'none';
+            text.textContent = button.id === 'loginBtn' ? 'Masuk' : 'Daftar';
+        }
+    }
+
+    // FUNGSI UNTUK MENGUBAH FILE GAMBAR MENJADI BASE64
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    // LOGIKA REGISTER (MENGGUNAKAN BASE64)
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoading(registerBtn, true);
+
+        const username = document.getElementById('register-username').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const profilePicFile = document.getElementById('register-profile-pic').files[0];
+
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            let profilePicBase64 = ''; // Default kosong jika tidak ada gambar
+            if (profilePicFile) {
+                // Ubah gambar menjadi string Base64
+                profilePicBase64 = await fileToBase64(profilePicFile);
+            }
+
+            // Simpan data ke Firestore, URL gambar diganti dengan string Base64
+            await db.collection('users').doc(user.uid).set({
+                username: username,
+                email: email,
+                role: 'anggota',
+                profilePicUrl: profilePicBase64 // Simpan string Base64 di sini
+            });
+
+            showMessage('Registrasi berhasil! Silakan login.', 'success');
+            document.getElementById('registerForm').reset();
+            openTab({ currentTarget: document.querySelector('.tab-button') }, 'login');
+
+        } catch (error) {
+            showMessage(error.message, 'error');
+        } finally {
+            setLoading(registerBtn, false);
+        }
+    });
+
+    // LOGIKA LOGIN
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoading(loginBtn, true);
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            showMessage('Login berhasil! Mengalihkan...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard_anggota.html';
+            }, 1500);
+        } catch (error) {
+            showMessage(error.message, 'error');
+        } finally {
+            setLoading(loginBtn, false);
+        }
+    });
+
+    function resetPassword() {
+        const email = prompt('Masukkan email Anda untuk menerima link reset password:');
+        if (email) {
+            auth.sendPasswordResetEmail(email).then(() => {
+                showMessage(`Link reset password telah dikirim ke ${email}`, 'success');
+            }).catch((error) => {
+                showMessage(error.message, 'error');
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
