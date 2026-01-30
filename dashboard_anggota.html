@@ -62,9 +62,7 @@
         .promo-card { min-width: 280px; background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-right: 15px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
         .promo-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
         .promo-card-image { width: 100%; height: 140px; object-fit: cover; }
-        .promo-card-info { padding: 15px; }
-        .promo-card-title { font-size: 16px; font-weight: 700; margin-bottom: 5px; color: #2c3e50; }
-        .promo-card-desc { font-size: 13px; color: #7f8c8d; line-height: 1.5; }
+        .promo-card-info { display: none; } /* Sembunyikan info di carousel */
         .event-section { margin: 0 15px 15px; background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; position: relative; }
         .event-section:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
         .event-image { width: 100%; height: 160px; object-fit: cover; display: none; }
@@ -282,6 +280,50 @@
             50% { text-shadow: 0 0 10px #ff00de, 0 0 20px red; }
         }
 
+        /* --- GAYA UNTUK LOADING SCREEN (BARU) --- */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease-out;
+        }
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: #4285f4;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 15px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
         @media (max-width: 480px) {
             .phone-container { width: 100%; height: 100vh; border-radius: 0; }
             body { padding: 0; }
@@ -289,6 +331,13 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">BGT PRO</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Memuat aplikasi...</div>
+    </div>
+
     <div class="phone-container">
         <div class="app-container">
             <!-- Konten Utama (Home, Promo, dll) -->
@@ -691,6 +740,35 @@
             </div>
         </div>
 
+        <!-- Modal Ganti Password (DISEMBUNYIKAN SECARA DEFAULT) -->
+        <div class="modal" id="changePasswordModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Ganti Password</div>
+                    <button class="modal-close" onclick="closeChangePasswordModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-details">
+                        <div style="margin-bottom: 15px;">
+                            <label for="currentPassword" style="display: block; margin-bottom: 5px; font-size: 14px; color: #2c3e50;">Password Lama</label>
+                            <input type="password" id="currentPassword" placeholder="Masukkan password lama" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 14px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label for="newPassword" style="display: block; margin-bottom: 5px; font-size: 14px; color: #2c3e50;">Password Baru</label>
+                            <input type="password" id="newPassword" placeholder="Masukkan password baru" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 14px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-size: 14px; color: #2c3e50;">Konfirmasi Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Konfirmasi password baru" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 14px;">
+                        </div>
+                        <button class="modal-action" onclick="changePassword()">Ubah Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Overlay Disrupsi (DISEMBUNYIKAN SECARA DEFAULT) -->
         <div id="disruption-overlay">
             <h1>DISRUPTED!</h1>
@@ -747,6 +825,9 @@
         let locationsListener = null;
         let activeUsers = new Set(); // Track active users
         let inactiveTimeout = {}; // Track inactive timeouts
+        let eventNotificationTimeout = null; // Track event notification timeout
+        let isExplicitLogout = false; // Track if user explicitly logged out
+        let authInitialized = false; // Track if auth state has been initialized
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
         function showMainContent() {
@@ -854,6 +935,66 @@
 
         function stopDisruption() {
             document.getElementById('disruption-overlay').classList.remove('active');
+        }
+
+        // --- FUNGSI UNTUK NOTIFIKASI SUARA ---
+        function playNotificationSound(type = 'default') {
+            // Create audio context for sound generation
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create oscillator for sound
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            // Connect nodes
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Set sound parameters based on type
+            switch(type) {
+                case 'event':
+                    // Event notification - urgent sound
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // Higher pitch
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); // Louder
+                    oscillator.type = 'square';
+                    break;
+                case 'promo':
+                    // Promo notification - friendly sound
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    oscillator.type = 'sine';
+                    break;
+                case 'message':
+                    // Message notification - gentle sound
+                    oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    oscillator.type = 'triangle';
+                    break;
+                default:
+                    // Default notification
+                    oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    oscillator.type = 'sine';
+            }
+            
+            // Play sound
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2); // Play for 200ms
+            
+            // Create a second beep for emphasis
+            setTimeout(() => {
+                const oscillator2 = audioContext.createOscillator();
+                const gainNode2 = audioContext.createGain();
+                oscillator2.connect(gainNode2);
+                gainNode2.connect(audioContext.destination);
+                
+                oscillator2.frequency.setValueAtTime(oscillator.frequency.value + 100, audioContext.currentTime);
+                gainNode2.gain.setValueAtTime(gainNode.gain.value * 0.7, audioContext.currentTime);
+                oscillator2.type = oscillator.type;
+                
+                oscillator2.start(audioContext.currentTime);
+                oscillator2.stop(audioContext.currentTime + 0.1);
+            }, 250);
         }
 
         // --- FUNGSI UNTUK MENANGANI DATA KAS ---
@@ -1129,6 +1270,8 @@
                 // Reload messages
                 loadMessages();
                 
+                // Play notification sound
+                playNotificationSound('message');
                 showToast('Pesan terkirim');
                 
             } catch (error) {
@@ -1147,33 +1290,79 @@
         }
 
         function showChangePasswordModal() {
-            showModal('changePassword', 'Ubah Password', 'Fitur ini akan segera hadir');
+            document.getElementById('changePasswordModal').classList.add('active');
+            document.querySelector('.app-container').style.overflow = 'hidden';
+            // Focus on current password field
+            setTimeout(() => {
+                document.getElementById('currentPassword').focus();
+            }, 300);
         }
 
-        function logout() {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                // Stop location tracking
-                if (locationWatchId) {
-                    navigator.geolocation.clearWatch(locationWatchId);
-                    locationWatchId = null;
-                }
-                
-                // Remove user location from Firebase
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('active');
+            document.querySelector('.app-container').style.overflow = 'auto';
+        }
+
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showToast('Mohon lengkapi semua field');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('Password baru dan konfirmasi tidak cocok');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showToast('Password minimal 6 karakter');
+                return;
+            }
+            
+            try {
                 const user = auth.currentUser;
-                if (user) {
-                    db.collection('user_locations').doc(user.uid).delete().catch(error => {
-                        console.error("Error removing user location:", error);
-                    });
+                if (!user) {
+                    showToast('Anda harus login untuk mengubah password');
+                    return;
                 }
                 
-                auth.signOut().then(() => {
-                    // Firebase akan secara otomatis menghapus sesi dari localStorage
-                    // Pengguna perlu login lagi saat membuka aplikasi
-                    window.location.href = 'index.html';
+                // Reauthenticate user
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+                
+                user.reauthenticateWithCredential(credential).then(() => {
+                    // Update password
+                    user.updatePassword(newPassword).then(() => {
+                        // Clear form
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmPassword').value = '';
+                        
+                        // Close modal
+                        closeChangePasswordModal();
+                        
+                        showToast('Password berhasil diubah');
+                        playNotificationSound('default');
+                    }).catch(error => {
+                        console.error("Error updating password:", error);
+                        showToast('Gagal mengubah password');
+                    });
                 }).catch(error => {
-                    console.error("Error signing out:", error);
-                    showToast('Gagal keluar');
+                    console.error("Error reauthenticating:", error);
+                    if (error.code === 'auth/wrong-password') {
+                        showToast('Password lama salah');
+                    } else {
+                        showToast('Gagal mengubah password');
+                    }
                 });
+                
+            } catch (error) {
+                console.error("Error changing password:", error);
+                handleFirebaseError(error);
+                showToast('Gagal mengubah password');
             }
         }
 
@@ -1572,6 +1761,93 @@
             return null;
         }
 
+        // --- FUNGSI UNTUK MEMERIKSA EVENT NOTIFIKASI ---
+        function checkEventNotification() {
+            // Clear existing timeout
+            if (eventNotificationTimeout) {
+                clearTimeout(eventNotificationTimeout);
+            }
+            
+            // Load events to check for upcoming events
+            db.collection('events').where('status', '==', 'active').get().then(snapshot => {
+                if (snapshot.empty) return;
+                
+                const events = [];
+                snapshot.forEach(doc => {
+                    const eventData = { id: doc.id, ...doc.data() };
+                    if (eventData.startDate) {
+                        events.push(eventData);
+                    }
+                });
+                
+                // Sort events by start date
+                events.sort((a, b) => {
+                    const dateA = a.startDate.toDate();
+                    const dateB = b.startDate.toDate();
+                    return dateA - dateB;
+                });
+                
+                // Get the next event
+                const nextEvent = events.length > 0 ? events[0] : null;
+                if (!nextEvent) return;
+                
+                const now = new Date();
+                const eventTime = nextEvent.startDate.toDate();
+                const timeDiff = eventTime - now;
+                
+                // If event is within 2 hours, schedule notification
+                if (timeDiff > 0 && timeDiff <= 7200000) { // 2 hours in milliseconds
+                    const notificationTime = timeDiff - 600000; // Notify 10 minutes before event
+                    
+                    if (notificationTime <= 0) {
+                        // Event is within 10 minutes, notify immediately
+                        triggerEventNotification(nextEvent);
+                    } else {
+                        // Schedule notification
+                        eventNotificationTimeout = setTimeout(() => {
+                            triggerEventNotification(nextEvent);
+                        }, notificationTime);
+                    }
+                }
+            }).catch(error => {
+                console.error("Error checking event notification:", error);
+            });
+        }
+        
+        function triggerEventNotification(event) {
+            const eventName = event.name || 'KOPDAR RUTIN';
+            const eventTime = event.startDate ? new Date(event.startDate.toDate()).toLocaleString('id-ID', { 
+                weekday: 'long', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }) : '';
+            
+            // Show notification
+            showToast(`Event "${eventName}" akan dimulai pada ${eventTime}`);
+            
+            // Play sound
+            playNotificationSound('event');
+            
+            // Update event section
+            const eventTitle = document.getElementById('eventTitle');
+            const eventTimeElement = document.getElementById('eventTime');
+            
+            if (eventTitle) {
+                eventTitle.innerHTML = `<i class="fas fa-calendar-alt" style="color: #4285f4;"></i> ${eventName}`;
+            }
+            
+            if (eventTimeElement) {
+                eventTimeElement.innerHTML = `<i class="fas fa-clock" style="font-size: 12px;"></i> ${eventTime}`;
+            }
+            
+            // Add pulse animation to event section
+            const eventSection = document.getElementById('eventSection');
+            eventSection.style.animation = 'none';
+            setTimeout(() => {
+                eventSection.style.animation = 'pulse 1s ease-in-out 3';
+            }, 10);
+        }
+
         // --- FUNGSI-FUNGSI UTAMA APLIKASI ---
         async function loadBannersFromFirebase() {
             const container = document.getElementById('adminCarousel');
@@ -1695,18 +1971,14 @@
                         
                         if (imageHtml) {
                             card.className = 'promo-card';
-                            card.innerHTML = imageHtml + `
-                                <div class="promo-card-info">
-                                    <div class="promo-card-title">${promo.title}</div>
-                                    <div class="promo-card-desc">${promo.description}</div>
-                                </div>
-                            `;
+                            card.innerHTML = imageHtml; // Hapus info card
                         } else {
                             card.className = 'promo-card promo-card-no-image';
                             card.innerHTML = `
-                                <div class="promo-card-info">
-                                    <div class="promo-card-title">${promo.title}</div>
-                                    <div class="promo-card-desc">${promo.description}</div>
+                                <div style="display:flex;align-items:center;justify-content:center;height:140px;background:linear-gradient(135deg, #4285f4, #1a73e8);color:white;text-align:center;padding:20px;">
+                                    <div>
+                                        <h3 style="margin:0;">${promo.title}</h3>
+                                    </div>
                                 </div>
                             `;
                         }
@@ -1804,6 +2076,9 @@
                 
                 // Tambahkan event listener untuk menampilkan modal dengan data lengkap
                 eventSection.onclick = () => showModal('event', event.name || 'KOPDAR RUTIN', event.description || 'Kopdar rutin mingguan komunitas BGT PRO', imageUrl);
+                
+                // Check for event notification
+                checkEventNotification();
             } catch (error) {
                 console.error("Error loading events:", error);
                 if (error.message.includes("The query requires an index")) { handleIndexError(error); } else { handleFirebaseError(error); }
@@ -1993,10 +2268,54 @@
             slides[currentSlide].classList.add('active'); indicators[currentSlide].classList.add('active');
         }
 
+        // --- FUNGSI LOGOUT YANG DIPERBAIKI ---
+        function logout() {
+            // Set flag untuk menandai logout eksplisit
+            isExplicitLogout = true;
+            
+            // Logout dari Firebase
+            auth.signOut().then(() => {
+                // Arahkan ke halaman login
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+                showToast('Gagal keluar, coba lagi');
+                // Reset flag jika gagal
+                isExplicitLogout = false;
+            });
+        }
+
         // --- INISIALISASI APLIKASI (DENGAN LISTENER UNTUK PM) ---
+        // Tampilkan loading screen saat aplikasi dimulai
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set timeout untuk menyembunyikan loading screen jika autentikasi memakan waktu terlalu lama
+            setTimeout(() => {
+                if (!authInitialized) {
+                    document.getElementById('loadingText').textContent = 'Memeriksa autentikasi...';
+                }
+            }, 2000);
+            
+            // Set timeout untuk menampilkan pesan error jika autentikasi gagal
+            setTimeout(() => {
+                if (!authInitialized) {
+                    document.getElementById('loadingText').textContent = 'Terjadi kesalahan, coba refresh halaman';
+                }
+            }, 5000);
+        });
+
         auth.onAuthStateChanged(user => {
+            // Tandai bahwa status autentikasi telah diinisialisasi
+            authInitialized = true;
+            
+            // Sembunyikan loading screen
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.add('hidden');
+            
             if (user) {
                 console.log("User logged in:", user.uid);
+                
+                // Reset flag logout eksplisit saat pengguna berhasil login
+                isExplicitLogout = false;
                 
                 // 1. Load data user untuk pertama kali
                 db.collection('users').doc(user.uid).get().then(doc => {
@@ -2038,35 +2357,63 @@
                 document.body.style.transition = 'opacity 0.5s';
                 setTimeout(() => { document.body.style.opacity = '1'; }, 100);
             } else {
-                console.log("No user logged in. Redirecting to login page...");
+                console.log("No user logged in.");
                 
-                // Clean up resources when user logs out
-                if (locationWatchId) {
-                    navigator.geolocation.clearWatch(locationWatchId);
-                    locationWatchId = null;
+                // Hanya arahkan ke halaman login jika:
+                // 1. Pengguna melakukan logout eksplisit, atau
+                // 2. Ini adalah inisialisasi pertama (tidak ada sesi yang tersimpan)
+                if (isExplicitLogout || !localStorage.getItem('bgtProSession')) {
+                    console.log("Redirecting to login page...");
+                    
+                    // Clean up resources when user logs out
+                    if (locationWatchId) {
+                        navigator.geolocation.clearWatch(locationWatchId);
+                        locationWatchId = null;
+                    }
+                    
+                    if (locationsListener) {
+                        locationsListener();
+                        locationsListener = null;
+                    }
+                    
+                    window.location.href = 'index.html';
+                } else {
+                    // Jika pengguna tidak logout eksplisit dan ada sesi yang tersimpan,
+                    // coba restore sesi dengan menunggu Firebase memuat ulang
+                    console.log("Attempting to restore session...");
+                    document.getElementById('loadingText').textContent = 'Memulihkan sesi...';
+                    loadingScreen.classList.remove('hidden');
+                    
+                    // Set timeout untuk menunggu Firebase memuat ulang sesi
+                    setTimeout(() => {
+                        if (!auth.currentUser) {
+                            // Jika setelah menunggu masih tidak ada pengguna, arahkan ke halaman login
+                            console.log("Failed to restore session, redirecting to login page...");
+                            window.location.href = 'index.html';
+                        }
+                    }, 3000);
                 }
-                
-                if (locationsListener) {
-                    locationsListener();
-                    locationsListener = null;
-                }
-                
-                // Firebase Authentication akan secara otomatis mempertahankan sesi
-                // Pengguna tidak perlu login lagi kecuali mereka menekan tombol keluar
-                // atau token kedaluwarsa (yang akan ditangani oleh refresh token otomatis)
-                window.location.href = 'index.html';
+            }
+        });
+
+        // Simpan indikator sesi saat pengguna login berhasil
+        auth.onAuthStateChanged(user => {
+            if (user && !isExplicitLogout) {
+                localStorage.setItem('bgtProSession', 'active');
             }
         });
 
         window.onclick = function(event) { 
             if (event.target === document.getElementById('modal')) closeModal();
             if (event.target === document.getElementById('addTransactionModal')) closeAddTransactionModal();
+            if (event.target === document.getElementById('changePasswordModal')) closeChangePasswordModal();
         }
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 if (document.getElementById('sideMenu').classList.contains('active')) toggleMenu();
                 if (document.getElementById('modal').classList.contains('active')) closeModal();
                 if (document.getElementById('addTransactionModal').classList.contains('active')) closeAddTransactionModal();
+                if (document.getElementById('changePasswordModal').classList.contains('active')) closeChangePasswordModal();
                 if (document.getElementById('disruption-overlay').classList.contains('active')) {
                     stopDisruption(); // Biarkan gangguan dengan tombol ESC
                 }
