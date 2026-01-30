@@ -12,10 +12,9 @@
     <meta name="apple-mobile-web-app-title" content="BGT PRO">
     <meta name="application-name" content="BGT PRO">
     <meta name="msapplication-TileColor" content="#4285f4">
-    <meta name="msapplication-config" content="/browserconfig.xml">
     
-    <!-- Manifest untuk PWA -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJHVCBQUk8iLAogICJzaG9ydF9uYW1lIjogIkJHVCBQUk8iLAogICJzdGFydF91cmwiOiAiL2Rhc2hib2FyZF9hbmdnb3RhLmh0bWwiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmOGY5ZmEiLAogICJ0aGVtZV9jb2xvciI6ICIjNDI4NWY0IiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQtcHJpbWFyeSIsCiAgInNjb3BlIjogIi8iLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICIvYXBwLWljb24tMTkyeDE5Mi5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIsCiAgICAgICJwdXJwb3NlIjogImFueSIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiL2FwcC1pY29uLTUxMng1MTIucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciLAogICAgICAicHVycG9zZSI6ICJhbnkiCiAgICB9LAogICAgewogICAgICAic3JjIjogIi9hcHAtaWNvbi0zODR4Mzg0LnBuZyIsCiAgICAgICJzaXplcyI6ICIzODR4Mzg0IiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IgogICAgfQogIF0KfQ==">
+    <!-- Manifest untuk PWA (DIPERBAIKI: Start_url & Icons) -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJHVCBQUk8iLAogICJzaG9ydF9uYW1lIjogIkJHVCBQUk8iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM0Mjg1ZjQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL3BpY3N1bS5waG90b3Mvc2VlZC9iZ3Rwcm8taWNvbi8xOTIvMTkyLmpwZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9waWNzdW0ucGhvdG9zL3NlZWQvYmd0cHJvLWljb24vNTEyLzUxMi5qcGciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL2pwZWciCiAgICB9CiAgXQp9">
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" sizes="192x192" href="https://picsum.photos/seed/bgtpro-icon/192/192.jpg">
@@ -352,7 +351,7 @@
             padding: 15px 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             z-index: 1000;
-            display: flex;
+            display: none; /* Hidden default */
             align-items: center;
             gap: 15px;
             max-width: 320px;
@@ -430,7 +429,7 @@
     </div>
 
     <!-- Install Prompt -->
-    <div class="install-prompt" id="installPrompt" style="display: none;">
+    <div class="install-prompt" id="installPrompt">
         <div class="install-prompt-icon">
             <i class="fas fa-download"></i>
         </div>
@@ -957,11 +956,11 @@
         });
 
         function showInstallPrompt() {
-            // Check if user already dismissed or installed
-            if (localStorage.getItem('bgtProInstallDismissed') === 'true' || 
-                localStorage.getItem('bgtProInstalled') === 'true') {
-                return;
-            }
+            // --- DIPERBAIKI: HAPUS PENGECEKAN LOCALSTORAGE AGAR MUNCUL SETIAP REFRESH ---
+            // if (localStorage.getItem('bgtProInstallDismissed') === 'true' || 
+            //     localStorage.getItem('bgtProInstalled') === 'true') {
+            //     return;
+            // }
             
             // Show install prompt after 3 seconds
             setTimeout(() => {
