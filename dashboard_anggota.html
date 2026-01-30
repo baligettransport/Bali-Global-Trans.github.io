@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BGT PRO - Aplikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS untuk Peta -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
@@ -14,12 +16,8 @@
     <style>
         /* ... (Semua CSS yang lama tetap sama, saya hanya menambahkan yang baru) ... */
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .phone-container { width: 350px; height: 750px; background-color: #ffffff; border-radius: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; position: relative; border: 8px solid #222; }
-        .status-bar { height: 40px; background-color: #ffffff; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 13px; font-weight: 600; position: relative; z-index: 10; }
-        .status-bar .time { font-weight: 700; }
-        .status-bar .icons { display: flex; gap: 5px; }
-        .status-bar .icons i { font-size: 11px; }
-        .app-container { height: calc(100% - 40px); overflow-y: auto; background-color: #f8f9fa; position: relative; }
+        .phone-container { width: 350px; height: 750px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); overflow: hidden; position: relative; }
+        .app-container { height: 100%; overflow-y: auto; background-color: #f8f9fa; position: relative; }
         .header { background: linear-gradient(135deg, #4285f4, #1a73e8); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); position: sticky; top: 0; z-index: 100; }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .profile-photo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
@@ -32,9 +30,9 @@
         .notification-badge { position: absolute; top: -2px; right: -2px; background: linear-gradient(135deg, #ff4757, #ff6348); color: white; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4); }
         .menu-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 8px; transition: background-color 0.3s; }
         .menu-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
-        .side-menu { position: absolute; top: 0; right: -280px; width: 280px; height: 100%; background-color: white; box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3); transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; display: flex; flex-direction: column; border-radius: 0 30px 30px 0; }
+        .side-menu { position: absolute; top: 0; right: -280px; width: 280px; height: 100%; background-color: white; box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3); transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; display: flex; flex-direction: column; border-radius: 0 16px 16px 0; }
         .side-menu.active { right: 0; }
-        .side-menu-header { background: linear-gradient(135deg, #4285f4, #1a73e8); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 0 20px; }
+        .side-menu-header { background: linear-gradient(135deg, #4285f4, #1a73e8); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 0 16px; }
         .close-menu { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 5px; border-radius: 8px; transition: background-color 0.3s; }
         .close-menu:hover { background-color: rgba(255, 255, 255, 0.2); }
         .side-menu-content { flex: 1; padding: 20px; overflow-y: auto; }
@@ -42,7 +40,7 @@
         .menu-item:hover { background-color: #e9ecef; transform: translateX(-5px); }
         .menu-item i { font-size: 20px; margin-right: 15px; color: #4285f4; }
         .menu-item span { font-size: 16px; font-weight: 600; color: #2c3e50; }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s; border-radius: 30px; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s; border-radius: 16px; }
         .overlay.active { opacity: 1; visibility: visible; }
         .admin-carousel { margin: 15px; position: relative; overflow: hidden; border-radius: 16px; background: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); }
         .carousel-container { position: relative; height: 180px; overflow: hidden; }
@@ -80,7 +78,7 @@
         .nav-item.active i { transform: scale(1.1); }
         .nav-item i { font-size: 20px; margin-bottom: 4px; transition: transform 0.3s; }
         .nav-item span { font-size: 10px; font-weight: 600; }
-        .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 2000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; border-radius: 30px; }
+        .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 2000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; border-radius: 16px; }
         .modal.active { display: flex; opacity: 1; }
         .modal-content { background-color: white; border-radius: 20px; width: 90%; max-width: 320px; max-height: 80%; overflow: hidden; position: relative; animation: modalSlideIn 0.3s; }
         @keyframes modalSlideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -162,13 +160,24 @@
         .promo-detail-desc { font-size: 14px; color: #7f8c8d; line-height: 1.5; margin-bottom: 15px; }
         .promo-detail-expiry { font-size: 13px; color: #e74c3c; display: flex; align-items: center; gap: 5px; }
 
-        /* --- GAYA UNTUK HALAMAN PETA (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN PETA (BARU & DIPERBAIKI) --- */
         .map-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .map-header h2 { font-size: 24px; color: #2c3e50; }
-        .map-container { background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); height: 400px; display: flex; justify-content: center; align-items: center; }
-        .map-placeholder { text-align: center; padding: 20px; color: #95a5a6; }
-        .map-placeholder i { font-size: 48px; margin-bottom: 15px; color: #4285f4; }
-        .map-placeholder p { font-size: 14px; }
+        .map-container { background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); height: 400px; position: relative; }
+        #map { height: 100%; width: 100%; }
+        .map-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+        .map-control-btn { background-color: white; border: none; width: 40px; height: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s; }
+        .map-control-btn:hover { background-color: #f8f9fa; transform: scale(1.05); }
+        .map-control-btn i { color: #4285f4; font-size: 18px; }
+        .location-list { background-color: white; border-radius: 16px; margin-top: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); max-height: 200px; overflow-y: auto; }
+        .location-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background-color 0.3s; }
+        .location-item:last-child { border-bottom: none; }
+        .location-item:hover { background-color: #f8f9fa; }
+        .location-item-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 12px; }
+        .location-item-info { flex: 1; }
+        .location-item-name { font-size: 14px; font-weight: 600; color: #2c3e50; }
+        .location-item-time { font-size: 12px; color: #7f8c8d; }
+        .location-item-distance { font-size: 12px; color: #4285f4; font-weight: 600; }
 
         /* --- GAYA UNTUK HALAMAN PESAN (BARU) --- */
         .message-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -226,7 +235,7 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-            border-radius: 30px;
+            border-radius: 16px;
         }
         #disruption-overlay.active {
             opacity: 1;
@@ -261,22 +270,13 @@
         }
 
         @media (max-width: 480px) {
-            .phone-container { width: 100%; height: 100vh; border-radius: 0; border: none; }
+            .phone-container { width: 100%; height: 100vh; border-radius: 0; }
             body { padding: 0; }
         }
     </style>
 </head>
 <body>
     <div class="phone-container">
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="icons">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-three-quarters"></i>
-            </div>
-        </div>
-        
         <div class="app-container">
             <!-- Konten Utama (Home, Promo, dll) -->
             <div id="main-content">
@@ -439,16 +439,24 @@
             <!-- Halaman Peta (DISEMBUNYIKAN SECARA DEFAULT) -->
             <div id="peta-page" class="page-view">
                 <div class="map-header">
-                    <h2>Peta</h2>
+                    <h2>Peta Lokasi Anggota</h2>
                     <button class="back-btn" onclick="showMainContent()">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </button>
                 </div>
                 <div class="map-container">
-                    <div class="map-placeholder">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <p>Peta akan ditampilkan di sini</p>
+                    <div id="map"></div>
+                    <div class="map-controls">
+                        <button class="map-control-btn" id="locateBtn" title="Lokasi Saya">
+                            <i class="fas fa-crosshairs"></i>
+                        </button>
+                        <button class="map-control-btn" id="refreshBtn" title="Perbarui Lokasi">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
+                </div>
+                <div class="location-list" id="locationList">
+                    <div class="kas-empty">Memuat lokasi anggota...</div>
                 </div>
             </div>
 
@@ -546,7 +554,8 @@
                             1. Menu Home: Menampilkan informasi utama seperti event terdekat, banner, dan promo terbaru.<br>
                             2. Menu Kas: Mengelola transaksi kas, pinjaman, dan iuran.<br>
                             3. Menu Profil: Menampilkan informasi profil pengguna.<br>
-                            4. Menu Pengaturan: Mengatur preferensi aplikasi dan akun.
+                            4. Menu Peta: Menampilkan lokasi real-time anggota komunitas.<br>
+                            5. Menu Pengaturan: Mengatur preferensi aplikasi dan akun.
                         </div>
                     </div>
                     <div class="help-card">
@@ -686,6 +695,9 @@
         </div>
     </div>
 
+    <!-- Leaflet JS untuk Peta -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -708,6 +720,10 @@
         let firebaseErrorShown = false;
         let indexErrorShown = false;
         let currentUserData = null;
+        let map = null;
+        let userMarker = null;
+        let markers = {};
+        let locationWatchId = null;
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
         function showMainContent() {
@@ -748,7 +764,15 @@
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
             document.getElementById('peta-page').classList.add('active');
             // Initialize map
-            initializeMap();
+            if (!map) {
+                initializeMap();
+            } else {
+                // Refresh map size when page is shown
+                setTimeout(() => {
+                    map.invalidateSize();
+                    centerMapOnUser();
+                }, 100);
+            }
         }
 
         function showPesanPage() {
@@ -1182,9 +1206,243 @@
 
         // --- FUNGSI UNTUK MENANGANI PETA ---
         function initializeMap() {
-            // This is a placeholder for map initialization
-            // In a real app, you would initialize a map service like Google Maps or Mapbox
-            showToast('Peta akan segera hadir');
+            // Initialize the map
+            map = L.map('map').setView([-6.2088, 106.8456], 13); // Default to Jakarta
+            
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add locate control
+            const locateBtn = document.getElementById('locateBtn');
+            locateBtn.addEventListener('click', function() {
+                centerMapOnUser();
+            });
+            
+            // Add refresh control
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.addEventListener('click', function() {
+                refreshLocations();
+            });
+            
+            // Start tracking user location
+            startLocationTracking();
+            
+            // Load other users' locations
+            loadUserLocations();
+        }
+        
+        function startLocationTracking() {
+            if (!navigator.geolocation) {
+                showToast('Geolocation tidak didukung oleh browser Anda');
+                return;
+            }
+            
+            // Get current position
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    updateUserLocation(position.coords.latitude, position.coords.longitude);
+                },
+                error => {
+                    console.error("Error getting location:", error);
+                    showToast('Gagal mendapatkan lokasi Anda');
+                }
+            );
+            
+            // Watch position for real-time updates
+            locationWatchId = navigator.geolocation.watchPosition(
+                position => {
+                    updateUserLocation(position.coords.latitude, position.coords.longitude);
+                },
+                error => {
+                    console.error("Error watching location:", error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        function updateUserLocation(lat, lng) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Update or create user marker
+            if (userMarker) {
+                userMarker.setLatLng([lat, lng]);
+            } else {
+                userMarker = L.marker([lat, lng], {
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map)
+                .bindPopup('Lokasi Anda')
+                .openPopup();
+            }
+            
+            // Center map on user location
+            map.setView([lat, lng], 15);
+            
+            // Save location to Firebase
+            saveUserLocationToFirebase(lat, lng);
+        }
+        
+        function saveUserLocationToFirebase(lat, lng) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Get user data
+            db.collection('users').doc(user.uid).get().then(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    const username = userData.username || 'Pengguna';
+                    const profilePicUrl = userData.profilePicUrl || 'https://picsum.photos/seed/default-user/100/100.jpg';
+                    
+                    // Save location to Firebase
+                    db.collection('user_locations').doc(user.uid).set({
+                        userId: user.uid,
+                        username: username,
+                        profilePicUrl: profilePicUrl,
+                        latitude: lat,
+                        longitude: lng,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            }).catch(error => {
+                console.error("Error getting user data:", error);
+            });
+        }
+        
+        function loadUserLocations() {
+            const locationList = document.getElementById('locationList');
+            locationList.innerHTML = '<div class="kas-empty">Memuat lokasi anggota...</div>';
+            
+            // Listen for real-time updates
+            db.collection('user_locations').onSnapshot(snapshot => {
+                locationList.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota</div>';
+                    return;
+                }
+                
+                const user = auth.currentUser;
+                const locations = [];
+                
+                snapshot.forEach(doc => {
+                    const location = doc.data();
+                    if (location.userId !== user.uid) { // Don't show current user in list
+                        locations.push(location);
+                        
+                        // Add or update marker
+                        if (markers[location.userId]) {
+                            markers[location.userId].setLatLng([location.latitude, location.longitude]);
+                        } else {
+                            const marker = L.marker([location.latitude, location.longitude], {
+                                icon: L.icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                })
+                            }).addTo(map)
+                            .bindPopup(location.username);
+                            
+                            markers[location.userId] = marker;
+                        }
+                    }
+                });
+                
+                // Update location list
+                locations.forEach(location => {
+                    const locationItem = document.createElement('div');
+                    locationItem.className = 'location-item';
+                    
+                    const timestamp = location.timestamp ? new Date(location.timestamp.toDate()).toLocaleString('id-ID') : '';
+                    const distance = calculateDistance(
+                        userMarker ? userMarker.getLatLng().lat : 0,
+                        userMarker ? userMarker.getLatLng().lng : 0,
+                        location.latitude,
+                        location.longitude
+                    );
+                    
+                    locationItem.innerHTML = `
+                        <img src="${location.profilePicUrl}" alt="${location.username}" class="location-item-avatar">
+                        <div class="location-item-info">
+                            <div class="location-item-name">${location.username}</div>
+                            <div class="location-item-time">${timestamp}</div>
+                        </div>
+                        <div class="location-item-distance">${distance} km</div>
+                    `;
+                    
+                    locationItem.addEventListener('click', function() {
+                        map.setView([location.latitude, location.longitude], 15);
+                        markers[location.userId].openPopup();
+                    });
+                    
+                    locationList.appendChild(locationItem);
+                });
+                
+                if (locations.length === 0) {
+                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota lain</div>';
+                }
+            }, error => {
+                console.error("Error loading user locations:", error);
+                handleFirebaseError(error);
+                locationList.innerHTML = '<div class="kas-empty">Gagal memuat lokasi anggota</div>';
+            });
+        }
+        
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const d = R * c; // Distance in km
+            return d.toFixed(1);
+        }
+        
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+        
+        function centerMapOnUser() {
+            if (userMarker) {
+                map.setView(userMarker.getLatLng(), 15);
+                userMarker.openPopup();
+            } else {
+                showToast('Lokasi Anda belum tersedia');
+            }
+        }
+        
+        function refreshLocations() {
+            // Force refresh of user location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        updateUserLocation(position.coords.latitude, position.coords.longitude);
+                        showToast('Lokasi diperbarui');
+                    },
+                    error => {
+                        console.error("Error refreshing location:", error);
+                        showToast('Gagal memperbarui lokasi');
+                    }
+                );
+            }
         }
 
         // --- FUNGSI UNTUK MENAMPILKAN PROFIL ---
