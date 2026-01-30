@@ -13,15 +13,12 @@
     <meta name="application-name" content="BGT PRO">
     <meta name="msapplication-TileColor" content="#4285f4">
     
-    <!-- Manifest untuk PWA (DIPERBARUI: Ikon menggunakan 512B.png) -->
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQkdUIFBSTyIsInNob3J0X25hbWUiOiJCR1QgUFJPIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJ0aGVtZV9jb2xvciI6IiM0Mjg1ZjQiLCJpY29ucyI6W3sic3JjIjoiNTEyQi5wbmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn0seyJzcmMiOiI1MTJCLnBuZyIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+    <!-- Manifest untuk PWA (DIPERBAIKI: Start_url & Icons) -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJHVCBQUk8iLAogICJzaG9ydF9uYW1lIjogIkJHVCBQUk8iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM0Mjg1ZjQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL3BpY3N1bS5waG90b3Mvc2VlZC9iZ3Rwcm8taWNvbi8xOTIvMTkyLmpwZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9waWNzdW0ucGhvdG9zL3NlZWQvYmd0cHJvLWljb24vNTEyLzUxMi5qcGciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL2pwZWciCiAgICB9CiAgXQp9">
     
-    <!-- Apple Touch Icons (DIPERBARUI: Menggunakan 512B.png) -->
-    <link rel="apple-touch-icon" sizes="192x192" href="512B.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="512B.png">
-    
-    <!-- Favicon untuk Browser Tab (DITAMBAHKAN) -->
-    <link rel="icon" type="image/png" href="512B.png">
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="192x192" href="https://picsum.photos/seed/bgtpro-icon/192/192.jpg">
+    <link rel="apple-touch-icon" sizes="512x512" href="https://picsum.photos/seed/bgtpro-icon/512/512.jpg">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS untuk Peta -->
@@ -880,7 +877,6 @@
         <!-- Overlay Disrupsi (DISEMBUNYIKAN SECARA DEFAULT) -->
         <div id="disruption-overlay">
             <h1>DISRUPTED!</h1>
-            <!-- Perhatian: File 512B.png ini digunakan juga untuk logo aplikasi -->
             <img src="512B.png" alt="Disrupted">
         </div>
 
@@ -960,6 +956,12 @@
         });
 
         function showInstallPrompt() {
+            // --- DIPERBAIKI: HAPUS PENGECEKAN LOCALSTORAGE AGAR MUNCUL SETIAP REFRESH ---
+            // if (localStorage.getItem('bgtProInstallDismissed') === 'true' || 
+            //     localStorage.getItem('bgtProInstalled') === 'true') {
+            //     return;
+            // }
+            
             // Show install prompt after 3 seconds
             setTimeout(() => {
                 const installPrompt = document.getElementById('installPrompt');
