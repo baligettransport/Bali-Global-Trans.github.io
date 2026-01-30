@@ -178,6 +178,8 @@
         .location-item-name { font-size: 14px; font-weight: 600; color: #2c3e50; }
         .location-item-time { font-size: 12px; color: #7f8c8d; }
         .location-item-distance { font-size: 12px; color: #4285f4; font-weight: 600; }
+        .map-stats { position: absolute; bottom: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 8px 12px; border-radius: 8px; z-index: 1000; font-size: 12px; color: #2c3e50; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .map-stats span { font-weight: 700; color: #4285f4; }
 
         /* --- GAYA UNTUK HALAMAN PESAN (BARU) --- */
         .message-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -454,6 +456,9 @@
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
+                    <div class="map-stats">
+                        <span id="memberCount">0</span> anggota online
+                    </div>
                 </div>
                 <div class="location-list" id="locationList">
                     <div class="kas-empty">Memuat lokasi anggota...</div>
@@ -724,6 +729,8 @@
         let userMarker = null;
         let markers = {};
         let locationWatchId = null;
+        let usersListener = null;
+        let locationsListener = null;
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
         function showMainContent() {
@@ -1129,6 +1136,20 @@
 
         function logout() {
             if (confirm('Apakah Anda yakin ingin keluar?')) {
+                // Stop location tracking
+                if (locationWatchId) {
+                    navigator.geolocation.clearWatch(locationWatchId);
+                    locationWatchId = null;
+                }
+                
+                // Remove user location from Firebase
+                const user = auth.currentUser;
+                if (user) {
+                    db.collection('user_locations').doc(user.uid).delete().catch(error => {
+                        console.error("Error removing user location:", error);
+                    });
+                }
+                
                 auth.signOut().then(() => {
                     window.location.href = 'index.html';
                 }).catch(error => {
@@ -1323,24 +1344,47 @@
         
         function loadUserLocations() {
             const locationList = document.getElementById('locationList');
+            const memberCount = document.getElementById('memberCount');
             locationList.innerHTML = '<div class="kas-empty">Memuat lokasi anggota...</div>';
             
-            // Listen for real-time updates
-            db.collection('user_locations').onSnapshot(snapshot => {
+            // Listen for real-time updates to user locations
+            locationsListener = db.collection('user_locations').onSnapshot(snapshot => {
                 locationList.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota</div>';
-                    return;
-                }
-                
-                const user = auth.currentUser;
+                const validUserIds = new Set();
                 const locations = [];
                 
+                // First pass: collect all valid user IDs and locations
                 snapshot.forEach(doc => {
                     const location = doc.data();
-                    if (location.userId !== user.uid) { // Don't show current user in list
-                        locations.push(location);
+                    validUserIds.add(location.userId);
+                    locations.push(location);
+                });
+                
+                // Check which users still exist in the users collection
+                db.collection('users').get().then(usersSnapshot => {
+                    const existingUserIds = new Set();
+                    usersSnapshot.forEach(doc => {
+                        existingUserIds.add(doc.id);
+                    });
+                    
+                    // Filter out locations for deleted users
+                    const validLocations = locations.filter(location => 
+                        existingUserIds.has(location.userId)
+                    );
+                    
+                    // Update member count
+                    memberCount.textContent = validLocations.length;
+                    
+                    if (validLocations.length === 0) {
+                        locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota</div>';
+                        return;
+                    }
+                    
+                    const user = auth.currentUser;
+                    
+                    validLocations.forEach(location => {
+                        // Skip current user in the list
+                        if (location.userId === user.uid) return;
                         
                         // Add or update marker
                         if (markers[location.userId]) {
@@ -1360,42 +1404,52 @@
                             
                             markers[location.userId] = marker;
                         }
-                    }
-                });
-                
-                // Update location list
-                locations.forEach(location => {
-                    const locationItem = document.createElement('div');
-                    locationItem.className = 'location-item';
-                    
-                    const timestamp = location.timestamp ? new Date(location.timestamp.toDate()).toLocaleString('id-ID') : '';
-                    const distance = calculateDistance(
-                        userMarker ? userMarker.getLatLng().lat : 0,
-                        userMarker ? userMarker.getLatLng().lng : 0,
-                        location.latitude,
-                        location.longitude
-                    );
-                    
-                    locationItem.innerHTML = `
-                        <img src="${location.profilePicUrl}" alt="${location.username}" class="location-item-avatar">
-                        <div class="location-item-info">
-                            <div class="location-item-name">${location.username}</div>
-                            <div class="location-item-time">${timestamp}</div>
-                        </div>
-                        <div class="location-item-distance">${distance} km</div>
-                    `;
-                    
-                    locationItem.addEventListener('click', function() {
-                        map.setView([location.latitude, location.longitude], 15);
-                        markers[location.userId].openPopup();
+                        
+                        // Add to location list
+                        const locationItem = document.createElement('div');
+                        locationItem.className = 'location-item';
+                        
+                        const timestamp = location.timestamp ? new Date(location.timestamp.toDate()).toLocaleString('id-ID') : '';
+                        const distance = calculateDistance(
+                            userMarker ? userMarker.getLatLng().lat : 0,
+                            userMarker ? userMarker.getLatLng().lng : 0,
+                            location.latitude,
+                            location.longitude
+                        );
+                        
+                        locationItem.innerHTML = `
+                            <img src="${location.profilePicUrl}" alt="${location.username}" class="location-item-avatar">
+                            <div class="location-item-info">
+                                <div class="location-item-name">${location.username}</div>
+                                <div class="location-item-time">${timestamp}</div>
+                            </div>
+                            <div class="location-item-distance">${distance} km</div>
+                        `;
+                        
+                        locationItem.addEventListener('click', function() {
+                            map.setView([location.latitude, location.longitude], 15);
+                            markers[location.userId].openPopup();
+                        });
+                        
+                        locationList.appendChild(locationItem);
                     });
                     
-                    locationList.appendChild(locationItem);
+                    // Clean up markers for users that no longer exist
+                    Object.keys(markers).forEach(userId => {
+                        if (!existingUserIds.has(userId)) {
+                            map.removeLayer(markers[userId]);
+                            delete markers[userId];
+                        }
+                    });
+                    
+                    if (validLocations.filter(l => l.userId !== user.uid).length === 0) {
+                        locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota lain</div>';
+                    }
+                }).catch(error => {
+                    console.error("Error checking user existence:", error);
+                    handleFirebaseError(error);
+                    locationList.innerHTML = '<div class="kas-empty">Gagal memuat lokasi anggota</div>';
                 });
-                
-                if (locations.length === 0) {
-                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota lain</div>';
-                }
             }, error => {
                 console.error("Error loading user locations:", error);
                 handleFirebaseError(error);
@@ -1952,6 +2006,18 @@
                 setTimeout(() => { document.body.style.opacity = '1'; }, 100);
             } else {
                 console.log("No user logged in. Redirecting to login page...");
+                
+                // Clean up resources when user logs out
+                if (locationWatchId) {
+                    navigator.geolocation.clearWatch(locationWatchId);
+                    locationWatchId = null;
+                }
+                
+                if (locationsListener) {
+                    locationsListener();
+                    locationsListener = null;
+                }
+                
                 window.location.href = 'index.html';
             }
         });
