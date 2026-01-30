@@ -335,7 +335,7 @@
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-logo">BGT PRO</div>
         <div class="loading-spinner"></div>
-        <div class="loading-text">Memuat aplikasi...</div>
+        <div class="loading-text" id="loadingText">Memuat aplikasi...</div>
     </div>
 
     <div class="phone-container">
@@ -814,6 +814,15 @@
         const auth = firebase.auth();
         const storage = firebase.storage();
 
+        // Set persistence to LOCAL untuk mempertahankan sesi bahkan saat browser ditutup
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => {
+                console.log("Firebase auth persistence set to LOCAL");
+            })
+            .catch((error) => {
+                console.error("Error setting auth persistence:", error);
+            });
+
         let currentSlide = 0;
         let firebaseErrorShown = false;
         let indexErrorShown = false;
@@ -828,6 +837,7 @@
         let eventNotificationTimeout = null; // Track event notification timeout
         let isExplicitLogout = false; // Track if user explicitly logged out
         let authInitialized = false; // Track if auth state has been initialized
+        let sessionRestoreAttempted = false; // Track if we've tried to restore session
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
         function showMainContent() {
@@ -2273,6 +2283,9 @@
             // Set flag untuk menandai logout eksplisit
             isExplicitLogout = true;
             
+            // Hapus indikator sesi dari localStorage
+            localStorage.removeItem('bgtProSession');
+            
             // Logout dari Firebase
             auth.signOut().then(() => {
                 // Arahkan ke halaman login
@@ -2288,19 +2301,15 @@
         // --- INISIALISASI APLIKASI (DENGAN LISTENER UNTUK PM) ---
         // Tampilkan loading screen saat aplikasi dimulai
         document.addEventListener('DOMContentLoaded', function() {
-            // Set timeout untuk menyembunyikan loading screen jika autentikasi memakan waktu terlalu lama
-            setTimeout(() => {
-                if (!authInitialized) {
-                    document.getElementById('loadingText').textContent = 'Memeriksa autentikasi...';
-                }
-            }, 2000);
+            // Update loading text
+            document.getElementById('loadingText').textContent = 'Memeriksa autentikasi...';
             
             // Set timeout untuk menampilkan pesan error jika autentikasi gagal
             setTimeout(() => {
                 if (!authInitialized) {
                     document.getElementById('loadingText').textContent = 'Terjadi kesalahan, coba refresh halaman';
                 }
-            }, 5000);
+            }, 10000); // Increased timeout to 10 seconds
         });
 
         auth.onAuthStateChanged(user => {
@@ -2316,6 +2325,10 @@
                 
                 // Reset flag logout eksplisit saat pengguna berhasil login
                 isExplicitLogout = false;
+                sessionRestoreAttempted = false;
+                
+                // Simpan indikator sesi di localStorage
+                localStorage.setItem('bgtProSession', 'active');
                 
                 // 1. Load data user untuk pertama kali
                 db.collection('users').doc(user.uid).get().then(doc => {
@@ -2359,47 +2372,43 @@
             } else {
                 console.log("No user logged in.");
                 
-                // Hanya arahkan ke halaman login jika:
-                // 1. Pengguna melakukan logout eksplisit, atau
-                // 2. Ini adalah inisialisasi pertama (tidak ada sesi yang tersimpan)
-                if (isExplicitLogout || !localStorage.getItem('bgtProSession')) {
-                    console.log("Redirecting to login page...");
-                    
-                    // Clean up resources when user logs out
-                    if (locationWatchId) {
-                        navigator.geolocation.clearWatch(locationWatchId);
-                        locationWatchId = null;
-                    }
-                    
-                    if (locationsListener) {
-                        locationsListener();
-                        locationsListener = null;
-                    }
-                    
+                // Jika pengguna melakukan logout eksplisit, arahkan ke halaman login
+                if (isExplicitLogout) {
+                    console.log("User explicitly logged out, redirecting to login page...");
                     window.location.href = 'index.html';
-                } else {
-                    // Jika pengguna tidak logout eksplisit dan ada sesi yang tersimpan,
-                    // coba restore sesi dengan menunggu Firebase memuat ulang
+                    return;
+                }
+                
+                // Jika bukan logout eksplisit, coba pulihkan sesi
+                const hasSession = localStorage.getItem('bgtProSession') === 'active';
+                
+                if (hasSession && !sessionRestoreAttempted) {
+                    // Tandai bahwa kita sudah mencoba memulihkan sesi
+                    sessionRestoreAttempted = true;
+                    
                     console.log("Attempting to restore session...");
                     document.getElementById('loadingText').textContent = 'Memulihkan sesi...';
                     loadingScreen.classList.remove('hidden');
                     
-                    // Set timeout untuk menunggu Firebase memuat ulang sesi
+                    // Coba untuk menunggu Firebase memuat ulang sesi
+                    // Firebase Auth dengan persistence LOCAL seharusnya otomatis memulihkan sesi
                     setTimeout(() => {
                         if (!auth.currentUser) {
-                            // Jika setelah menunggu masih tidak ada pengguna, arahkan ke halaman login
-                            console.log("Failed to restore session, redirecting to login page...");
+                            // Jika setelah menunggu masih tidak ada pengguna, mungkin sesi sudah kedaluwarsa
+                            console.log("Session expired, redirecting to login page...");
+                            localStorage.removeItem('bgtProSession');
                             window.location.href = 'index.html';
                         }
-                    }, 3000);
+                    }, 5000); // Tunggu 5 detik untuk memulihkan sesi
+                } else if (!hasSession) {
+                    // Jika tidak ada sesi yang tersimpan, arahkan ke halaman login
+                    console.log("No session found, redirecting to login page...");
+                    window.location.href = 'index.html';
+                } else {
+                    // Jika sudah mencoba memulihkan sesi tapi gagal, arahkan ke halaman login
+                    console.log("Session restore failed, redirecting to login page...");
+                    window.location.href = 'index.html';
                 }
-            }
-        });
-
-        // Simpan indikator sesi saat pengguna login berhasil
-        auth.onAuthStateChanged(user => {
-            if (user && !isExplicitLogout) {
-                localStorage.setItem('bgtProSession', 'active');
             }
         });
 
