@@ -18,17 +18,17 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .phone-container { width: 350px; height: 750px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); overflow: hidden; position: relative; }
         .app-container { height: 100%; overflow-y: auto; background-color: #f8f9fa; position: relative; }
-        .header { background: linear-gradient(135deg, #4285f4, #1a73e8); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); position: sticky; top: 0; z-index: 100; }
+        .header { background: linear-gradient(135deg, #4285f4, #1a73e8); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); position: sticky; top: 0; z-index: 100; }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        .profile-photo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+        .profile-photo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
         .profile-photo:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-        .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; position: absolute; left: 50%; transform: translateX(-50%); }
+        .logo { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; position: absolute; left: 50%; transform: translateX(-50%); }
         .header-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
         .balance { display: none; }
-        .notification-btn { position: relative; background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 5px; border-radius: 8px; transition: background-color 0.3s; }
+        .notification-btn { position: relative; background: none; border: none; color: white; font-size: 16px; cursor: pointer; padding: 5px; border-radius: 8px; transition: background-color 0.3s; }
         .notification-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
         .notification-badge { position: absolute; top: -2px; right: -2px; background: linear-gradient(135deg, #ff4757, #ff6348); color: white; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4); }
-        .menu-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 8px; transition: background-color 0.3s; }
+        .menu-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 5px; border-radius: 8px; transition: background-color 0.3s; }
         .menu-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
         .side-menu { position: absolute; top: 0; right: -280px; width: 280px; height: 100%; background-color: white; box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3); transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; display: flex; flex-direction: column; border-radius: 0 16px 16px 0; }
         .side-menu.active { right: 0; }
@@ -43,7 +43,7 @@
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s; border-radius: 16px; }
         .overlay.active { opacity: 1; visibility: visible; }
         .admin-carousel { margin: 15px; position: relative; overflow: hidden; border-radius: 16px; background: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); }
-        .carousel-container { position: relative; height: 180px; overflow: hidden; }
+        .carousel-container { position: relative; height: 160px; overflow: hidden; }
         .carousel-slide { position: absolute; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease-in-out; cursor: pointer; }
         .carousel-slide.active { opacity: 1; }
         .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
@@ -61,23 +61,23 @@
         @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .promo-card { min-width: 280px; background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-right: 15px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
         .promo-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
-        .promo-card-image { width: 100%; height: 160px; object-fit: cover; }
+        .promo-card-image { width: 100%; height: 140px; object-fit: cover; }
         .promo-card-info { padding: 15px; }
         .promo-card-title { font-size: 16px; font-weight: 700; margin-bottom: 5px; color: #2c3e50; }
         .promo-card-desc { font-size: 13px; color: #7f8c8d; line-height: 1.5; }
         .event-section { margin: 0 15px 15px; background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; position: relative; }
         .event-section:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
-        .event-image { width: 100%; height: 180px; object-fit: cover; display: none; }
+        .event-image { width: 100%; height: 160px; object-fit: cover; display: none; }
         .event-info { padding: 15px; position: relative; }
         .event-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: #2c3e50; display: flex; align-items: center; gap: 8px; }
         .event-time { color: #7f8c8d; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
         .event-badge { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #ff4757, #ff6348); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3); }
-        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background-color: white; display: flex; justify-content: space-around; padding: 10px 0 15px; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08); border-top: 1px solid #f0f0f0; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #95a5a6; cursor: pointer; transition: all 0.3s; position: relative; padding: 5px; }
+        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background-color: white; display: flex; justify-content: space-around; padding: 6px 0 10px; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08); border-top: 1px solid #f0f0f0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #95a5a6; cursor: pointer; transition: all 0.3s; position: relative; padding: 3px; }
         .nav-item.active { color: #4285f4; }
         .nav-item.active i { transform: scale(1.1); }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; transition: transform 0.3s; }
-        .nav-item span { font-size: 10px; font-weight: 600; }
+        .nav-item i { font-size: 18px; margin-bottom: 3px; transition: transform 0.3s; }
+        .nav-item span { font-size: 9px; font-weight: 600; }
         .modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 2000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; border-radius: 16px; }
         .modal.active { display: flex; opacity: 1; }
         .modal-content { background-color: white; border-radius: 20px; width: 90%; max-width: 320px; max-height: 80%; overflow: hidden; position: relative; animation: modalSlideIn 0.3s; }
@@ -160,25 +160,25 @@
         .promo-detail-desc { font-size: 14px; color: #7f8c8d; line-height: 1.5; margin-bottom: 15px; }
         .promo-detail-expiry { font-size: 13px; color: #e74c3c; display: flex; align-items: center; gap: 5px; }
 
-        /* --- GAYA UNTUK HALAMAN PETA (BARU & DIPERBAIKI) --- */
-        .map-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .map-header h2 { font-size: 24px; color: #2c3e50; }
-        .map-container { background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); height: 400px; position: relative; }
+        /* --- GAYA UNTUK HALAMAN PETA (DIPERBAIKI) --- */
+        .map-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .map-header h2 { font-size: 22px; color: #2c3e50; }
+        .map-container { background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); height: 460px; position: relative; }
         #map { height: 100%; width: 100%; }
         .map-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
-        .map-control-btn { background-color: white; border: none; width: 40px; height: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s; }
+        .map-control-btn { background-color: white; border: none; width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s; }
         .map-control-btn:hover { background-color: #f8f9fa; transform: scale(1.05); }
-        .map-control-btn i { color: #4285f4; font-size: 18px; }
-        .location-list { background-color: white; border-radius: 16px; margin-top: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); max-height: 200px; overflow-y: auto; }
-        .location-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background-color 0.3s; }
+        .map-control-btn i { color: #4285f4; font-size: 16px; }
+        .location-list { background-color: white; border-radius: 16px; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); max-height: 120px; overflow-y: auto; }
+        .location-item { display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background-color 0.3s; }
         .location-item:last-child { border-bottom: none; }
         .location-item:hover { background-color: #f8f9fa; }
-        .location-item-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 12px; }
+        .location-item-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
         .location-item-info { flex: 1; }
-        .location-item-name { font-size: 14px; font-weight: 600; color: #2c3e50; }
-        .location-item-time { font-size: 12px; color: #7f8c8d; }
-        .location-item-distance { font-size: 12px; color: #4285f4; font-weight: 600; }
-        .map-stats { position: absolute; bottom: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 8px 12px; border-radius: 8px; z-index: 1000; font-size: 12px; color: #2c3e50; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .location-item-name { font-size: 13px; font-weight: 600; color: #2c3e50; }
+        .location-item-time { font-size: 11px; color: #7f8c8d; }
+        .location-item-distance { font-size: 11px; color: #4285f4; font-weight: 600; }
+        .map-stats { position: absolute; bottom: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 6px 10px; border-radius: 8px; z-index: 1000; font-size: 11px; color: #2c3e50; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
         .map-stats span { font-weight: 700; color: #4285f4; }
 
         /* --- GAYA UNTUK HALAMAN PESAN (BARU) --- */
@@ -323,7 +323,7 @@
                     <div class="carousel-scroll" id="promoCarousel"></div>
                 </div>
                 
-                <div style="height: 80px;"></div>
+                <div style="height: 60px;"></div>
             </div>
 
             <!-- Halaman Profil (DISEMBUNYIKAN SECARA DEFAULT) -->
@@ -729,7 +729,6 @@
         let userMarker = null;
         let markers = {};
         let locationWatchId = null;
-        let usersListener = null;
         let locationsListener = null;
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
@@ -1151,6 +1150,8 @@
                 }
                 
                 auth.signOut().then(() => {
+                    // Firebase akan secara otomatis menghapus sesi dari localStorage
+                    // Pengguna perlu login lagi saat membuka aplikasi
                     window.location.href = 'index.html';
                 }).catch(error => {
                     console.error("Error signing out:", error);
@@ -1350,106 +1351,79 @@
             // Listen for real-time updates to user locations
             locationsListener = db.collection('user_locations').onSnapshot(snapshot => {
                 locationList.innerHTML = '';
-                const validUserIds = new Set();
                 const locations = [];
                 
-                // First pass: collect all valid user IDs and locations
+                // Collect all locations
                 snapshot.forEach(doc => {
                     const location = doc.data();
-                    validUserIds.add(location.userId);
                     locations.push(location);
                 });
                 
-                // Check which users still exist in the users collection
-                db.collection('users').get().then(usersSnapshot => {
-                    const existingUserIds = new Set();
-                    usersSnapshot.forEach(doc => {
-                        existingUserIds.add(doc.id);
-                    });
+                // Update member count
+                memberCount.textContent = locations.length;
+                
+                if (locations.length === 0) {
+                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota</div>';
+                    return;
+                }
+                
+                const user = auth.currentUser;
+                
+                locations.forEach(location => {
+                    // Skip current user in the list
+                    if (location.userId === user.uid) return;
                     
-                    // Filter out locations for deleted users
-                    const validLocations = locations.filter(location => 
-                        existingUserIds.has(location.userId)
+                    // Add or update marker
+                    if (markers[location.userId]) {
+                        markers[location.userId].setLatLng([location.latitude, location.longitude]);
+                    } else {
+                        const marker = L.marker([location.latitude, location.longitude], {
+                            icon: L.icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            })
+                        }).addTo(map)
+                        .bindPopup(location.username);
+                        
+                        markers[location.userId] = marker;
+                    }
+                    
+                    // Add to location list
+                    const locationItem = document.createElement('div');
+                    locationItem.className = 'location-item';
+                    
+                    const timestamp = location.timestamp ? new Date(location.timestamp.toDate()).toLocaleString('id-ID') : '';
+                    const distance = calculateDistance(
+                        userMarker ? userMarker.getLatLng().lat : 0,
+                        userMarker ? userMarker.getLatLng().lng : 0,
+                        location.latitude,
+                        location.longitude
                     );
                     
-                    // Update member count
-                    memberCount.textContent = validLocations.length;
+                    locationItem.innerHTML = `
+                        <img src="${location.profilePicUrl}" alt="${location.username}" class="location-item-avatar">
+                        <div class="location-item-info">
+                            <div class="location-item-name">${location.username}</div>
+                            <div class="location-item-time">${timestamp}</div>
+                        </div>
+                        <div class="location-item-distance">${distance} km</div>
+                    `;
                     
-                    if (validLocations.length === 0) {
-                        locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota</div>';
-                        return;
-                    }
-                    
-                    const user = auth.currentUser;
-                    
-                    validLocations.forEach(location => {
-                        // Skip current user in the list
-                        if (location.userId === user.uid) return;
-                        
-                        // Add or update marker
-                        if (markers[location.userId]) {
-                            markers[location.userId].setLatLng([location.latitude, location.longitude]);
-                        } else {
-                            const marker = L.marker([location.latitude, location.longitude], {
-                                icon: L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                })
-                            }).addTo(map)
-                            .bindPopup(location.username);
-                            
-                            markers[location.userId] = marker;
-                        }
-                        
-                        // Add to location list
-                        const locationItem = document.createElement('div');
-                        locationItem.className = 'location-item';
-                        
-                        const timestamp = location.timestamp ? new Date(location.timestamp.toDate()).toLocaleString('id-ID') : '';
-                        const distance = calculateDistance(
-                            userMarker ? userMarker.getLatLng().lat : 0,
-                            userMarker ? userMarker.getLatLng().lng : 0,
-                            location.latitude,
-                            location.longitude
-                        );
-                        
-                        locationItem.innerHTML = `
-                            <img src="${location.profilePicUrl}" alt="${location.username}" class="location-item-avatar">
-                            <div class="location-item-info">
-                                <div class="location-item-name">${location.username}</div>
-                                <div class="location-item-time">${timestamp}</div>
-                            </div>
-                            <div class="location-item-distance">${distance} km</div>
-                        `;
-                        
-                        locationItem.addEventListener('click', function() {
-                            map.setView([location.latitude, location.longitude], 15);
-                            markers[location.userId].openPopup();
-                        });
-                        
-                        locationList.appendChild(locationItem);
+                    locationItem.addEventListener('click', function() {
+                        map.setView([location.latitude, location.longitude], 15);
+                        markers[location.userId].openPopup();
                     });
                     
-                    // Clean up markers for users that no longer exist
-                    Object.keys(markers).forEach(userId => {
-                        if (!existingUserIds.has(userId)) {
-                            map.removeLayer(markers[userId]);
-                            delete markers[userId];
-                        }
-                    });
-                    
-                    if (validLocations.filter(l => l.userId !== user.uid).length === 0) {
-                        locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota lain</div>';
-                    }
-                }).catch(error => {
-                    console.error("Error checking user existence:", error);
-                    handleFirebaseError(error);
-                    locationList.innerHTML = '<div class="kas-empty">Gagal memuat lokasi anggota</div>';
+                    locationList.appendChild(locationItem);
                 });
+                
+                if (locations.filter(l => l.userId !== user.uid).length === 0) {
+                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota lain</div>';
+                }
             }, error => {
                 console.error("Error loading user locations:", error);
                 handleFirebaseError(error);
@@ -1930,7 +1904,7 @@
             let toast = document.getElementById('toast');
             if (!toast) {
                 toast = document.createElement('div'); toast.id = 'toast';
-                toast.style.cssText = 'position:absolute; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:white; padding:10px 20px; border-radius:20px; z-index:1001; opacity:0; transition:all 0.3s; font-size:13px; font-weight:600; backdrop-filter:blur(10px;';
+                toast.style.cssText = 'position:absolute; bottom:60px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:white; padding:10px 20px; border-radius:20px; z-index:1001; opacity:0; transition:all 0.3s; font-size:13px; font-weight:600; backdrop-filter:blur(10px;';
                 document.querySelector('.phone-container').appendChild(toast);
             }
             toast.textContent = message;
@@ -2018,6 +1992,9 @@
                     locationsListener = null;
                 }
                 
+                // Firebase Authentication akan secara otomatis mempertahankan sesi
+                // Pengguna tidak perlu login lagi kecuali mereka menekan tombol keluar
+                // atau token kedaluwarsa (yang akan ditangani oleh refresh token otomatis)
                 window.location.href = 'index.html';
             }
         });
