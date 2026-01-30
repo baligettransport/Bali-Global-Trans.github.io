@@ -13,12 +13,11 @@
     <meta name="application-name" content="BGT PRO">
     <meta name="msapplication-TileColor" content="#4285f4">
     
-    <!-- Manifest untuk PWA (DIPERBAIKI: Start_url & Icons) -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJHVCBQUk8iLAogICJzaG9ydF9uYW1lIjogIkJHVCBQUk8iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM0Mjg1ZjQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL3BpY3N1bS5waG90b3Mvc2VlZC9iZ3Rwcm8taWNvbi8xOTIvMTkyLmpwZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9waWNzdW0ucGhvdG9zL3NlZWQvYmd0cHJvLWljb24vNTEyLzUxMi5qcGciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL2pwZWciCiAgICB9CiAgXQp9">
+    <!-- Manifest untuk PWA (DIUPDATE: Menggunakan 512B.png) -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIkJHVCBQUk8iLCAic2hvcnRfbmFtZSI6ICJCR1QgUFJPIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLCAidGhlbWVfY29sb3IiOiAiIzQyODVmNCIsICJpY29ucyI6IFt7InNyYyI6ICI1MTJCLnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIn1dfQ==">
     
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" sizes="192x192" href="512B.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="512B.png">
+    <!-- Apple Touch Icons (DIUPDATE: Menggunakan 512B.png) -->
+    <link rel="apple-touch-icon" href="512B.png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS untuk Peta -->
@@ -30,7 +29,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
     <style>
-        /* ... (Semua CSS yang lama tetap sama, saya hanya menambahkan yang baru) ... */
+        /* ... (Semua CSS yang lama tetap sama) ... */
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         .phone-container { width: 350px; height: 750px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); overflow: hidden; position: relative; }
         .app-container { height: 100%; overflow-y: auto; background-color: #f8f9fa; position: relative; }
@@ -127,7 +126,7 @@
         .permission-guide .copy-btn { background-color: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-top: 10px; font-size: 12px; transition: background-color 0.3s; }
         .permission-guide .copy-btn:hover { background-color: rgba(255, 255, 255, 0.3); }
 
-        /* --- GAYA UNTUK HALAMAN PROFIL (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN PROFIL --- */
         .page-view { display: none; padding: 20px; animation: fadeInUp 0.5s ease-out; }
         .page-view.active { display: block; }
         .profile-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -144,7 +143,7 @@
         .stat-item .stat-value { font-size: 18px; font-weight: 700; color: #2c3e50; }
         .stat-item .stat-label { font-size: 12px; color: #95a5a6; text-transform: uppercase; margin-top: 5px; }
 
-        /* --- GAYA UNTUK HALAMAN KAS (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN KAS --- */
         .kas-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .kas-header h2 { font-size: 24px; color: #2c3e50; }
         .kas-content { display: flex; flex-direction: column; gap: 15px; }
@@ -163,7 +162,7 @@
         .kas-add-btn { background: linear-gradient(135deg, #4285f4, #1a73e8); color: white; border: none; padding: 10px 15px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.3s, box-shadow 0.3s; }
         .kas-add-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4); }
 
-        /* --- GAYA UNTUK HALAMAN PROMO (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN PROMO --- */
         .promo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .promo-header h2 { font-size: 24px; color: #2c3e50; }
         .promo-content { display: flex; flex-direction: column; gap: 15px; }
@@ -174,7 +173,7 @@
         .promo-detail-desc { font-size: 14px; color: #7f8c8d; line-height: 1.5; margin-bottom: 15px; }
         .promo-detail-expiry { font-size: 13px; color: #e74c3c; display: flex; align-items: center; gap: 5px; }
 
-        /* --- GAYA UNTUK HALAMAN PETA (DIPERBAIKI) --- */
+        /* --- GAYA UNTUK HALAMAN PETA --- */
         .map-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
         .map-header h2 { font-size: 22px; color: #2c3e50; }
         .map-container { background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); height: 460px; position: relative; }
@@ -206,7 +205,7 @@
             100% { opacity: 1; }
         }
 
-        /* --- GAYA UNTUK HALAMAN PESAN (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN PESAN --- */
         .message-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .message-header h2 { font-size: 24px; color: #2c3e50; }
         .message-compose { background-color: white; border-radius: 16px; padding: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); margin-bottom: 15px; }
@@ -220,7 +219,7 @@
         .message-item-time { font-size: 12px; color: #95a5a6; }
         .message-item-content { font-size: 14px; color: #7f8c8d; line-height: 1.5; }
 
-        /* --- GAYA UNTUK HALAMAN PENGATURAN (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN PENGATURAN --- */
         .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .settings-header h2 { font-size: 24px; color: #2c3e50; }
         .settings-content { display: flex; flex-direction: column; gap: 15px; }
@@ -236,7 +235,7 @@
         .settings-btn { background: none; border: 1px solid #ddd; color: #7f8c8d; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
         .settings-btn:hover { background-color: #f8f9fa; border-color: #adb5bd; }
 
-        /* --- GAYA UNTUK HALAMAN BANTUAN (BARU) --- */
+        /* --- GAYA UNTUK HALAMAN BANTUAN --- */
         .help-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .help-header h2 { font-size: 24px; color: #2c3e50; }
         .help-content { display: flex; flex-direction: column; gap: 15px; }
@@ -246,7 +245,7 @@
         .help-contact { display: flex; align-items: center; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
         .help-contact-item { display: flex; align-items: center; gap: 5px; font-size: 14px; color: #4285f4; }
 
-        /* --- GAYA UNTUK DISRUPSI (BARU) --- */
+        /* --- GAYA UNTUK DISRUPSI --- */
         #disruption-overlay {
             position: fixed;
             top: 0;
@@ -296,7 +295,7 @@
             50% { text-shadow: 0 0 10px #ff00de, 0 0 20px red; }
         }
 
-        /* --- GAYA UNTUK LOADING SCREEN (BARU) --- */
+        /* --- GAYA UNTUK LOADING SCREEN --- */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -340,7 +339,7 @@
             font-size: 14px;
         }
 
-        /* --- GAYA UNTUK INSTALL PROMPT (BARU) --- */
+        /* --- GAYA UNTUK INSTALL PROMPT --- */
         .install-prompt {
             position: fixed;
             bottom: 80px;
@@ -956,12 +955,6 @@
         });
 
         function showInstallPrompt() {
-            // --- DIPERBAIKI: HAPUS PENGECEKAN LOCALSTORAGE AGAR MUNCUL SETIAP REFRESH ---
-            // if (localStorage.getItem('bgtProInstallDismissed') === 'true' || 
-            //     localStorage.getItem('bgtProInstalled') === 'true') {
-            //     return;
-            // }
-            
             // Show install prompt after 3 seconds
             setTimeout(() => {
                 const installPrompt = document.getElementById('installPrompt');
@@ -1363,13 +1356,10 @@
                     let imageHtml = '';
                     if (imageUrl) {
                         if (imageUrl.startsWith('data:image')) {
-                            // Jika base64, gunakan langsung
                             imageHtml = `<img src="${imageUrl}" alt="${promo.title}" class="promo-detail-image">`;
                         } else if (imageUrl.startsWith('http')) {
-                            // Jika URL HTTP, gunakan langsung
                             imageHtml = `<img src="${imageUrl}" alt="${promo.title}" class="promo-detail-image">`;
                         } else if (imageUrl.startsWith('gs://')) {
-                            // Jika URL Firebase Storage, coba dapatkan URL unduhan
                             imageHtml = `<img src="" alt="${promo.title}" class="promo-detail-image" data-firebase-url="${imageUrl}">`;
                         }
                     }
@@ -1385,27 +1375,19 @@
                         </div>
                     `;
                     
-                    // Tambahkan event listener untuk menampilkan modal dengan data lengkap
                     promoCard.addEventListener('click', function() {
                         showModal('promo', promo.title, promo.description, imageUrl);
                     });
                     
                     promoContent.appendChild(promoCard);
                     
-                    // Jika ada gambar Firebase Storage, coba dapatkan URL unduhan
                     const firebaseImage = promoCard.querySelector('img[data-firebase-url]');
                     if (firebaseImage) {
                         const firebaseUrl = firebaseImage.getAttribute('data-firebase-url');
                         getValidImageUrl(firebaseUrl).then(url => {
-                            if (url) {
-                                firebaseImage.src = url;
-                            } else {
-                                firebaseImage.style.display = 'none';
-                            }
-                        }).catch(error => {
-                            console.error("Error loading Firebase image:", error);
-                            firebaseImage.style.display = 'none';
-                        });
+                            if (url) firebaseImage.src = url;
+                            else firebaseImage.style.display = 'none';
+                        }).catch(() => firebaseImage.style.display = 'none');
                     }
                 });
                 
@@ -1473,12 +1455,10 @@
                     return;
                 }
                 
-                // Get user data
                 const userDoc = await db.collection('users').doc(user.uid).get();
                 const userData = userDoc.exists ? userDoc.data() : {};
                 const senderName = userData.username || 'Pengguna';
                 
-                // Add message to Firestore
                 await db.collection('messages').add({
                     senderId: user.uid,
                     senderName: senderName,
@@ -1486,13 +1466,8 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Clear input
                 messageInput.value = '';
-                
-                // Reload messages
                 loadMessages();
-                
-                // Play notification sound
                 playNotificationSound('message');
                 showToast('Pesan terkirim');
                 
@@ -1514,7 +1489,6 @@
         function showChangePasswordModal() {
             document.getElementById('changePasswordModal').classList.add('active');
             document.querySelector('.app-container').style.overflow = 'hidden';
-            // Focus on current password field
             setTimeout(() => {
                 document.getElementById('currentPassword').focus();
             }, 300);
@@ -1552,20 +1526,14 @@
                     return;
                 }
                 
-                // Reauthenticate user
                 const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
                 
                 user.reauthenticateWithCredential(credential).then(() => {
-                    // Update password
                     user.updatePassword(newPassword).then(() => {
-                        // Clear form
                         document.getElementById('currentPassword').value = '';
                         document.getElementById('newPassword').value = '';
                         document.getElementById('confirmPassword').value = '';
-                        
-                        // Close modal
                         closeChangePasswordModal();
-                        
                         showToast('Password berhasil diubah');
                         playNotificationSound('default');
                     }).catch(error => {
@@ -1574,11 +1542,8 @@
                     });
                 }).catch(error => {
                     console.error("Error reauthenticating:", error);
-                    if (error.code === 'auth/wrong-password') {
-                        showToast('Password lama salah');
-                    } else {
-                        showToast('Gagal mengubah password');
-                    }
+                    if (error.code === 'auth/wrong-password') showToast('Password lama salah');
+                    else showToast('Gagal mengubah password');
                 });
                 
             } catch (error) {
@@ -1616,7 +1581,6 @@
                     return;
                 }
                 
-                // Add transaction to appropriate collection
                 let collectionName = 'kas';
                 if (type === 'pinjaman') collectionName = 'pinjaman';
                 else if (type === 'iuran') collectionName = 'iuran';
@@ -1629,22 +1593,16 @@
                 };
                 
                 if (type === 'pinjaman') {
-                    transactionData.borrower = description; // For pinjaman, use description as borrower name
+                    transactionData.borrower = description;
                     transactionData.description = `Pinjaman oleh ${description}`;
                 }
                 
                 await db.collection(collectionName).add(transactionData);
                 
-                // Clear form
                 document.getElementById('transactionDescription').value = '';
                 document.getElementById('transactionAmount').value = '';
-                
-                // Close modal
                 closeAddTransactionModal();
-                
-                // Reload kas data
                 loadKasData();
-                
                 showToast('Transaksi berhasil ditambahkan');
                 
             } catch (error) {
@@ -1656,21 +1614,17 @@
 
         // --- FUNGSI UNTUK MENANGANI PETA ---
         function initializeMap() {
-            // Initialize the map
-            map = L.map('map').setView([-6.2088, 106.8456], 13); // Default to Jakarta
+            map = L.map('map').setView([-6.2088, 106.8456], 13);
             
-            // Add tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             
-            // Add locate control
             const locateBtn = document.getElementById('locateBtn');
             locateBtn.addEventListener('click', function() {
                 centerMapOnUser();
             });
             
-            // Add refresh control
             const refreshBtn = document.getElementById('refreshBtn');
             refreshBtn.addEventListener('click', function() {
                 refreshLocations();
@@ -1749,14 +1703,12 @@
             const user = auth.currentUser;
             if (!user) return;
             
-            // Get user data
             db.collection('users').doc(user.uid).get().then(doc => {
                 if (doc.exists) {
                     const userData = doc.data();
                     const username = userData.username || 'Pengguna';
                     const profilePicUrl = userData.profilePicUrl || 'https://picsum.photos/seed/default-user/100/100.jpg';
                     
-                    // Save location to Firebase with active status
                     db.collection('user_locations').doc(user.uid).set({
                         userId: user.uid,
                         username: username,
@@ -1779,25 +1731,20 @@
             const mapActivityIndicator = document.getElementById('mapActivityIndicator');
             locationList.innerHTML = '<div class="kas-empty">Memuat lokasi anggota...</div>';
             
-            // Listen for real-time updates to user locations
             locationsListener = db.collection('user_locations').onSnapshot(snapshot => {
-                // Show updating indicator
                 mapActivityIndicator.classList.add('updating');
-                
                 locationList.innerHTML = '';
                 const locations = [];
                 const currentActiveUsers = new Set();
                 
-                // Process all location documents
                 snapshot.forEach(doc => {
                     const location = doc.data();
                     const userId = location.userId;
                     
-                    // Check if user is active (updated within last 2 minutes)
                     const now = new Date();
                     const lastSeen = location.lastSeen ? location.lastSeen.toDate() : location.timestamp.toDate();
                     const timeDiff = now - lastSeen;
-                    const isActive = timeDiff < 120000; // 2 minutes in milliseconds
+                    const isActive = timeDiff < 120000; 
                     
                     if (isActive) {
                         currentActiveUsers.add(userId);
@@ -1805,10 +1752,8 @@
                     }
                 });
                 
-                // Update member count
                 memberCount.textContent = currentActiveUsers.size;
                 
-                // Clean up markers for inactive users
                 Object.keys(markers).forEach(userId => {
                     if (!currentActiveUsers.has(userId)) {
                         map.removeLayer(markers[userId]);
@@ -1823,22 +1768,13 @@
                 }
                 
                 const user = auth.currentUser;
-                
-                // Sort locations by username
                 locations.sort((a, b) => a.username.localeCompare(b.username));
                 
                 locations.forEach(location => {
-                    // Skip current user in the list
                     if (location.userId === user.uid) return;
                     
-                    // Add or update marker
                     if (markers[location.userId]) {
-                        // Animate marker movement
-                        const currentLatLng = markers[location.userId].getLatLng();
-                        const newLatLng = [location.latitude, location.longitude];
-                        
-                        // Smooth animation for marker movement
-                        markers[location.userId].setLatLng(newLatLng);
+                        markers[location.userId].setLatLng([location.latitude, location.longitude]);
                     } else {
                         const marker = L.marker([location.latitude, location.longitude], {
                             icon: L.icon({
@@ -1855,7 +1791,6 @@
                         markers[location.userId] = marker;
                     }
                     
-                    // Add to location list
                     const locationItem = document.createElement('div');
                     locationItem.className = 'location-item';
                     
@@ -1889,7 +1824,6 @@
                     locationList.innerHTML = '<div class="kas-empty">Tidak ada anggota lain yang aktif</div>';
                 }
                 
-                // Hide updating indicator
                 setTimeout(() => {
                     mapActivityIndicator.classList.remove('updating');
                 }, 500);
@@ -1902,7 +1836,7 @@
         }
         
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the earth in km
+            const R = 6371; 
             const dLat = deg2rad(lat2 - lat1);
             const dLon = deg2rad(lon2 - lon1);
             const a = 
@@ -1910,7 +1844,7 @@
                 Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
                 Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const d = R * c; // Distance in km
+            const d = R * c; 
             return d.toFixed(1);
         }
         
@@ -1928,7 +1862,6 @@
         }
         
         function refreshLocations() {
-            // Force refresh of user location
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     position => {
@@ -1958,18 +1891,8 @@
         // --- HELPER FUNCTION UNTUK GAMBAR - DIPERBAIKI ---
         async function getValidImageUrl(imagePath) {
             if (!imagePath) return null;
-            
-            // Jika base64, kembalikan langsung
-            if (imagePath.startsWith('data:image')) {
-                return imagePath;
-            }
-            
-            // Jika URL HTTP, kembalikan langsung
-            if (imagePath.startsWith('http')) {
-                return imagePath;
-            }
-            
-            // Jika URL Firebase Storage, coba dapatkan URL unduhan
+            if (imagePath.startsWith('data:image')) return imagePath;
+            if (imagePath.startsWith('http')) return imagePath;
             if (imagePath.startsWith('gs://')) {
                 try {
                     const storageRef = firebase.storage().refFromURL(imagePath);
@@ -1979,18 +1902,15 @@
                     return null;
                 }
             }
-            
             return null;
         }
 
         // --- FUNGSI UNTUK MEMERIKSA EVENT NOTIFIKASI ---
         function checkEventNotification() {
-            // Clear existing timeout
             if (eventNotificationTimeout) {
                 clearTimeout(eventNotificationTimeout);
             }
             
-            // Load events to check for upcoming events
             db.collection('events').where('status', '==', 'active').get().then(snapshot => {
                 if (snapshot.empty) return;
                 
@@ -2002,14 +1922,12 @@
                     }
                 });
                 
-                // Sort events by start date
                 events.sort((a, b) => {
                     const dateA = a.startDate.toDate();
                     const dateB = b.startDate.toDate();
                     return dateA - dateB;
                 });
                 
-                // Get the next event
                 const nextEvent = events.length > 0 ? events[0] : null;
                 if (!nextEvent) return;
                 
@@ -2017,15 +1935,12 @@
                 const eventTime = nextEvent.startDate.toDate();
                 const timeDiff = eventTime - now;
                 
-                // If event is within 2 hours, schedule notification
-                if (timeDiff > 0 && timeDiff <= 7200000) { // 2 hours in milliseconds
-                    const notificationTime = timeDiff - 600000; // Notify 10 minutes before event
+                if (timeDiff > 0 && timeDiff <= 7200000) { 
+                    const notificationTime = timeDiff - 600000; 
                     
                     if (notificationTime <= 0) {
-                        // Event is within 10 minutes, notify immediately
                         triggerEventNotification(nextEvent);
                     } else {
-                        // Schedule notification
                         eventNotificationTimeout = setTimeout(() => {
                             triggerEventNotification(nextEvent);
                         }, notificationTime);
@@ -2044,13 +1959,9 @@
                 minute: '2-digit' 
             }) : '';
             
-            // Show notification
             showToast(`Event "${eventName}" akan dimulai pada ${eventTime}`);
-            
-            // Play sound
             playNotificationSound('event');
             
-            // Update event section
             const eventTitle = document.getElementById('eventTitle');
             const eventTimeElement = document.getElementById('eventTime');
             
@@ -2062,7 +1973,6 @@
                 eventTimeElement.innerHTML = `<i class="fas fa-clock" style="font-size: 12px;"></i> ${eventTime}`;
             }
             
-            // Add pulse animation to event section
             const eventSection = document.getElementById('eventSection');
             eventSection.style.animation = 'none';
             setTimeout(() => {
@@ -2084,19 +1994,15 @@
                     const slideDiv = document.createElement('div');
                     slideDiv.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
                     
-                    // PERBAIKAN: Menangani gambar base64
                     const imageUrl = banner.imageUrl || '';
                     let imageHtml = '';
                     
                     if (imageUrl) {
                         if (imageUrl.startsWith('data:image')) {
-                            // Jika base64, gunakan langsung
                             imageHtml = `<img src="${imageUrl}" alt="${banner.title}">`;
                         } else if (imageUrl.startsWith('http')) {
-                            // Jika URL HTTP, gunakan langsung
                             imageHtml = `<img src="${imageUrl}" alt="${banner.title}">`;
                         } else if (imageUrl.startsWith('gs://')) {
-                            // Jika URL Firebase Storage, coba dapatkan URL unduhan
                             imageHtml = `<img src="" alt="${banner.title}" data-firebase-url="${imageUrl}">`;
                         }
                     }
@@ -2119,7 +2025,6 @@
                         `;
                     }
                     
-                    // Tambahkan event listener untuk menampilkan modal dengan data lengkap
                     slideDiv.onclick = () => showModal('banner', banner.title, banner.description, imageUrl);
                     container.appendChild(slideDiv);
                     
@@ -2128,15 +2033,12 @@
                     indicator.onclick = () => goToSlide(index);
                     indicators.appendChild(indicator);
                     
-                    // Jika ada gambar Firebase Storage, coba dapatkan URL unduhan
                     const firebaseImage = slideDiv.querySelector('img[data-firebase-url]');
                     if (firebaseImage) {
                         const firebaseUrl = firebaseImage.getAttribute('data-firebase-url');
                         getValidImageUrl(firebaseUrl).then(url => {
-                            if (url) {
-                                firebaseImage.src = url;
-                            } else {
-                                // Jika gagal memuat gambar, tampilkan fallback
+                            if (url) firebaseImage.src = url;
+                            else {
                                 firebaseImage.parentElement.innerHTML = `
                                     <div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg, #4285f4, #1a73e8);color:white;text-align:center;padding:20px;">
                                         <div>
@@ -2146,17 +2048,15 @@
                                     </div>
                                 `;
                             }
-                        }).catch(error => {
-                            console.error("Error loading Firebase image:", error);
-                            // Jika gagal memuat gambar, tampilkan fallback
+                        }).catch(() => {
                             firebaseImage.parentElement.innerHTML = `
-                                <div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg, #4285f4, #1a73e8);color:white;text-align:center;padding:20px;">
-                                    <div>
-                                        <h2 style="margin-bottom:10px;">${banner.title}</h2>
-                                        <p>${banner.description}</p>
+                                    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg, #4285f4, #1a73e8);color:white;text-align:center;padding:20px;">
+                                        <div>
+                                            <h2 style="margin-bottom:10px;">${banner.title}</h2>
+                                            <p>${banner.description}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
                         });
                     }
                 }
@@ -2176,24 +2076,20 @@
                         const card = document.createElement('div');
                         const imageUrl = promo.imageUrl || '';
                         
-                        // PERBAIKAN: Menangani gambar base64
                         let imageHtml = '';
                         if (imageUrl) {
                             if (imageUrl.startsWith('data:image')) {
-                                // Jika base64, gunakan langsung
                                 imageHtml = `<img src="${imageUrl}" alt="${promo.title}" class="promo-card-image">`;
                             } else if (imageUrl.startsWith('http')) {
-                                // Jika URL HTTP, gunakan langsung
                                 imageHtml = `<img src="${imageUrl}" alt="${promo.title}" class="promo-card-image">`;
                             } else if (imageUrl.startsWith('gs://')) {
-                                // Jika URL Firebase Storage, coba dapatkan URL unduhan
                                 imageHtml = `<img src="" alt="${promo.title}" class="promo-card-image" data-firebase-url="${imageUrl}">`;
                             }
                         }
                         
                         if (imageHtml) {
                             card.className = 'promo-card';
-                            card.innerHTML = imageHtml; // Hapus info card
+                            card.innerHTML = imageHtml; 
                         } else {
                             card.className = 'promo-card promo-card-no-image';
                             card.innerHTML = `
@@ -2205,25 +2101,19 @@
                             `;
                         }
                         
-                        // Tambahkan event listener untuk menampilkan modal dengan data lengkap
                         card.onclick = () => showModal('promo', promo.title, promo.description, imageUrl);
                         carousel.appendChild(card);
                         
-                        // Jika ada gambar Firebase Storage, coba dapatkan URL unduhan
                         const firebaseImage = card.querySelector('img[data-firebase-url]');
                         if (firebaseImage) {
                             const firebaseUrl = firebaseImage.getAttribute('data-firebase-url');
                             getValidImageUrl(firebaseUrl).then(url => {
-                                if (url) {
-                                    firebaseImage.src = url;
-                                } else {
-                                    // Jika gagal memuat gambar, sembunyikan dan tambahkan class no-image
+                                if (url) firebaseImage.src = url;
+                                else {
                                     firebaseImage.style.display = 'none';
                                     card.classList.add('promo-card-no-image');
                                 }
-                            }).catch(error => {
-                                console.error("Error loading Firebase image:", error);
-                                // Jika gagal memuat gambar, sembunyikan dan tambahkan class no-image
+                            }).catch(() => {
                                 firebaseImage.style.display = 'none';
                                 card.classList.add('promo-card-no-image');
                             });
@@ -2248,19 +2138,15 @@
                 if (!event) { eventTitle.innerHTML = '<i class="fas fa-calendar-alt" style="color: #4285f4;"></i> KOPDAR RUTIN'; eventTime.innerHTML = '<i class="fas fa-clock" style="font-size: 12px;"></i> Sabtu, 20:00 WIB'; return; }
                 console.log("Event ditemukan:", event);
                 
-                // PERBAIKAN: Menangani gambar base64
                 const imageUrl = event.imageUrl || '';
                 if (imageUrl) {
                     if (imageUrl.startsWith('data:image')) {
-                        // Jika base64, gunakan langsung
                         eventImage.src = imageUrl;
                         eventImage.style.display = 'block';
                     } else if (imageUrl.startsWith('http')) {
-                        // Jika URL HTTP, gunakan langsung
                         eventImage.src = imageUrl;
                         eventImage.style.display = 'block';
                     } else if (imageUrl.startsWith('gs://')) {
-                        // Jika URL Firebase Storage, coba dapatkan URL unduhan
                         getValidImageUrl(imageUrl).then(url => {
                             if (url) {
                                 eventImage.src = url;
@@ -2296,10 +2182,8 @@
                     } catch (e) { eventTime.innerHTML = '<i class="fas fa-clock" style="font-size: 12px;"></i> Sabtu, 20:00 WIB'; }
                 } else { eventTime.innerHTML = '<i class="fas fa-clock" style="font-size: 12px;"></i> Sabtu, 20:00 WIB'; }
                 
-                // Tambahkan event listener untuk menampilkan modal dengan data lengkap
                 eventSection.onclick = () => showModal('event', event.name || 'KOPDAR RUTIN', event.description || 'Kopdar rutin mingguan komunitas BGT PRO', imageUrl);
                 
-                // Check for event notification
                 checkEventNotification();
             } catch (error) {
                 console.error("Error loading events:", error);
@@ -2310,7 +2194,6 @@
         }
         
         function updateBalanceFromFirebase() {
-            // DIUBAH: Tidak lagi memperbarui balance di navbar
         }
         
         function setupKasRealtimeListener() {
@@ -2400,18 +2283,14 @@
             document.getElementById('modalDetailDesc').textContent = description;
             const modalImage = document.getElementById('modalImage');
             
-            // PERBAIKAN: Menangani gambar base64 di modal
             if (image) {
                 if (image.startsWith('data:image')) {
-                    // Jika base64, gunakan langsung
                     modalImage.src = image;
                     modalImage.style.display = 'block';
                 } else if (image.startsWith('http')) {
-                    // Jika URL HTTP, gunakan langsung
                     modalImage.src = image;
                     modalImage.style.display = 'block';
                 } else if (image.startsWith('gs://')) {
-                    // Jika URL Firebase Storage, coba dapatkan URL unduhan
                     getValidImageUrl(image).then(url => {
                         if (url) {
                             modalImage.src = url;
@@ -2492,63 +2371,52 @@
 
         // --- FUNGSI LOGOUT YANG DIPERBAIKI ---
         function logout() {
-            // Set flag untuk menandai logout eksplisit
             isExplicitLogout = true;
-            
-            // Hapus indikator sesi dari localStorage
             localStorage.removeItem('bgtProSession');
             
-            // Logout dari Firebase
             auth.signOut().then(() => {
-                // Arahkan ke halaman login
                 window.location.href = 'index.html';
             }).catch((error) => {
                 console.error("Error signing out:", error);
                 showToast('Gagal keluar, coba lagi');
-                // Reset flag jika gagal
                 isExplicitLogout = false;
             });
         }
 
-        // --- INISIALISASI APLIKASI (DENGAN LISTENER UNTUK PM) ---
-        // Tampilkan loading screen saat aplikasi dimulai
+        // --- INISIALISASI APLIKASI ---
         document.addEventListener('DOMContentLoaded', function() {
-            // Update loading text
             document.getElementById('loadingText').textContent = 'Memeriksa autentikasi...';
             
-            // Set timeout untuk menampilkan pesan error jika autentikasi gagal
             setTimeout(() => {
                 if (!authInitialized) {
                     document.getElementById('loadingText').textContent = 'Terjadi kesalahan, coba refresh halaman';
                 }
-            }, 10000); // Increased timeout to 10 seconds
+            }, 10000);
         });
 
         auth.onAuthStateChanged(user => {
-            // Tandai bahwa status autentikasi telah diinisialisasi
             authInitialized = true;
-            
-            // Sembunyikan loading screen
             const loadingScreen = document.getElementById('loadingScreen');
             loadingScreen.classList.add('hidden');
             
             if (user) {
                 console.log("User logged in:", user.uid);
                 
-                // Reset flag logout eksplisit saat pengguna berhasil login
                 isExplicitLogout = false;
                 sessionRestoreAttempted = false;
                 
-                // Simpan indikator sesi di localStorage
                 localStorage.setItem('bgtProSession', 'active');
                 
-                // 1. Load data user untuk pertama kali
+                // 1. Minta lokasi OTOMATIS saat login
+                if (navigator.geolocation) {
+                    startLocationTracking();
+                }
+                
                 db.collection('users').doc(user.uid).get().then(doc => {
                     if (doc.exists) {
                         currentUserData = doc.data();
                         loadUserDataIntoUI(currentUserData);
                         
-                        // 2. Setup real-time listener untuk PM
                         db.collection('users').doc(user.uid).onSnapshot(doc => {
                             const updatedUserData = doc.data();
                             if (updatedUserData.pmStatus === 'disrupted') {
@@ -2558,7 +2426,7 @@
                             }
                         }, error => {
                             console.error("Error listening for PM status:", error);
-                            stopDisruption(); // Hapus gangguan jika ada error
+                            stopDisruption(); 
                         });
 
                     } else {
@@ -2571,7 +2439,6 @@
                     handleFirebaseError(error);
                 });
 
-                // 3. Load konten aplikasi
                 loadEventsFromFirebase();
                 loadBannersFromFirebase();
                 loadPromosFromFirebase();
@@ -2584,40 +2451,32 @@
             } else {
                 console.log("No user logged in.");
                 
-                // Jika pengguna melakukan logout eksplisit, arahkan ke halaman login
                 if (isExplicitLogout) {
                     console.log("User explicitly logged out, redirecting to login page...");
                     window.location.href = 'index.html';
                     return;
                 }
                 
-                // Jika bukan logout eksplisit, coba pulihkan sesi
                 const hasSession = localStorage.getItem('bgtProSession') === 'active';
                 
                 if (hasSession && !sessionRestoreAttempted) {
-                    // Tandai bahwa kita sudah mencoba memulihkan sesi
                     sessionRestoreAttempted = true;
                     
                     console.log("Attempting to restore session...");
                     document.getElementById('loadingText').textContent = 'Memulihkan sesi...';
                     loadingScreen.classList.remove('hidden');
                     
-                    // Coba untuk menunggu Firebase memuat ulang sesi
-                    // Firebase Auth dengan persistence LOCAL seharusnya otomatis memulihkan sesi
                     setTimeout(() => {
                         if (!auth.currentUser) {
-                            // Jika setelah menunggu masih tidak ada pengguna, mungkin sesi sudah kedaluwarsa
                             console.log("Session expired, redirecting to login page...");
                             localStorage.removeItem('bgtProSession');
                             window.location.href = 'index.html';
                         }
-                    }, 5000); // Tunggu 5 detik untuk memulihkan sesi
+                    }, 5000); 
                 } else if (!hasSession) {
-                    // Jika tidak ada sesi yang tersimpan, arahkan ke halaman login
                     console.log("No session found, redirecting to login page...");
                     window.location.href = 'index.html';
                 } else {
-                    // Jika sudah mencoba memulihkan sesi tapi gagal, arahkan ke halaman login
                     console.log("Session restore failed, redirecting to login page...");
                     window.location.href = 'index.html';
                 }
@@ -2636,11 +2495,10 @@
                 if (document.getElementById('addTransactionModal').classList.contains('active')) closeAddTransactionModal();
                 if (document.getElementById('changePasswordModal').classList.contains('active')) closeChangePasswordModal();
                 if (document.getElementById('disruption-overlay').classList.contains('active')) {
-                    stopDisruption(); // Biarkan gangguan dengan tombol ESC
+                    stopDisruption(); 
                 }
             }
         });
     </script>
 </body>
 </html>
-
