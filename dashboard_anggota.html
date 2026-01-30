@@ -178,8 +178,19 @@
         .location-item-name { font-size: 13px; font-weight: 600; color: #2c3e50; }
         .location-item-time { font-size: 11px; color: #7f8c8d; }
         .location-item-distance { font-size: 11px; color: #4285f4; font-weight: 600; }
+        .location-item-status { width: 8px; height: 8px; border-radius: 50%; margin-left: 8px; }
+        .location-item-status.active { background-color: #27ae60; }
+        .location-item-status.inactive { background-color: #95a5a6; }
         .map-stats { position: absolute; bottom: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 6px 10px; border-radius: 8px; z-index: 1000; font-size: 11px; color: #2c3e50; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
         .map-stats span { font-weight: 700; color: #4285f4; }
+        .map-activity-indicator { position: absolute; top: 10px; left: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 6px 10px; border-radius: 8px; z-index: 1000; font-size: 11px; color: #2c3e50; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 5px; }
+        .map-activity-indicator i { color: #27ae60; }
+        .map-activity-indicator.updating i { animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
 
         /* --- GAYA UNTUK HALAMAN PESAN (BARU) --- */
         .message-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -456,8 +467,12 @@
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
+                    <div class="map-activity-indicator" id="mapActivityIndicator">
+                        <i class="fas fa-circle"></i>
+                        <span>Real-time</span>
+                    </div>
                     <div class="map-stats">
-                        <span id="memberCount">0</span> anggota online
+                        <span id="memberCount">0</span> anggota aktif
                     </div>
                 </div>
                 <div class="location-list" id="locationList">
@@ -730,6 +745,8 @@
         let markers = {};
         let locationWatchId = null;
         let locationsListener = null;
+        let activeUsers = new Set(); // Track active users
+        let inactiveTimeout = {}; // Track inactive timeouts
 
         // --- FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN HALAMAN ---
         function showMainContent() {
@@ -1328,13 +1345,15 @@
                     const username = userData.username || 'Pengguna';
                     const profilePicUrl = userData.profilePicUrl || 'https://picsum.photos/seed/default-user/100/100.jpg';
                     
-                    // Save location to Firebase
+                    // Save location to Firebase with active status
                     db.collection('user_locations').doc(user.uid).set({
                         userId: user.uid,
                         username: username,
                         profilePicUrl: profilePicUrl,
                         latitude: lat,
                         longitude: lng,
+                        isActive: true,
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -1346,28 +1365,56 @@
         function loadUserLocations() {
             const locationList = document.getElementById('locationList');
             const memberCount = document.getElementById('memberCount');
+            const mapActivityIndicator = document.getElementById('mapActivityIndicator');
             locationList.innerHTML = '<div class="kas-empty">Memuat lokasi anggota...</div>';
             
             // Listen for real-time updates to user locations
             locationsListener = db.collection('user_locations').onSnapshot(snapshot => {
+                // Show updating indicator
+                mapActivityIndicator.classList.add('updating');
+                
                 locationList.innerHTML = '';
                 const locations = [];
+                const currentActiveUsers = new Set();
                 
-                // Collect all locations
+                // Process all location documents
                 snapshot.forEach(doc => {
                     const location = doc.data();
-                    locations.push(location);
+                    const userId = location.userId;
+                    
+                    // Check if user is active (updated within last 2 minutes)
+                    const now = new Date();
+                    const lastSeen = location.lastSeen ? location.lastSeen.toDate() : location.timestamp.toDate();
+                    const timeDiff = now - lastSeen;
+                    const isActive = timeDiff < 120000; // 2 minutes in milliseconds
+                    
+                    if (isActive) {
+                        currentActiveUsers.add(userId);
+                        locations.push({...location, isActive: true});
+                    }
                 });
                 
                 // Update member count
-                memberCount.textContent = locations.length;
+                memberCount.textContent = currentActiveUsers.size;
+                
+                // Clean up markers for inactive users
+                Object.keys(markers).forEach(userId => {
+                    if (!currentActiveUsers.has(userId)) {
+                        map.removeLayer(markers[userId]);
+                        delete markers[userId];
+                    }
+                });
                 
                 if (locations.length === 0) {
-                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota</div>';
+                    locationList.innerHTML = '<div class="kas-empty">Tidak ada anggota aktif</div>';
+                    mapActivityIndicator.classList.remove('updating');
                     return;
                 }
                 
                 const user = auth.currentUser;
+                
+                // Sort locations by username
+                locations.sort((a, b) => a.username.localeCompare(b.username));
                 
                 locations.forEach(location => {
                     // Skip current user in the list
@@ -1375,7 +1422,12 @@
                     
                     // Add or update marker
                     if (markers[location.userId]) {
-                        markers[location.userId].setLatLng([location.latitude, location.longitude]);
+                        // Animate marker movement
+                        const currentLatLng = markers[location.userId].getLatLng();
+                        const newLatLng = [location.latitude, location.longitude];
+                        
+                        // Smooth animation for marker movement
+                        markers[location.userId].setLatLng(newLatLng);
                     } else {
                         const marker = L.marker([location.latitude, location.longitude], {
                             icon: L.icon({
@@ -1396,7 +1448,7 @@
                     const locationItem = document.createElement('div');
                     locationItem.className = 'location-item';
                     
-                    const timestamp = location.timestamp ? new Date(location.timestamp.toDate()).toLocaleString('id-ID') : '';
+                    const timestamp = location.lastSeen ? new Date(location.lastSeen.toDate()).toLocaleString('id-ID') : '';
                     const distance = calculateDistance(
                         userMarker ? userMarker.getLatLng().lat : 0,
                         userMarker ? userMarker.getLatLng().lng : 0,
@@ -1411,6 +1463,7 @@
                             <div class="location-item-time">${timestamp}</div>
                         </div>
                         <div class="location-item-distance">${distance} km</div>
+                        <div class="location-item-status active"></div>
                     `;
                     
                     locationItem.addEventListener('click', function() {
@@ -1422,12 +1475,18 @@
                 });
                 
                 if (locations.filter(l => l.userId !== user.uid).length === 0) {
-                    locationList.innerHTML = '<div class="kas-empty">Tidak ada lokasi anggota lain</div>';
+                    locationList.innerHTML = '<div class="kas-empty">Tidak ada anggota lain yang aktif</div>';
                 }
+                
+                // Hide updating indicator
+                setTimeout(() => {
+                    mapActivityIndicator.classList.remove('updating');
+                }, 500);
             }, error => {
                 console.error("Error loading user locations:", error);
                 handleFirebaseError(error);
                 locationList.innerHTML = '<div class="kas-empty">Gagal memuat lokasi anggota</div>';
+                mapActivityIndicator.classList.remove('updating');
             });
         }
         
