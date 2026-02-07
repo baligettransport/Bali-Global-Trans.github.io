@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pesan - BGT PRO</title>
     
     <!-- External Libraries -->
@@ -24,7 +24,6 @@
             --primary-color: #4285f4;
             --primary-dark: #1a73e8;
             --secondary-color: #ff6b6b;
-            --secondary-dark: #ee5a24;
             --success-color: #27ae60;
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
@@ -44,7 +43,6 @@
             /* Transitions */
             --transition-fast: 0.2s;
             --transition-normal: 0.3s;
-            --transition-slow: 0.5s;
             
             /* WhatsApp Theme Variables */
             --whatsapp-bg: #f0f2f5;
@@ -61,7 +59,6 @@
         }
         
         [data-theme="dark"] {
-            /* Dark Theme */
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --text-color: #ffffff;
@@ -78,6 +75,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body { 
@@ -88,33 +86,44 @@
             justify-content: center; 
             align-items: center; 
             min-height: 100vh; 
-            padding: 20px; 
-            -webkit-font-smoothing: antialiased; 
-            -moz-osx-font-smoothing: grayscale;
-            transition: background-color var(--transition-normal), color var(--transition-normal);
+            padding: 0; 
+            overflow: hidden; /* Mencegah scroll pada body utama */
+            transition: background-color var(--transition-normal);
         }
         
         /* Phone Container */
         .phone-container { 
-            width: 350px; 
-            height: 750px; 
+            width: 100%; 
+            height: 100%; 
             background-color: var(--card-bg); 
-            border-radius: 16px; 
-            box-shadow: 0 10px 30px var(--shadow-color); 
-            overflow: hidden; 
             position: relative; 
+            overflow: hidden; 
             transition: background-color var(--transition-normal);
+            display: flex;
         }
         
-        /* WhatsApp Container */
+        @media (min-width: 480px) {
+            .phone-container {
+                width: 375px;
+                height: 750px;
+                border-radius: 16px; 
+                box-shadow: 0 10px 30px var(--shadow-color); 
+                border: 1px solid var(--border-color);
+            }
+        }
+        
+        /* WhatsApp Container Layout */
         .whatsapp-container {
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Default layout sidebar + chat */
+            width: 100%;
             height: 100%;
             background-color: var(--whatsapp-bg);
             overflow: hidden;
+            position: relative;
         }
         
+        /* --- SIDEBAR --- */
         .whatsapp-sidebar {
             background-color: var(--whatsapp-sidebar);
             display: flex;
@@ -122,30 +131,92 @@
             width: 100%;
             height: 100%;
             flex-shrink: 0;
+            z-index: 10;
+            transition: transform 0.3s ease;
         }
         
+        /* Desktop Layout */
+        @media (min-width: 769px) {
+            .whatsapp-sidebar {
+                width: 350px;
+                border-right: 1px solid #333;
+            }
+        }
+        
+        /* --- CHAT WINDOW --- */
         .whatsapp-chat-window {
-            display: none;
+            display: none; /* Hidden by default on mobile */
             flex-direction: column;
             background-color: #efeae2;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20; /* Di atas sidebar */
+        }
+        
+        /* Desktop Chat Window Behavior */
+        @media (min-width: 769px) {
+            .whatsapp-chat-window {
+                display: flex; /* Selalu tampil di desktop */
+                position: relative;
+                flex-grow: 1;
+                z-index: 5;
+            }
         }
         
         .whatsapp-chat-window.active {
             display: flex;
+            animation: slideInRight 0.2s ease-out;
         }
         
-        .whatsapp-back-btn {
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* --- MEMBERS LIST (Full Screen Overlay) --- */
+        .members-list {
             display: none;
+            flex-direction: column;
+            height: 100%;
+            background-color: #f0f2f5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 30; /* Paling atas untuk overlay full screen */
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .members-list.active {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* --- UI COMPONENTS --- */
+        .whatsapp-back-btn {
+            display: block; /* Selalu tampilkan di mobile */
             margin-right: 15px;
             color: #8696a0;
             font-size: 20px;
             cursor: pointer;
         }
+
+        @media (min-width: 769px) {
+            .whatsapp-back-btn {
+                display: none; /* Sembunyikan di desktop */
+            }
+        }
         
-        .whatsapp-sidebar-header {
+        /* Header Styles */
+        .whatsapp-sidebar-header, .whatsapp-chat-header, .members-header {
             padding: 10px 16px;
             display: flex;
             align-items: center;
@@ -163,6 +234,7 @@
             padding: 5px;
             border-radius: 8px;
             transition: background-color 0.2s;
+            flex-grow: 1;
         }
         
         .whatsapp-user-profile:hover {
@@ -178,14 +250,17 @@
         }
         
         .whatsapp-user-profile-name {
-            font-size: 18px;
+            font-size: 16px; /* Sedikit lebih kecil agar muat */
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .whatsapp-sidebar-header .icons {
             display: flex;
-            gap: 25px;
-            font-size: 20px;
+            gap: 20px;
+            font-size: 18px;
             cursor: pointer;
         }
         
@@ -193,6 +268,7 @@
             color: #8696a0;
         }
         
+        /* Tabs & Search */
         .whatsapp-filter-tabs {
             display: flex;
             background-color: var(--whatsapp-header);
@@ -205,7 +281,7 @@
         
         .whatsapp-filter-tab {
             padding: 6px 12px;
-            margin-right: 20px;
+            margin-right: 15px;
             cursor: pointer;
             font-size: 14px;
             border-radius: 10px;
@@ -218,14 +294,14 @@
         }
         
         .whatsapp-search-box {
-            padding: 8px 16px;
+            padding: 8px 12px;
             background-color: var(--whatsapp-header);
             flex-shrink: 0;
         }
         
         .whatsapp-search-box input {
             width: 100%;
-            padding: 9px 12px;
+            padding: 8px 12px;
             border-radius: 8px;
             background-color: var(--whatsapp-hover);
             border: none;
@@ -234,10 +310,7 @@
             font-size: 14px;
         }
         
-        .whatsapp-search-box input::placeholder {
-            color: #8696a0;
-        }
-        
+        /* Chat List Items */
         .whatsapp-chat-list {
             flex-grow: 1;
             overflow-y: auto;
@@ -259,8 +332,8 @@
         }
         
         .whatsapp-chat-item img {
-            width: 49px;
-            height: 49px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             margin-right: 13px;
             object-fit: cover;
@@ -271,9 +344,6 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-        }
-        
-        .whatsapp-chat-item-info {
             overflow: hidden;
         }
         
@@ -281,6 +351,9 @@
             font-size: 16px;
             font-weight: 400;
             margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .whatsapp-chat-item-details p {
@@ -289,61 +362,38 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width: 200px;
-        }
-        
-        .whatsapp-chat-item-time {
-            font-size: 12px;
-            color: #8696a0;
-            margin-top: 3px;
+            max-width: 180px;
         }
         
         .whatsapp-chat-item-meta {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            min-width: 50px;
         }
         
-        .whatsapp-message-status {
-            display: flex;
-            align-items: center;
-            margin-top: 2px;
-        }
-        
-        .whatsapp-message-status i {
+        .whatsapp-chat-item-time {
             font-size: 12px;
-            margin-left: 2px;
-        }
-        
-        .whatsapp-message-status.read {
-            color: #53bdeb;
-        }
-        
-        .whatsapp-message-status.unread {
             color: #8696a0;
+            margin-bottom: 2px;
         }
         
         .whatsapp-unread-badge {
             background-color: var(--whatsapp-green);
             color: white;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            min-width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            margin-top: 3px;
+            font-size: 11px;
+            padding: 0 4px;
         }
         
+        /* Chat Window Header */
         .whatsapp-chat-header {
-            padding: 10px 16px;
-            background-color: var(--whatsapp-header);
-            display: flex;
-            align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: 60px;
-            flex-shrink: 0;
         }
         
         .whatsapp-chat-header img {
@@ -356,29 +406,34 @@
         
         .whatsapp-chat-header .info {
             flex-grow: 1;
+            overflow: hidden;
         }
         
         .whatsapp-chat-header .info h3 {
-            font-size: 18px;
+            font-size: 16px;
             color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .whatsapp-chat-header .info p {
-            font-size: 13px;
+            font-size: 12px;
             color: #8696a0;
         }
         
         .whatsapp-chat-header .icons {
             display: flex;
-            gap: 25px;
-            font-size: 20px;
+            gap: 20px;
+            font-size: 18px;
             color: #8696a0;
             cursor: pointer;
         }
         
+        /* Messages Area */
         .whatsapp-messages {
             flex-grow: 1;
-            padding: 20px 10px;
+            padding: 15px 10px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -409,6 +464,7 @@
             position: relative;
             max-width: 100%;
             word-wrap: break-word;
+            font-size: 14px;
         }
         
         .whatsapp-message.sent .whatsapp-message-bubble {
@@ -420,23 +476,26 @@
         }
         
         .whatsapp-message-time {
-            font-size: 11px;
+            font-size: 10px;
             color: #999;
-            margin-top: 4px;
+            margin-top: 2px;
+            margin-left: 4px;
+            float: right;
         }
         
+        /* Chat Input */
         .whatsapp-chat-input {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background-color: var(--whatsapp-header);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-shrink: 0;
         }
         
         .whatsapp-chat-input i {
             color: #8696a0;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
         }
         
@@ -444,15 +503,11 @@
             flex-grow: 1;
             border: none;
             background-color: var(--whatsapp-hover);
-            padding: 9px 12px;
+            padding: 10px 15px;
             border-radius: 20px;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
             color: white;
-        }
-        
-        .whatsapp-chat-input input::placeholder {
-            color: #8696a0;
         }
         
         .whatsapp-chat-input button {
@@ -469,31 +524,28 @@
             justify-content: center;
         }
         
-        .whatsapp-welcome-screen {
-            display: flex;
+        /* Welcome & Profile Views */
+        .whatsapp-welcome-screen, .whatsapp-profile-view {
+            display: none; /* Default hidden */
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100%;
             color: #8696a0;
             background-color: #efeae2;
+            text-align: center;
+            padding: 20px;
         }
-        
-        .whatsapp-profile-view {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            background-color: #efeae2;
-        }
-        
-        .whatsapp-profile-view.active {
+
+        .whatsapp-welcome-screen.active, .whatsapp-profile-view.active {
             display: flex;
         }
         
         .whatsapp-profile-content {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 30px 20px;
+            padding: 20px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -503,41 +555,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 30px;
-            text-align: center;
+            margin-bottom: 20px;
         }
         
         .whatsapp-profile-header img {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             border: 4px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             object-fit: cover;
-        }
-        
-        .whatsapp-profile-header h2 {
-            color: var(--whatsapp-dark);
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        
-        .whatsapp-profile-title-barcode {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .whatsapp-profile-title-barcode p {
-            color: #667781;
-            font-size: 16px;
-        }
-        
-        .whatsapp-profile-title-barcode #barcode {
-            height: 40px;
         }
         
         .whatsapp-profile-details {
@@ -545,14 +573,7 @@
             border-radius: 10px;
             padding: 20px;
             width: 100%;
-            max-width: 500px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .whatsapp-profile-details h3 {
-            color: var(--whatsapp-dark);
-            margin-bottom: 15px;
-            font-size: 18px;
         }
         
         .whatsapp-detail-item {
@@ -560,89 +581,45 @@
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #f0f2f5;
-        }
-        
-        .whatsapp-detail-item:last-child {
-            border-bottom: none;
-        }
-        
-        .whatsapp-detail-label {
-            color: #667781;
-            font-size: 16px;
-        }
-        
-        .whatsapp-detail-value {
-            color: var(--whatsapp-dark);
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 14px;
         }
         
         .whatsapp-edit-btn {
             background-color: var(--whatsapp-green);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 10px 25px;
             border-radius: 25px;
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            margin-top: 25px;
-            transition: background-color 0.2s;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
         }
-        
-        .whatsapp-edit-btn:hover {
-            background-color: #128c7e;
-        }
-        
-        /* Members List */
-        .members-list {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            background-color: #f0f2f5;
-            overflow: hidden;
-        }
-        
-        .members-list.active {
-            display: flex;
-        }
-        
-        .members-header {
-            padding: 10px 16px;
-            background-color: #0b141a;
-            color: white;
-            display: flex;
-            align-items: center;
-            height: 60px;
-            flex-shrink: 0;
-        }
-        
-        .members-header h3 {
-            font-size: 18px;
-            margin-left: 15px;
-        }
-        
+
+        /* Members List Styles */
         .members-content {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 10px;
         }
         
         .member-item {
             display: flex;
             align-items: center;
             padding: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.1s, background-color 0.2s;
         }
         
-        .member-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        .member-item:active {
+            background-color: #f0f2f5;
+            transform: scale(0.98);
         }
         
         .member-avatar {
@@ -651,73 +628,29 @@
             border-radius: 50%;
             margin-right: 15px;
             object-fit: cover;
+            background-color: #ddd;
         }
         
         .member-info {
             flex-grow: 1;
+            overflow: hidden;
         }
         
         .member-name {
             font-size: 16px;
             font-weight: 600;
             color: #202c33;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .member-status {
-            font-size: 13px;
+            font-size: 12px;
             color: #667781;
         }
-        
-        .member-status.active {
-            color: #25d366;
-        }
-        
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            padding: 12px 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            z-index: 1001;
-            opacity: 0;
-            transition: all var(--transition-normal);
-            font-size: 14px;
-            font-weight: 600;
-            max-width: 300px;
-            text-align: center;
-        }
-        
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        
-        .toast.success {
-            background-color: var(--success-color);
-            color: white;
-        }
-        
-        .toast.error {
-            background-color: var(--danger-color);
-            color: white;
-        }
-        
-        .toast.warning {
-            background-color: var(--warning-color);
-            color: white;
-        }
-        
-        .toast.info {
-            background-color: var(--info-color);
-            color: white;
-        }
-        
+
         /* Loading State */
         .loading-state {
             display: flex;
@@ -727,75 +660,86 @@
             height: 100%;
             color: #8696a0;
             background-color: #efeae2;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 5;
         }
         
         .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #25d366;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #25d366;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s;
+            font-size: 14px;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
         
-        /* Responsive Design */
-        @media (max-width: 480px) {
-            .phone-container { 
-                width: 100%; 
-                height: 100vh; 
-                border-radius: 0; 
-            }
-            body { 
-                padding: 0; 
-            }
-            
-            .whatsapp-back-btn {
-                display: block;
-            }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
 <body>
     <div class="phone-container">
         <div class="whatsapp-container">
-            <aside class="whatsapp-sidebar">
+            <!-- Sidebar Area -->
+            <aside class="whatsapp-sidebar" id="whatsapp-sidebar">
                 <header class="whatsapp-sidebar-header">
-                    <!-- Tombol kembali di posisi ikon kamera -->
-                    <div class="icons">
-                        <i class="fas fa-arrow-left" id="whatsapp-back-to-main"></i>
-                    </div>
-                    
-                    <!-- Profil pengguna yang login - akan diupdate secara dinamis -->
                     <div class="whatsapp-user-profile" id="whatsapp-user-profile">
                         <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-sidebar-profile-pic">
                         <span class="whatsapp-user-profile-name" id="whatsapp-sidebar-username">Memuat...</span>
+                    </div>
+                    <div class="icons">
+                        <i class="fas fa-sign-out-alt" id="btn-logout" title="Keluar ke Dashboard"></i>
                     </div>
                 </header>
                 
                 <div class="whatsapp-filter-tabs">
                     <div class="whatsapp-filter-tab active" data-filter="all">Semua</div>
-                    <div class="whatsapp-filter-tab" data-filter="unread">Belum dibaca</div>
+                    <div class="whatsapp-filter-tab" data-filter="unread">Belum baca</div>
                     <div class="whatsapp-filter-tab" data-filter="groups">Grup</div>
                 </div>
                 
                 <div class="whatsapp-search-box">
-                    <input type="text" placeholder="Cari atau mulai chat baru" id="whatsapp-search-input">
+                    <input type="text" placeholder="Cari..." id="whatsapp-search-input">
                 </div>
                 
                 <div class="whatsapp-chat-list" id="whatsapp-chat-list">
                     <div class="loading-state">
                         <div class="loading-spinner"></div>
-                        <p>Memuat daftar chat...</p>
+                        <p>Memuat...</p>
                     </div>
                 </div>
             </aside>
 
+            <!-- Chat Area -->
             <main class="whatsapp-chat-window" id="whatsapp-chat-window">
                 <header class="whatsapp-chat-header">
                     <i class="fas fa-arrow-left whatsapp-back-btn" id="whatsapp-back-btn"></i>
@@ -807,90 +751,74 @@
                     <div class="icons">
                         <i class="fas fa-video"></i>
                         <i class="fas fa-phone"></i>
-                        <i class="fas fa-search"></i>
                     </div>
                 </header>
                 
-                <!-- Welcome Screen (default) -->
+                <!-- Welcome Screen -->
                 <div class="whatsapp-messages" id="whatsapp-messages">
-                    <div class="whatsapp-welcome-screen">
-                        <i class="fab fa-whatsapp"></i>
-                        <h3>Selamat datang di WhatsApp BGT PRO</h3>
-                        <p>Kirim dan terima pesan tanpa menyimpan nomor telepon</p>
+                    <div class="whatsapp-welcome-screen active" id="whatsapp-welcome-screen">
+                        <i class="fab fa-whatsapp" style="font-size: 48px; margin-bottom: 20px; color: #25d366;"></i>
+                        <h3>Selamat datang di BGT PRO Chat</h3>
+                        <p>Kirim dan terima pesan dengan anggota lain.</p>
                     </div>
                 </div>
                 
-                <!-- Profile View (hidden by default) -->
-                <div class="whatsapp-profile-view" id="whatsapp-profile-view">
+                <!-- Profile View -->
+                <div class="whatsapp-messages whatsapp-profile-view" id="whatsapp-profile-view">
                     <div class="whatsapp-profile-content">
                         <div class="whatsapp-profile-header">
                             <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-profile-pic-large">
                             <h2 id="whatsapp-profile-username">Memuat...</h2>
-                            <div class="whatsapp-profile-title-barcode">
-                                <p id="whatsapp-profile-role">Memuat...</p>
-                                <!-- Barcode akan digenerate oleh JsBarcode -->
+                            <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                                <p id="whatsapp-profile-role" style="color: #667781;">Memuat...</p>
                                 <svg id="whatsapp-barcode"></svg>
                             </div>
                         </div>
                         
                         <div class="whatsapp-profile-details">
-                            <h3>Data Lengkap Anggota</h3>
-                            <div class="whatsapp-detail-item">
-                                <span class="whatsapp-detail-label">Nama Lengkap</span>
-                                <span class="whatsapp-detail-value" id="whatsapp-detail-name">Memuat...</span>
-                            </div>
+                            <h3 style="margin-bottom: 15px; color: var(--whatsapp-dark);">Profil Saya</h3>
                             <div class="whatsapp-detail-item">
                                 <span class="whatsapp-detail-label">Email</span>
-                                <span class="whatsapp-detail-value" id="whatsapp-detail-email">Memuat...</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-email">-</span>
                             </div>
                             <div class="whatsapp-detail-item">
                                 <span class="whatsapp-detail-label">Telepon</span>
-                                <span class="whatsapp-detail-value" id="whatsapp-detail-phone">Memuat...</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-phone">-</span>
                             </div>
                             <div class="whatsapp-detail-item">
                                 <span class="whatsapp-detail-label">Status</span>
-                                <span class="whatsapp-detail-value" id="whatsapp-detail-status">Memuat...</span>
-                            </div>
-                            <div class="whatsapp-detail-item">
-                                <span class="whatsapp-detail-label">Bergabung</span>
-                                <span class="whatsapp-detail-value" id="whatsapp-detail-joined">Memuat...</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-status">-</span>
                             </div>
                         </div>
                         
-                        <button class="whatsapp-edit-btn" id="whatsapp-edit-profile-btn">Lihat Anggota</button>
+                        <button class="whatsapp-edit-btn" id="whatsapp-view-members-btn">Lihat Anggota Terdaftar</button>
                     </div>
                 </div>
                 
-                <div class="whatsapp-chat-input">
+                <div class="whatsapp-chat-input" id="whatsapp-chat-input-area" style="display: none;">
                     <i class="fas fa-smile"></i>
                     <i class="fas fa-paperclip"></i>
-                    <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan" disabled>
+                    <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan">
                     <i class="fas fa-microphone" id="whatsapp-mic-icon"></i>
-                    <button id="whatsapp-send-btn" disabled><i class="fas fa-paper-plane"></i></button>
+                    <button id="whatsapp-send-btn" style="display: none;"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </main>
             
-            <!-- Members List View -->
+            <!-- Members List View (Full Screen Overlay) -->
             <div class="members-list" id="members-list">
                 <header class="members-header">
                     <i class="fas fa-arrow-left" id="members-back-btn"></i>
                     <h3>Anggota Terdaftar</h3>
                 </header>
                 <div class="members-content" id="members-content">
-                    <div class="loading-state">
-                        <div class="loading-spinner"></div>
-                        <p>Memuat daftar anggota...</p>
-                    </div>
+                    <!-- Member items injected here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast" class="toast"></div>
-    
-    <!-- Hidden file input for profile picture -->
-    <input type="file" id="whatsapp-profile-pic-input" accept="image/*" style="display: none;">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Notifikasi</div>
 
     <script>
         // Firebase configuration
@@ -909,802 +837,455 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const storage = firebase.storage();
 
         // WhatsApp App State
         const whatsappApp = {
             state: {
-                activeChat: null,
+                activeChatId: null,
                 activeFilter: 'all',
                 chats: [],
                 messages: {},
                 currentUserData: null,
                 registeredMembers: [],
-                groups: [],
-                chatWindows: {} // Store multiple chat windows
+                previousView: 'sidebar', // 'sidebar' or 'members'
+                isMobile: window.innerWidth <= 768
             },
 
-            // Initialize WhatsApp App
             init() {
-                // Check for existing session first
                 this.checkExistingSession();
                 
-                // Initialize Firebase auth
+                // Auth Listener
                 auth.onAuthStateChanged(user => {
                     if (user) {
                         this.loadUserData(user.uid);
-                        this.initWhatsApp();
+                        this.initUI();
                         this.loadRegisteredMembers();
-                        this.loadGroups();
                     } else {
-                        // No user found, redirect to dashboard_anggota.html
                         window.location.href = 'dashboard_anggota.html';
                     }
                 });
+
+                // Handle Resize
+                window.addEventListener('resize', () => {
+                    this.state.isMobile = window.innerWidth <= 768;
+                    this.handleResize();
+                });
             },
 
-            // Check for existing session
             checkExistingSession() {
                 const session = localStorage.getItem('bgtProSession');
-                if (session === 'active') {
-                    // Session exists, continue
-                    console.log('Session found, continuing...');
-                } else {
-                    // No session, check if we're coming from dashboard
+                if (session !== 'active') {
                     const referrer = document.referrer;
                     if (referrer && referrer.includes('dashboard_anggota.html')) {
-                        // Coming from dashboard, set session
                         localStorage.setItem('bgtProSession', 'active');
-                        console.log('Session set from dashboard');
+                    } else {
+                        window.location.href = 'dashboard_anggota.html';
                     }
                 }
             },
 
-            // Load user data
             async loadUserData(userId) {
                 try {
                     const doc = await db.collection('users').doc(userId).get();
                     if (doc.exists) {
-                        this.state.currentUserData = doc.data();
-                        this.updateUserProfileUI(this.state.currentUserData);
+                        this.state.currentUserData = { id: doc.id, ...doc.data() };
+                        this.updateProfileUI();
                     }
                 } catch (error) {
                     console.error("Error loading user data:", error);
                 }
             },
 
-            // Load registered members from Firebase
             async loadRegisteredMembers() {
                 try {
                     const snapshot = await db.collection('users').get();
                     this.state.registeredMembers = [];
-                    
                     snapshot.forEach(doc => {
-                        const memberData = {
-                            id: doc.id,
-                            ...doc.data()
-                        };
-                        this.state.registeredMembers.push(memberData);
-                    });
-                    
-                    // Update sample chats with registered members
-                    this.updateChatsWithRegisteredMembers();
-                } catch (error) {
-                    console.error("Error loading registered members:", error);
-                    this.showToast("Gagal memuat data anggota", "error");
-                }
-            },
-
-            // Load groups from Firebase
-            async loadGroups() {
-                try {
-                    const snapshot = await db.collection('groups').get();
-                    this.state.groups = [];
-                    
-                    snapshot.forEach(doc => {
-                        const groupData = {
-                            id: doc.id,
-                            ...doc.data()
-                        };
-                        this.state.groups.push(groupData);
-                    });
-                    
-                    // Update chats with groups
-                    this.updateChatsWithGroups();
-                } catch (error) {
-                    console.error("Error loading groups:", error);
-                    // Groups might not exist yet, which is fine
-                }
-            },
-
-            // Update chats with registered members
-            updateChatsWithRegisteredMembers() {
-                // Create sample chats with registered members
-                const sampleChats = [];
-                
-                // Add registered members as chats (excluding current user)
-                this.state.registeredMembers.forEach((member, index) => {
-                    if (member.id !== auth.currentUser.uid) { // Don't add self
-                        sampleChats.push({
-                            id: `member_${member.id}`,
-                            name: member.username || 'Anggota',
-                            avatar: member.profilePicUrl || `https://i.pravatar.cc/150?img=${index + 10}`,
-                            lastMessage: 'Halo, apa kabar?',
-                            time: this.getRandomTime(),
-                            unread: Math.floor(Math.random() * 3),
-                            isGroup: false,
-                            userId: member.id // Store user ID for navigation
-                        });
-                    }
-                });
-                
-                this.state.chats = sampleChats;
-                
-                // Load sample messages for each chat
-                sampleChats.forEach(chat => {
-                    this.state.messages[chat.id] = this.generateSampleMessages(chat.id);
-                });
-                
-                // Render chat list
-                this.renderChatList();
-            },
-
-            // Update chats with groups
-            updateChatsWithGroups() {
-                // Add groups to chats if they exist
-                this.state.groups.forEach(group => {
-                    this.state.chats.push({
-                        id: `group_${group.id}`,
-                        name: group.name || 'Grup',
-                        avatar: group.avatar || 'https://i.pravatar.cc/150?img=12',
-                        lastMessage: group.lastMessage || 'Admin: Jangan lupa iuran bulanan',
-                        time: this.getRandomTime(),
-                        unread: Math.floor(Math.random() * 3),
-                        isGroup: true,
-                        groupId: group.id // Store group ID for navigation
-                    });
-                });
-                
-                // Re-render chat list
-                this.renderChatList();
-            },
-
-            // Get random time for sample data
-            getRandomTime() {
-                const times = ['10:30', 'Kemarin', 'Senin', 'Minggu', '2 hari yang lalu'];
-                return times[Math.floor(Math.random() * times.length)];
-            },
-
-            // Update user profile UI with dynamic data
-            updateUserProfileUI(userData) {
-                const imageUrl = userData.profilePicUrl || 'https://picsum.photos/seed/default-user/100/100.jpg';
-                const username = userData.username || 'Pengguna';
-                
-                // Update all profile-related elements
-                const elements = {
-                    'whatsapp-sidebar-profile-pic': imageUrl,
-                    'whatsapp-profile-pic-large': imageUrl,
-                    'whatsapp-chat-profile-img': imageUrl,
-                    'whatsapp-sidebar-username': username,
-                    'whatsapp-profile-username': username,
-                    'whatsapp-profile-role': userData.role || 'Anggota',
-                    'whatsapp-detail-name': username,
-                    'whatsapp-detail-email': userData.email || 'Email tidak tersedia',
-                    'whatsapp-detail-phone': userData.phone || 'Telepon tidak tersedia',
-                    'whatsapp-detail-status': userData.status || 'Aktif',
-                    'whatsapp-detail-joined': userData.joinDate ? 
-                        new Date(userData.joinDate.toDate()).toLocaleDateString('id-ID') : 
-                        'Tidak diketahui'
-                };
-                
-                // Update all elements
-                Object.keys(elements).forEach(elementId => {
-                    const element = document.getElementById(elementId);
-                    if (element) {
-                        if (elementId.includes('pic') || elementId.includes('img')) {
-                            element.src = elements[elementId];
-                            element.onerror = () => {
-                                element.src = 'https://picsum.photos/seed/default-user/100/100.jpg';
-                            };
-                        } else {
-                            element.textContent = elements[elementId];
+                        if (doc.id !== auth.currentUser.uid) {
+                            this.state.registeredMembers.push({ id: doc.id, ...doc.data() });
                         }
-                    }
-                });
-                
-                // Generate barcode with user ID
-                const barcodeEl = document.getElementById('whatsapp-barcode');
-                if (barcodeEl && userData.id) {
-                    JsBarcode(barcodeEl, userData.id, {
-                        format: "CODE128",
-                        width: 1.5,
-                        height: 40,
-                        displayValue: false
                     });
+                    this.generateSampleChats(); // Buat chat list dari anggota
+                } catch (error) {
+                    console.error("Error loading members:", error);
                 }
             },
 
-            // Initialize WhatsApp functionality
-            initWhatsApp() {
-                // WhatsApp elements
-                const whatsappChatList = document.getElementById('whatsapp-chat-list');
-                const whatsappMessages = document.getElementById('whatsapp-messages');
-                const whatsappMessageInput = document.getElementById('whatsapp-message-input');
-                const whatsappSendBtn = document.getElementById('whatsapp-send-btn');
-                const whatsappChatName = document.getElementById('whatsapp-chat-name');
-                const whatsappChatStatus = document.getElementById('whatsapp-chat-status');
-                const whatsappChatProfileImg = document.getElementById('whatsapp-chat-profile-img');
-                const whatsappChatWindow = document.getElementById('whatsapp-chat-window');
-                const whatsappBackBtn = document.getElementById('whatsapp-back-btn');
-                const whatsappBackToMain = document.getElementById('whatsapp-back-to-main');
-                const whatsappFilterTabs = document.querySelectorAll('.whatsapp-filter-tab');
-                const whatsappSearchInput = document.getElementById('whatsapp-search-input');
-                const whatsappMicIcon = document.getElementById('whatsapp-mic-icon');
+            generateSampleChats() {
+                const sampleChats = this.state.registeredMembers.map((member, index) => ({
+                    id: member.id,
+                    name: member.username || 'Anggota',
+                    avatar: member.profilePicUrl || `https://i.pravatar.cc/150?img=${index + 10}`,
+                    lastMessage: 'Klik untuk mulai chat',
+                    time: '',
+                    unread: 0,
+                    isGroup: false,
+                    userId: member.id
+                }));
+
+                this.state.chats = sampleChats;
+                this.renderChatList();
+            },
+
+            updateProfileUI() {
+                const user = this.state.currentUserData;
+                if (!user) return;
+
+                const updateEl = (id, val, isSrc = false) => {
+                    const el = document.getElementById(id);
+                    if (el) isSrc ? el.src = val : el.textContent = val;
+                };
+
+                const imgUrl = user.profilePicUrl || 'https://picsum.photos/seed/default/100/100.jpg';
                 
-                // WhatsApp profile elements
-                const whatsappUserProfileTrigger = document.getElementById('whatsapp-user-profile');
-                const whatsappProfileView = document.getElementById('whatsapp-profile-view');
-                const whatsappWelcomeScreen = document.querySelector('.whatsapp-welcome-screen');
-                const whatsappEditProfileBtn = document.getElementById('whatsapp-edit-profile-btn');
-                
-                // Members list elements
-                const membersList = document.getElementById('members-list');
-                const membersBackBtn = document.getElementById('members-back-btn');
-                const membersContent = document.getElementById('members-content');
-                
-                // WhatsApp filter tabs
-                whatsappFilterTabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        whatsappFilterTabs.forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        this.state.activeFilter = tab.dataset.filter;
-                        this.filterChats();
-                    });
+                updateEl('whatsapp-sidebar-profile-pic', imgUrl, true);
+                updateEl('whatsapp-profile-pic-large', imgUrl, true);
+                updateEl('whatsapp-sidebar-username', user.username || 'User');
+                updateEl('whatsapp-profile-username', user.username || 'User');
+                updateEl('whatsapp-profile-role', user.role || 'Anggota');
+                updateEl('whatsapp-detail-email', user.email || '-');
+                updateEl('whatsapp-detail-phone', user.phone || '-');
+                updateEl('whatsapp-detail-status', user.status || 'Aktif');
+
+                // Generate Barcode
+                JsBarcode("#whatsapp-barcode", user.id, {
+                    format: "CODE128", width: 1.5, height: 30, displayValue: false
                 });
-                
-                // WhatsApp search
-                whatsappSearchInput.addEventListener('input', (e) => {
-                    this.searchChats(e.target.value);
+            },
+
+            initUI() {
+                // Elements
+                const els = {
+                    userProfile: document.getElementById('whatsapp-user-profile'),
+                    viewMembersBtn: document.getElementById('whatsapp-view-members-btn'),
+                    membersBackBtn: document.getElementById('whatsapp-members-back-btn'), // ID fixed below
+                    chatBackBtn: document.getElementById('whatsapp-back-btn'),
+                    logoutBtn: document.getElementById('btn-logout'),
+                    filterTabs: document.querySelectorAll('.whatsapp-filter-tab'),
+                    searchInput: document.getElementById('whatsapp-search-input'),
+                    msgInput: document.getElementById('whatsapp-message-input'),
+                    sendBtn: document.getElementById('whatsapp-send-btn'),
+                    micIcon: document.getElementById('whatsapp-mic-icon')
+                };
+
+                // --- Event Listeners ---
+
+                // 1. Klik Profil Sidebar -> Buka Profil
+                els.userProfile.addEventListener('click', () => {
+                    this.showScreen('profile');
+                    this.state.previousView = 'sidebar';
                 });
-                
-                // WhatsApp event listeners
-                
-                // Open/close profile view
-                whatsappUserProfileTrigger.addEventListener('click', () => {
-                    whatsappWelcomeScreen.style.display = 'none';
-                    whatsappProfileView.classList.add('active');
-                    whatsappChatName.textContent = 'Profil Saya';
-                    whatsappChatStatus.textContent = 'Data Diri';
-                    whatsappChatProfileImg.src = document.getElementById('whatsapp-sidebar-profile-pic').src;
-                    
-                    // In mobile, ensure chat window is active
-                    if (window.innerWidth <= 767) {
-                        whatsappChatWindow.classList.add('active');
+
+                // 2. Klik Tombol "Lihat Anggota" -> Buka Halaman Anggota (Tanpa Loading)
+                els.viewMembersBtn.addEventListener('click', () => {
+                    this.showMembersListInstant();
+                });
+
+                // 3. Klik Back di Anggota -> Kembali ke Dashboard Utama
+                document.getElementById('members-back-btn').addEventListener('click', () => {
+                    // Langsung redirect tanpa loading
+                    window.location.href = 'dashboard_anggota.html';
+                });
+
+                // 4. Klik Back di Chat -> Logika pintar (Sidebar vs Members)
+                els.chatBackBtn.addEventListener('click', () => {
+                    if (this.state.previousView === 'members') {
+                        // Kembali ke List Anggota
+                        this.showMembersListInstant();
+                    } else {
+                        // Kembali ke Sidebar
+                        this.closeChat();
                     }
                 });
-                
-                // Back button (main) - Mengarah ke dashboard_anggota.html
-                whatsappBackToMain.addEventListener('click', () => {
-                    // Clear session
+
+                // 5. Klik Logout -> Dashboard
+                els.logoutBtn.addEventListener('click', () => {
                     localStorage.removeItem('bgtProSession');
                     window.location.href = 'dashboard_anggota.html';
                 });
-                
-                // Back button (chat)
-                whatsappBackBtn.addEventListener('click', () => {
-                    // If profile view is active, go back to welcome screen
-                    if (whatsappProfileView.classList.contains('active')) {
-                        whatsappProfileView.classList.remove('active');
-                        whatsappWelcomeScreen.style.display = 'flex';
-                        whatsappChatName.textContent = 'BGT PRO';
-                        whatsappChatStatus.textContent = 'Aplikasi Pesan Real-Time';
-                        
-                        // In mobile, go back to sidebar
-                        if (window.innerWidth <= 767) {
-                            whatsappChatWindow.classList.remove('active');
-                        }
+
+                // Filter Tabs
+                els.filterTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        els.filterTabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.state.activeFilter = tab.dataset.filter;
+                        this.renderChatList();
+                    });
+                });
+
+                // Search
+                els.searchInput.addEventListener('input', (e) => this.renderChatList(e.target.value));
+
+                // Input Pesan
+                els.msgInput.addEventListener('input', (e) => {
+                    if (e.target.value.trim()) {
+                        els.sendBtn.style.display = 'flex';
+                        els.micIcon.style.display = 'none';
                     } else {
-                        // Otherwise, go back to chat list
-                        whatsappChatWindow.classList.remove('active');
-                        this.state.activeChat = null;
+                        els.sendBtn.style.display = 'none';
+                        els.micIcon.style.display = 'block';
                     }
                 });
-                
-                // Edit profile button - now shows members list
-                whatsappEditProfileBtn.addEventListener('click', () => {
-                    this.showMembersList();
-                });
-                
-                // Members back button
-                membersBackBtn.addEventListener('click', () => {
-                    membersList.classList.remove('active');
-                    whatsappProfileView.classList.add('active');
-                });
-                
-                // Message input
-                whatsappMessageInput.addEventListener('input', (e) => {
-                    // Toggle between send button and mic icon based on input
-                    if (e.target.value.trim() === '') {
-                        whatsappSendBtn.style.display = 'none';
-                        whatsappMicIcon.style.display = 'block';
-                    } else {
-                        whatsappSendBtn.style.display = 'flex';
-                        whatsappMicIcon.style.display = 'none';
-                    }
-                });
-                
-                // Send message
-                whatsappSendBtn.addEventListener('click', () => {
-                    this.sendMessage();
-                });
-                
-                // Send message on Enter key
-                whatsappMessageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.sendMessage();
-                    }
-                });
+
+                els.sendBtn.addEventListener('click', () => this.sendMessage());
+                els.msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.sendMessage(); });
             },
 
-            // Show members list
-            showMembersList() {
-                const membersList = document.getElementById('members-list');
-                const membersContent = document.getElementById('members-content');
+            // --- Navigation Logic ---
+
+            showScreen(screenName) {
+                const welcome = document.getElementById('whatsapp-welcome-screen');
+                const profile = document.getElementById('whatsapp-profile-view');
+                const chatName = document.getElementById('whatsapp-chat-name');
+                const chatStatus = document.getElementById('whatsapp-chat-status');
+                const chatImg = document.getElementById('whatsapp-chat-profile-img');
+
+                if (screenName === 'welcome') {
+                    welcome.classList.add('active');
+                    profile.classList.remove('active');
+                    chatName.textContent = 'BGT PRO';
+                    chatStatus.textContent = 'Aplikasi Pesan';
+                    chatImg.src = document.getElementById('whatsapp-sidebar-profile-pic').src;
+                    document.getElementById('whatsapp-chat-input-area').style.display = 'none';
+                } else if (screenName === 'profile') {
+                    welcome.classList.remove('active');
+                    profile.classList.add('active');
+                    chatName.textContent = 'Proil Saya';
+                    chatStatus.textContent = 'Data Diri';
+                    chatImg.src = this.state.currentUserData?.profilePicUrl || '';
+                    document.getElementById('whatsapp-chat-input-area').style.display = 'none';
+                }
+            },
+
+            // 1. Buka List Anggota (Instant)
+            showMembersListInstant() {
+                // Hide chat window sidebar profile view logic if active
+                this.showScreen('welcome'); 
                 
-                // Hide profile view and show members list
-                document.getElementById('whatsapp-profile-view').classList.remove('active');
+                // Show Members List Overlay
+                const membersList = document.getElementById('members-list');
                 membersList.classList.add('active');
                 
-                // Render members list
-                this.renderMembersList();
+                // Render members (Pastikan data sudah ada di state)
+                this.renderMembersContent();
             },
 
-            // Render members list
-            renderMembersList() {
-                const membersContent = document.getElementById('members-content');
-                
+            // 2. Render Anggota
+            renderMembersContent() {
+                const container = document.getElementById('members-content');
+                container.innerHTML = ''; // Clear existing
+
                 if (this.state.registeredMembers.length === 0) {
-                    membersContent.innerHTML = '<p style="text-align: center; color: #667781; padding: 20px;">Tidak ada anggota terdaftar</p>';
+                    container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px;">Tidak ada anggota lain.</p>';
                     return;
                 }
-                
-                membersContent.innerHTML = '';
-                
+
                 this.state.registeredMembers.forEach(member => {
-                    const memberItem = document.createElement('div');
-                    memberItem.className = 'member-item';
+                    const item = document.createElement('div');
+                    item.className = 'member-item';
                     
-                    // Determine if member is online (random for demo)
-                    const isOnline = Math.random() > 0.5;
-                    
-                    memberItem.innerHTML = `
-                        <img src="${member.profilePicUrl || 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random() * 70)}" alt="${member.username}" class="member-avatar">
+                    const avatarUrl = member.profilePicUrl || `https://ui-avatars.com/api/?name=${member.username}&background=random`;
+
+                    item.innerHTML = `
+                        <img src="${avatarUrl}" class="member-avatar" alt="img">
                         <div class="member-info">
-                            <div class="member-name">${member.username || 'Anggota'}</div>
-                            <div class="member-status ${isOnline ? 'active' : ''}">${isOnline ? 'Aktif' : 'Tidak aktif'}</div>
+                            <div class="member-name">${member.username || 'Tanpa Nama'}</div>
+                            <div class="member-status">Klik untuk chat</div>
                         </div>
+                        <i class="fas fa-comment-dots" style="color: #8696a0;"></i>
                     `;
-                    
-                    memberItem.addEventListener('click', () => {
-                        this.showMemberDetails(member);
+
+                    // 3. Klik Anggota -> Buka Chat Full Screen
+                    item.addEventListener('click', () => {
+                        this.openChatFromMembers(member);
                     });
-                    
-                    membersContent.appendChild(memberItem);
+
+                    container.appendChild(item);
                 });
             },
 
-            // Show member details
-            showMemberDetails(member) {
-                // Create a simple modal with member details
-                const modal = document.createElement('div');
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.7);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 2000;
-                `;
-                
-                const modalContent = document.createElement('div');
-                modalContent.style.cssText = `
-                    background-color: white;
-                    border-radius: 16px;
-                    width: 90%;
-                    max-width: 320px;
-                    max-height: 80%;
-                    overflow: hidden;
-                    position: relative;
-                    padding: 20px;
-                `;
-                
-                modalContent.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <img src="${member.profilePicUrl || 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random() * 70)}" alt="${member.username}" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 10px;">
-                        <h3 style="margin: 0; color: #202c33;">${member.username || 'Anggota'}</h3>
-                        <p style="margin: 5px 0; color: #667781;">${member.email || 'Email tidak tersedia'}</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f5;">
-                            <span style="color: #667781;">Status</span>
-                            <span style="color: #202c33;">${member.status || 'Aktif'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f5;">
-                            <span style="color: #667781;">Bergabung</span>
-                            <span style="color: #202c33;">${member.joinDate ? new Date(member.joinDate.toDate()).toLocaleDateString('id-ID') : 'Tidak diketahui'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 10px 0;">
-                            <span style="color: #667781;">Role</span>
-                            <span style="color: #202c33;">${member.role || 'Anggota'}</span>
-                        </div>
-                    </div>
-                    
-                    <button style="background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;" onclick="this.parentElement.parentElement.remove()">
-                        Tutup
-                    </button>
-                `;
-                
-                modal.appendChild(modalContent);
-                document.body.appendChild(modal);
-                
-                // Close modal when clicking outside
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        document.body.removeChild(modal);
-                    }
-                });
-            },
-
-            // Render chat list
-            renderChatList() {
-                const whatsappChatList = document.getElementById('whatsapp-chat-list');
-                
-                if (this.state.chats.length === 0) {
-                    whatsappChatList.innerHTML = `
-                        <div class="loading-state">
-                            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
-                            <p>Belum ada chat</p>
-                        </div>
-                    `;
-                    return;
+            // 4. Buka Chat dari List Anggota
+            openChatFromMembers(member) {
+                // Cari atau buat objek chat
+                let chat = this.state.chats.find(c => c.userId === member.id);
+                if (!chat) {
+                    chat = {
+                        id: member.id,
+                        name: member.username,
+                        avatar: member.profilePicUrl || `https://ui-avatars.com/api/?name=${member.username}&background=random`,
+                        lastMessage: '',
+                        userId: member.id
+                    };
                 }
+
+                // Set state previous view agar tombol back tahu kemana harus balik
+                this.state.previousView = 'members';
                 
-                whatsappChatList.innerHTML = '';
-                
-                this.state.chats.forEach(chat => {
-                    // Apply filter
-                    if (this.state.activeFilter === 'unread' && chat.unread === 0) return;
-                    if (this.state.activeFilter === 'groups' && !chat.isGroup) return;
-                    
-                    const chatItem = document.createElement('div');
-                    chatItem.className = 'whatsapp-chat-item';
-                    chatItem.dataset.chatId = chat.id;
-                    
-                    chatItem.innerHTML = `
-                        <img src="${chat.avatar}" alt="${chat.name}">
-                        <div class="whatsapp-chat-item-details">
-                            <div class="whatsapp-chat-item-info">
-                                <h4>${chat.name}</h4>
-                                <p>${chat.lastMessage}</p>
-                            </div>
-                            <div class="whatsapp-chat-item-meta">
-                                <div class="whatsapp-chat-item-time">${chat.time}</div>
-                                ${chat.unread > 0 ? `<div class="whatsapp-unread-badge">${chat.unread}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Add click event to open chat
-                    chatItem.addEventListener('click', () => {
-                        this.openChat(chat);
-                    });
-                    
-                    whatsappChatList.appendChild(chatItem);
-                });
+                // Buka Chat Window
+                this.openChat(chat);
             },
 
-            // Open chat window
             openChat(chat) {
-                const whatsappChatWindow = document.getElementById('whatsapp-chat-window');
-                const whatsappChatName = document.getElementById('whatsapp-chat-name');
-                const whatsappChatStatus = document.getElementById('whatsapp-chat-status');
-                const whatsappChatProfileImg = document.getElementById('whatsapp-chat-profile-img');
-                const whatsappMessages = document.getElementById('whatsapp-messages');
-                const whatsappMessageInput = document.getElementById('whatsapp-message-input');
-                const whatsappWelcomeScreen = document.querySelector('.whatsapp-welcome-screen');
+                const chatWindow = document.getElementById('whatsapp-chat-window');
                 
-                // Update chat header
-                whatsappChatName.textContent = chat.name;
-                whatsappChatStatus.textContent = chat.isGroup ? 'Grup' : 'Online';
-                whatsappChatProfileImg.src = chat.avatar;
+                // Update Header
+                document.getElementById('whatsapp-chat-name').textContent = chat.name;
+                document.getElementById('whatsapp-chat-status').textContent = 'Online';
+                document.getElementById('whatsapp-chat-profile-img').src = chat.avatar;
+
+                // Hide Screens, Show Input
+                document.getElementById('whatsapp-welcome-screen').classList.remove('active');
+                document.getElementById('whatsapp-profile-view').classList.remove('active');
+                document.getElementById('whatsapp-chat-input-area').style.display = 'flex';
+
+                // Active Chat Window (Full Screen di Mobile karena position absolute)
+                chatWindow.classList.add('active');
                 
-                // Hide welcome screen and show messages
-                whatsappWelcomeScreen.style.display = 'none';
+                // Hide Members List Overlay jika sedang aktif (Transisi bersih)
+                document.getElementById('members-list').classList.remove('active');
+
+                this.state.activeChatId = chat.id;
+                this.loadMessages(chat.id);
                 
-                // Show chat window
-                whatsappChatWindow.classList.add('active');
-                
-                // Enable message input
-                whatsappMessageInput.disabled = false;
-                whatsappMessageInput.placeholder = 'Ketik pesan';
-                
-                // Store active chat
-                this.state.activeChat = chat.id;
-                
-                // Load or create messages
-                this.loadChatMessages(chat.id);
-                
-                // Focus on input
-                whatsappMessageInput.focus();
+                // Focus input
+                setTimeout(() => document.getElementById('whatsapp-message-input').focus(), 300);
             },
 
-            // Load or create chat messages
-            loadChatMessages(chatId) {
-                const whatsappMessages = document.getElementById('whatsapp-messages');
+            closeChat() {
+                const chatWindow = document.getElementById('whatsapp-chat-window');
+                chatWindow.classList.remove('active');
+                this.state.activeChatId = null;
+                this.showScreen('welcome');
+            },
+
+            loadMessages(chatId) {
+                const msgContainer = document.getElementById('whatsapp-messages');
+                // Simulasi pesan (bisa diganti real-time listener)
+                msgContainer.innerHTML = ''; // Clear welcome screen
                 
-                // Check if we already have messages for this chat
-                if (this.state.messages[chatId]) {
-                    this.renderMessages(chatId);
-                } else {
-                    // Create initial messages
-                    this.state.messages[chatId] = this.generateSampleMessages(chatId);
-                    this.renderMessages(chatId);
+                // Cek local state dulu
+                if (!this.state.messages[chatId]) {
+                    this.state.messages[chatId] = [
+                        { text: 'Halo!', senderId: 'other', timestamp: new Date() },
+                        { text: 'Hai, apa kabar?', senderId: 'me', timestamp: new Date() }
+                    ];
+                }
+
+                this.renderMessages(chatId);
+
+                // Realtime Listener (Optional Logic)
+                db.collection('chats').doc(chatId).onSnapshot(doc => {
+                    if (doc.exists && doc.data().messages) {
+                        this.state.messages[chatId] = doc.data().messages;
+                        this.renderMessages(chatId);
+                    }
+                });
+            },
+
+            renderMessages(chatId) {
+                const container = document.getElementById('whatsapp-messages');
+                const msgs = this.state.messages[chatId] || [];
+                
+                // Keep welcome/profile screens hidden structure, but inject messages
+                // Simple hack: append messages, ensure profile/welcome are display:none via class toggling in openChat
+                
+                // Clear only messages, keep structure if needed, but here we rebuild
+                const existingMessages = container.querySelectorAll('.whatsapp-message');
+                existingMessages.forEach(el => el.remove());
+
+                // If no messages and screens are hidden, show empty placeholder? 
+                // No, just show the bubbles.
+                
+                // Note: In this DOM structure, .whatsapp-messages contains both welcome screen and bubbles.
+                // We must ensure bubbles are placed correctly.
+                // Better approach: Have a dedicated div for bubbles inside messages.
+                // For now, let's just append.
+                
+                // Actually, let's protect the inner screens
+                const welcome = document.getElementById('whatsapp-welcome-screen');
+                const profile = document.getElementById('whatsapp-profile-view');
+                
+                // Create a container for bubbles if not exists
+                let bubbleContainer = document.getElementById('bubble-container');
+                if(!bubbleContainer) {
+                    bubbleContainer = document.createElement('div');
+                    bubbleContainer.id = 'bubble-container';
+                    bubbleContainer.style.flexDirection = 'column';
+                    bubbleContainer.style.display = 'flex';
+                    bubbleContainer.style.width = '100%';
+                    container.appendChild(bubbleContainer);
                 }
                 
-                // Setup real-time listener for this chat
-                this.setupChatListener(chatId);
-            },
+                bubbleContainer.innerHTML = '';
 
-            // Setup real-time listener for chat
-            setupChatListener(chatId) {
-                const chatRef = db.collection('chats').doc(chatId);
-                
-                chatRef.onSnapshot((doc) => {
-                    if (doc.exists) {
-                        const chatData = doc.data();
-                        if (chatData.messages) {
-                            this.state.messages[chatId] = chatData.messages;
-                            this.renderMessages(chatId);
-                        }
-                    }
-                });
-            },
-
-            // Render messages
-            renderMessages(chatId) {
-                const whatsappMessages = document.getElementById('whatsapp-messages');
-                const messages = this.state.messages[chatId] || [];
-                
-                whatsappMessages.innerHTML = '';
-                
-                // Add date separator
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                
-                let lastDate = null;
-                
-                messages.forEach(message => {
-                    const messageDate = new Date(message.timestamp);
-                    const dateStr = messageDate.toDateString();
-                    
-                    // Add date separator if needed
-                    if (lastDate !== dateStr) {
-                        const dateSeparator = document.createElement('div');
-                        dateSeparator.style.textAlign = 'center';
-                        dateSeparator.style.margin = '10px 0';
-                        dateSeparator.style.fontSize = '12px';
-                        dateSeparator.style.color = '#999';
-                        
-                        if (dateStr === today.toDateString()) {
-                            dateSeparator.textContent = 'Hari ini';
-                        } else if (dateStr === yesterday.toDateString()) {
-                            dateSeparator.textContent = 'Kemarin';
-                        } else {
-                            dateSeparator.textContent = messageDate.toLocaleDateString('id-ID', { 
-                                weekday: 'long', 
-                                day: 'numeric', 
-                                month: 'long' 
-                            });
-                        }
-                        
-                        whatsappMessages.appendChild(dateSeparator);
-                        lastDate = dateStr;
-                    }
-                    
-                    // Create message element
-                    const messageElement = document.createElement('div');
-                    messageElement.className = `whatsapp-message ${message.senderId === auth.currentUser.uid ? 'sent' : 'received'}`;
-                    
-                    messageElement.innerHTML = `
-                        <div class="whatsapp-message-bubble">${message.text}</div>
-                        <div class="whatsapp-message-time">${message.timestamp.toLocaleTimeString('id-ID', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        })}</div>
+                msgs.forEach(msg => {
+                    const isMe = msg.senderId === auth.currentUser.uid || msg.senderId === 'me';
+                    const el = document.createElement('div');
+                    el.className = `whatsapp-message ${isMe ? 'sent' : 'received'}`;
+                    el.innerHTML = `
+                        <div class="whatsapp-message-bubble">${msg.text}</div>
+                        <div class="whatsapp-message-time">10:00</div>
                     `;
-                    
-                    whatsappMessages.appendChild(messageElement);
+                    bubbleContainer.appendChild(el);
                 });
-                
-                // Scroll to bottom
-                whatsappMessages.scrollTop = whatsappMessages.scrollHeight;
+
+                container.scrollTop = container.scrollHeight;
             },
 
-            // Send message
             async sendMessage() {
-                const messageInput = document.getElementById('whatsapp-message-input');
-                const messageText = messageInput.value.trim();
-                
-                if (!messageText || !this.state.activeChat) return;
-                
-                const newMessage = {
-                    text: messageText,
+                const input = document.getElementById('whatsapp-message-input');
+                const text = input.value.trim();
+                if (!text || !this.state.activeChatId) return;
+
+                const newMsg = {
+                    text: text,
                     senderId: auth.currentUser.uid,
-                    senderName: this.state.currentUserData.username || 'Pengguna',
                     timestamp: new Date()
                 };
-                
+
+                // Optimistic UI
+                this.state.messages[this.state.activeChatId].push(newMsg);
+                this.renderMessages(this.state.activeChatId);
+                input.value = '';
+                document.getElementById('whatsapp-send-btn').style.display = 'none';
+                document.getElementById('whatsapp-mic-icon').style.display = 'block';
+
                 try {
-                    // Save to Firebase
-                    const chatRef = db.collection('chats').doc(this.state.activeChat);
-                    await chatRef.update({
-                        messages: firebase.firestore.FieldValue.arrayUnion(newMessage),
-                        lastMessage: messageText,
-                        lastMessageTime: new Date()
-                    });
-                    
-                    // Update local state
-                    if (!this.state.messages[this.state.activeChat]) {
-                        this.state.messages[this.state.activeChat] = [];
-                    }
-                    this.state.messages[this.state.activeChat].push(newMessage);
-                    
-                    // Update chat in list
-                    const chat = this.state.chats.find(c => c.id === this.state.activeChat);
-                    if (chat) {
-                        chat.lastMessage = messageText;
-                        chat.time = 'Baru saja';
-                    }
-                    
-                    // Clear input
-                    messageInput.value = '';
-                    document.getElementById('whatsapp-send-btn').style.display = 'none';
-                    document.getElementById('whatsapp-mic-icon').style.display = 'block';
-                    
-                    // Re-render messages
-                    this.renderMessages(this.state.activeChat);
-                    this.renderChatList();
-                    
-                } catch (error) {
-                    console.error("Error sending message:", error);
-                    this.showToast("Gagal mengirim pesan", "error");
+                    await db.collection('chats').doc(this.state.activeChatId).set({
+                        messages: firebase.firestore.FieldValue.arrayUnion(newMsg),
+                        lastUpdated: new Date()
+                    }, { merge: true });
+                } catch (e) {
+                    console.error(e);
+                    this.showToast('Gagal mengirim');
                 }
             },
 
-            // Generate sample messages for a chat
-            generateSampleMessages(chatId) {
-                const messages = [];
-                const now = new Date();
+            renderChatList(filterText = '') {
+                const list = document.getElementById('whatsapp-chat-list');
+                list.innerHTML = '';
                 
-                // Generate different messages based on chat ID
-                if (chatId.startsWith('member_')) {
-                    messages.push(
-                        { 
-                            text: 'Halo, apa kabar?', 
-                            senderId: 'other', 
-                            senderName: 'Teman', 
-                            timestamp: new Date(now.getTime() - 3600000) 
-                        },
-                        { 
-                            text: 'Baik, kamu bagaimana?', 
-                            senderId: auth.currentUser.uid, 
-                            senderName: this.state.currentUserData.username || 'Saya', 
-                            timestamp: new Date(now.getTime() - 3000000) 
-                        },
-                        { 
-                            text: 'Juga baik. Ada acara komunitas besok?', 
-                            senderId: 'other', 
-                            senderName: 'Teman', 
-                            timestamp: new Date(now.getTime() - 2400000) 
-                        },
-                        { 
-                            text: 'Iya, ada rapat rutin jam 10 pagi', 
-                            senderId: auth.currentUser.uid, 
-                            senderName: this.state.currentUserData.username || 'Saya', 
-                            timestamp: new Date(now.getTime() - 1800000) 
-                        }
-                    );
-                } else if (chatId.startsWith('group_')) {
-                    messages.push(
-                        { 
-                            text: 'Admin: Jangan lupa iuran bulanan', 
-                            senderId: 'admin', 
-                            senderName: 'Admin', 
-                            timestamp: new Date(now.getTime() - 86400000) 
-                        },
-                        { 
-                            text: 'Sudah saya transfer pak', 
-                            senderId: 'member1', 
-                            senderName: 'Anggota 1', 
-                            timestamp: new Date(now.getTime() - 80000000) 
-                        },
-                        { 
-                            text: 'Budi: Belum, nanti malam', 
-                            senderId: 'member2', 
-                            senderName: 'Budi', 
-                            timestamp: new Date(now.getTime() - 70000000) 
-                        },
-                        { 
-                            text: 'Siti: Ok, saya transfer besok', 
-                            senderId: 'member3', 
-                            senderName: 'Siti', 
-                            timestamp: new Date(now.getTime() - 60000000) 
-                        }
-                    );
-                } else {
-                    messages.push(
-                        { 
-                            text: 'Halo', 
-                            senderId: 'other', 
-                            senderName: 'Teman', 
-                            timestamp: new Date(now.getTime() - 3600000) 
-                        },
-                        { 
-                            text: 'Halo juga', 
-                            senderId: auth.currentUser.uid, 
-                            senderName: this.state.currentUserData.username || 'Saya', 
-                            timestamp: new Date(now.getTime() - 3000000) 
-                        }
-                    );
-                }
-                
-                return messages;
-            },
+                const filtered = this.state.chats.filter(c => {
+                    const matchesFilter = 
+                        (this.state.activeFilter === 'all') ||
+                        (this.state.activeFilter === 'unread' && c.unread > 0) ||
+                        (this.state.activeFilter === 'groups' && c.isGroup);
+                    
+                    const matchesSearch = c.name.toLowerCase().includes(filterText.toLowerCase());
+                    return matchesFilter && matchesSearch;
+                });
 
-            // Filter chats
-            filterChats() {
-                this.renderChatList();
-            },
-
-            // Search chats
-            searchChats(query) {
-                const whatsappChatList = document.getElementById('whatsapp-chat-list');
-                
-                if (!query.trim()) {
-                    this.renderChatList();
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#667781; padding:20px;">Tidak ada chat.</p>';
                     return;
                 }
-                
-                const filteredChats = this.state.chats.filter(chat => 
-                    chat.name.toLowerCase().includes(query.toLowerCase()) ||
-                    chat.lastMessage.toLowerCase().includes(query.toLowerCase())
-                );
-                
-                whatsappChatList.innerHTML = '';
-                
-                if (filteredChats.length === 0) {
-                    whatsappChatList.innerHTML = `
-                        <div class="loading-state">
-                            <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
-                            <p>Tidak ada hasil untuk "${query}"</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                filteredChats.forEach(chat => {
-                    const chatItem = document.createElement('div');
-                    chatItem.className = 'whatsapp-chat-item';
-                    chatItem.dataset.chatId = chat.id;
-                    
-                    chatItem.innerHTML = `
-                        <img src="${chat.avatar}" alt="${chat.name}">
+
+                filtered.forEach(chat => {
+                    const item = document.createElement('div');
+                    item.className = 'whatsapp-chat-item';
+                    item.innerHTML = `
+                        <img src="${chat.avatar}">
                         <div class="whatsapp-chat-item-details">
                             <div class="whatsapp-chat-item-info">
                                 <h4>${chat.name}</h4>
@@ -1712,41 +1293,39 @@
                             </div>
                             <div class="whatsapp-chat-item-meta">
                                 <div class="whatsapp-chat-item-time">${chat.time}</div>
-                                ${chat.unread > 0 ? `<div class="whatsapp-unread-badge">${chat.unread}</div>` : ''}
                             </div>
                         </div>
                     `;
-                    
-                    // Add click event to open chat
-                    chatItem.addEventListener('click', () => {
+                    item.addEventListener('click', () => {
+                        this.state.previousView = 'sidebar'; // Standard chat behavior
                         this.openChat(chat);
                     });
-                    
-                    whatsappChatList.appendChild(chatItem);
+                    list.appendChild(item);
                 });
             },
 
-            // Show toast notification
-            showToast(message, type = 'default') {
-                let toast = document.getElementById('toast');
-                if (!toast) {
-                    toast = document.createElement('div');
-                    toast.id = 'toast';
-                    toast.className = 'toast';
-                    document.querySelector('.phone-container').appendChild(toast);
+            handleResize() {
+                const chatWindow = document.getElementById('whatsapp-chat-window');
+                if (this.state.isMobile) {
+                    // Mobile logic handled by CSS .active class and absolute positioning
+                    if (!this.state.activeChatId) {
+                        chatWindow.classList.remove('active');
+                    }
+                } else {
+                    // Desktop: Always show chat window
+                    chatWindow.style.display = 'flex';
+                    chatWindow.classList.remove('active'); // Remove animation class
                 }
-                
-                toast.textContent = message;
-                toast.className = `toast ${type}`;
-                toast.classList.add('show');
-                
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3000);
+            },
+
+            showToast(msg) {
+                const t = document.getElementById('toast');
+                t.textContent = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
             }
         };
 
-        // Initialize WhatsApp app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             whatsappApp.init();
         });
