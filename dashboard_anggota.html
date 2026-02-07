@@ -31,6 +31,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
     
+    <!-- Tambahkan library JsBarcode untuk barcode yang fungsional -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
     <style>
         /* CSS Variables untuk Theme Support */
         :root {
@@ -58,6 +61,19 @@
             --transition-fast: 0.2s;
             --transition-normal: 0.3s;
             --transition-slow: 0.5s;
+            
+            /* WhatsApp Theme Variables */
+            --whatsapp-bg: #f0f2f5;
+            --whatsapp-sidebar: #111b21;
+            --whatsapp-chat-bg: #e5ddd5;
+            --whatsapp-msg-sent: #d9fdd3;
+            --whatsapp-msg-received: #fff;
+            --whatsapp-green: #25d366;
+            --whatsapp-dark: #202c33;
+            --whatsapp-header: #0b141a;
+            --whatsapp-hover: #182229;
+            --whatsapp-filter-active: #8696a0;
+            --whatsapp-sidebar-width: 350px;
         }
         
         [data-theme="dark"] {
@@ -177,6 +193,10 @@
             align-items: center; 
             gap: 12px; 
             margin-left: auto; 
+        }
+        
+        .balance { 
+            display: none; 
         }
         
         .notification-btn, .menu-btn, .theme-toggle { 
@@ -311,7 +331,7 @@
             visibility: visible; 
         }
         
-        /* Event Section */
+        /* Event Section - Clean Image Only */
         .event-section { 
             margin: 0 15px 15px; 
             background-color: var(--card-bg); 
@@ -379,7 +399,7 @@
             opacity: 1;
         }
         
-        /* Admin Carousel */
+        /* Admin Carousel - Clean Image Only */
         .admin-carousel { 
             margin: 15px; 
             position: relative; 
@@ -707,7 +727,6 @@
         .page-view { 
             display: none; 
             padding: 20px; 
-            padding-bottom: 80px;
             animation: fadeInUp var(--transition-slow) ease-out; 
         }
         
@@ -940,7 +959,6 @@
             padding: 15px;
             border-bottom: 1px solid var(--border-color);
             transition: background-color var(--transition-normal);
-            cursor: pointer;
         }
         
         .list-item:last-child {
@@ -1010,25 +1028,6 @@
             margin-top: 15px;
             color: var(--text-secondary);
             font-size: 14px;
-        }
-        
-        /* Tombol Batal Loading */
-        .cancel-loading-btn {
-            margin-top: 20px;
-            padding: 8px 16px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--danger-color);
-            color: var(--danger-color);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: none; /* Hidden by default */
-        }
-        
-        .cancel-loading-btn:hover {
-            background-color: var(--danger-color);
-            color: white;
         }
         
         /* Install Prompt */
@@ -1334,79 +1333,109 @@
             margin-bottom: 20px;
         }
         
-        /* Map Related Styles */
-        .map-activity-indicator {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(255,255,255, 0.9);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-        
-        .map-activity-indicator.updating i {
-            color: var(--warning-color);
-        }
-        
-        .map-stats {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(255,255,255, 0.9);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-color);
-            z-index: 1000;
-        }
-        
+        /* Map Dots - Simple circular markers like standard maps */
         .map-dot {
-            width: 100%;
-            height: 100%;
-            background-color: var(--text-secondary);
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            display: block;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .user-dot {
+            background-color: #4285f4;
         }
         
         .active-dot {
-            background-color: var(--primary-color);
+            background-color: #27ae60;
         }
         
         .inactive-dot {
-            background-color: #999;
+            background-color: #95a5a6;
         }
         
+        /* Blinking animation for real-time updates */
         .blinking {
             animation: blink 1.5s infinite;
         }
         
         @keyframes blink {
             0% { opacity: 1; }
-            50% { opacity: 0.4; }
+            50% { opacity: 0.3; }
             100% { opacity: 1; }
         }
         
+        /* User Location Markers */
+        .user-location-marker {
+            background: transparent;
+            border: none;
+        }
+        
+        /* Status Indicators */
         .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             margin-right: 10px;
         }
         
         .status-indicator.active {
-            background-color: var(--success-color);
+            background-color: #27ae60;
+            box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
         }
         
         .status-indicator.inactive {
-            background-color: var(--text-secondary);
+            background-color: #95a5a6;
+        }
+        
+        /* Map Stats Update */
+        .map-stats {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 6px 10px;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 11px;
+            color: var(--text-color);
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        
+        .map-stats span {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        /* Map Activity Indicator */
+        .map-activity-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 6px 10px;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 11px;
+            color: var(--text-color);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .map-activity-indicator i {
+            color: #27ae60;
+        }
+        
+        .map-activity-indicator.updating i {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
         
         /* Responsive Design */
@@ -1428,10 +1457,6 @@
         <div class="loading-logo">BGT PRO</div>
         <div class="loading-spinner"></div>
         <div class="loading-text" id="loadingText">Memuat aplikasi...</div>
-        <!-- Tombol Cancel Loading Jika Macet -->
-        <button class="cancel-loading-btn" id="cancelLoadingBtn" onclick="app.forceCancelLoading()">
-            Batal / Muat Ulang
-        </button>
     </div>
 
     <!-- Install Prompt -->
@@ -1586,40 +1611,6 @@
                 </div>
             </div>
 
-            <!-- Halaman Explorer -->
-            <div id="explorer-page" class="page-view">
-                <div class="profile-header">
-                    <h2>Explorer</h2>
-                    <button class="back-btn" onclick="app.showMainContent()">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </button>
-                </div>
-                <div id="explorerContent">
-                    <div class="empty-state">
-                        <i class="fas fa-compass"></i>
-                        <h3>Memuat Explorer</h3>
-                        <p>Mengambil data explorer dari server...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Halaman Activity -->
-            <div id="activity-page" class="page-view">
-                <div class="profile-header">
-                    <h2>Aktivitas</h2>
-                    <button class="back-btn" onclick="app.showMainContent()">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </button>
-                </div>
-                <div id="activityContent">
-                    <div class="empty-state">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Memuat Aktivitas</h3>
-                        <p>Mengambil data aktivitas dari server...</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Halaman Pengaturan -->
             <div id="pengaturan-page" class="page-view">
                 <div class="profile-header">
@@ -1653,31 +1644,61 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Halaman Explorer -->
+            <div id="explorer-page" class="page-view">
+                <div class="profile-header">
+                    <h2>Explorer</h2>
+                    <button class="back-btn" onclick="app.showMainContent()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                </div>
+                <div id="explorerContent">
+                    <div class="empty-state">
+                        <i class="fas fa-compass"></i>
+                        <h3>Memuat Explorer</h3>
+                        <p>Mengambil data explorer dari server...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Halaman Activity -->
+            <div id="activity-page" class="page-view">
+                <div class="profile-header">
+                    <h2>Aktivitas</h2>
+                    <button class="back-btn" onclick="app.showMainContent()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                </div>
+                <div id="activityContent">
+                    <div class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Memuat Aktivitas</h3>
+                        <p>Mengambil data aktivitas dari server...</p>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- UPDATE: BOTTOM NAV (Perubahan Menu) -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="app.handleNavClick(this, 'Home')">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </div>
-            <!-- Pindah ke sini: Peta (mep) -->
-            <div class="nav-item" onclick="app.handleNavClick(this, 'Peta')">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>Peta</span>
+            <div class="nav-item" onclick="app.handleNavClick(this, 'Explore')">
+                <i class="fas fa-compass"></i>
+                <span>Explore</span>
             </div>
             <div class="nav-item" onclick="app.handleNavClick(this, 'Activity')">
                 <i class="fas fa-chart-line"></i>
                 <span>Activity</span>
             </div>
-            <!-- Pindah ke sini: Pesan (ganti Profil) -->
-            <div class="nav-item" onclick="app.handleNavClick(this, 'Pesan')">
-                <i class="fas fa-comment-dots"></i>
-                <span>Pesan</span>
+            <div class="nav-item" onclick="app.handleNavClick(this, 'Profile')">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
             </div>
         </div>
 
-        <!-- UPDATE: SIDE MENU (Perubahan Menu) -->
         <div class="side-menu" id="sideMenu">
             <div class="side-menu-header">
                 <div class="logo">Menu</div>
@@ -1689,11 +1710,12 @@
                 <div class="menu-item" onclick="app.handleMenuClick('Kas')">
                     <i class="fas fa-wallet"></i><span>Kas</span>
                 </div>
-                <!-- Pindah ke sini: Explore -->
-                <div class="menu-item" onclick="app.handleMenuClick('Explore')">
-                    <i class="fas fa-compass"></i><span>Explore</span>
+                <div class="menu-item" onclick="app.handleMenuClick('Peta')">
+                    <i class="fas fa-map-marked-alt"></i><span>Peta</span>
                 </div>
-                <!-- Pesan Dihapus dari sini karena pindah ke bawah -->
+                <div class="menu-item" onclick="app.handleMenuClick('Pesan')">
+                    <i class="fas fa-envelope"></i><span>Pesan</span>
+                </div>
                 <div class="menu-item" onclick="app.handleMenuClick('Pengaturan')">
                     <i class="fas fa-cog"></i><span>Pengaturan</span>
                 </div>
@@ -1754,6 +1776,9 @@
     <!-- Toast Container -->
     <div id="toast" class="toast"></div>
 
+    <!-- Leaflet JS untuk Peta -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
     <script>
         // Main Application Object
         const app = {
@@ -1810,63 +1835,44 @@
                 map: null,
                 userMarker: null,
                 locationMarkers: {},
-                locationListener: null,
-                isGuestMode: false
+                locationListener: null
             },
             
             // Initialize Application
             init() {
+                // Initialize theme
                 this.initTheme();
-                this.initFirebase();
-                this.initPWA();
-                this.initServiceWorker();
-                this.initEventListeners();
-                this.showLoadingScreen('Memeriksa koneksi...');
                 
-                setTimeout(() => {
-                    const cancelBtn = document.getElementById('cancelLoadingBtn');
-                    if (!this.state.authInitialized && cancelBtn) {
-                        cancelBtn.style.display = 'block';
-                        document.getElementById('loadingText').textContent = "Memerlukan waktu lebih lama...";
-                    }
-                }, 3000);
-
+                // Initialize Firebase
+                this.initFirebase();
+                
+                // Initialize PWA
+                this.initPWA();
+                
+                // Initialize Service Worker
+                this.initServiceWorker();
+                
+                // Initialize event listeners
+                this.initEventListeners();
+                
+                // Show loading screen
+                this.showLoadingScreen('Memeriksa autentikasi...');
+                
+                // Set timeout for auth initialization
                 setTimeout(() => {
                     if (!this.state.authInitialized) {
-                        console.error("Auth initialization timeout");
-                        this.showToast("Koneksi ke server terputus. Masuk Mode Tamu.", "warning");
-                        this.enterGuestMode();
+                        this.showLoadingScreen('Terjadi kesalahan, coba refresh halaman');
                     }
                 }, 10000);
             },
             
-            forceCancelLoading() {
-                this.showToast("Loading dibatalkan. Masuk Mode Tamu.", "warning");
-                this.enterGuestMode();
-            },
-            
-            enterGuestMode() {
-                this.hideLoadingScreen();
-                this.state.isGuestMode = true;
-                this.state.authInitialized = true;
-                
-                this.state.currentUserData = { 
-                    username: 'Guest User', 
-                    email: 'guest@bgtpro.com', 
-                    role: 'Guest',
-                    profilePicUrl: 'https://picsum.photos/seed/guest/100/100.jpg' 
-                };
-                
-                this.updateUserProfileUI(this.state.currentUserData);
-                this.loadAppContent();
-                this.animateAppEntrance();
-            },
-            
+            // Initialize Theme
             initTheme() {
                 document.body.setAttribute('data-theme', this.state.theme);
                 this.updateThemeIcon();
             },
             
+            // Toggle Theme
             toggleTheme() {
                 this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
                 document.body.setAttribute('data-theme', this.state.theme);
@@ -1875,6 +1881,7 @@
                 this.showToast(`Tema ${this.state.theme === 'light' ? 'Terang' : 'Gelap'} diaktifkan`, 'success');
             },
             
+            // Update Theme Icon
             updateThemeIcon() {
                 const themeIcon = document.getElementById('themeIcon');
                 if (themeIcon) {
@@ -1882,94 +1889,84 @@
                 }
             },
             
+            // Initialize Firebase
             initFirebase() {
-                try {
-                    if (typeof firebase === 'undefined') {
-                        throw new Error("Library Firebase tidak dapat dimuat. Periksa koneksi internet Anda.");
-                    }
-
-                    firebase.initializeApp(this.config.firebase);
-                    this.db = firebase.firestore();
-                    this.auth = firebase.auth();
-                    this.storage = firebase.storage();
-                    
-                    console.log("Firebase initialized successfully");
-                    
-                    // Set persistence to LOCAL untuk menyimpan sesi pengguna
-                    this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-                        .then(() => {
-                            console.log("Firebase auth persistence set to LOCAL");
-                            
-                            // Periksa apakah ada sesi yang tersimpan
-                            const hasSession = localStorage.getItem('bgtProSession') === 'active';
-                            
-                            if (hasSession) {
-                                console.log("Found existing session, attempting to restore...");
-                                this.showLoadingScreen('Memulihkan sesi...');
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Error setting auth persistence:", error);
-                        });
-                    
-                    this.auth.onAuthStateChanged(user => {
-                        this.handleAuthStateChange(user);
+                firebase.initializeApp(this.config.firebase);
+                this.db = firebase.firestore();
+                this.auth = firebase.auth();
+                this.storage = firebase.storage();
+                
+                // Set auth persistence
+                this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                    .then(() => {
+                        console.log("Firebase auth persistence set to LOCAL");
+                    })
+                    .catch((error) => {
+                        console.error("Error setting auth persistence:", error);
                     });
-                    
-                } catch (error) {
-                    console.error("CRITICAL: Gagal inisialisasi Firebase", error);
-                    this.showToast("Gagal memuat Firebase: " + error.message, "error");
-                    setTimeout(() => this.enterGuestMode(), 2000);
-                }
+                
+                // Listen for auth state changes
+                this.auth.onAuthStateChanged(user => {
+                    this.handleAuthStateChange(user);
+                });
             },
             
+            // Handle Auth State Change
             handleAuthStateChange(user) {
                 this.state.authInitialized = true;
                 this.hideLoadingScreen();
                 
-                try {
-                    if (user) {
-                        console.log("User logged in:", user.uid);
-                        this.state.isExplicitLogout = false;
-                        this.state.sessionRestoreAttempted = false;
-                        this.state.isGuestMode = false;
-                        
-                        // Simpan status sesi aktif di localStorage
-                        localStorage.setItem('bgtProSession', 'active');
-                        
-                        this.loadUserData(user.uid);
-                        this.loadAppContent();
-                        this.setupRealtimeListeners();
-                        this.animateAppEntrance();
-                    } else {
-                        console.log("No user logged in.");
-                        
-                        // Periksa apakah pengguna secara eksplisit logout
-                        if (this.state.isExplicitLogout) {
-                            console.log("User explicitly logged out. Session cleared.");
-                            return;
-                        }
-                        
-                        // Periksa apakah ada sesi yang tersimpan
-                        const hasSession = localStorage.getItem('bgtProSession') === 'active';
-                        
-                        if (hasSession && !this.state.sessionRestoreAttempted) {
-                            this.state.sessionRestoreAttempted = true;
-                            console.log("Session found but user is null. Entering Guest Mode to prevent loop.");
-                            localStorage.removeItem('bgtProSession');
-                            this.enterGuestMode();
-                        } else if (!hasSession) {
-                            console.log("No session found. Entering Guest Mode.");
-                            this.enterGuestMode();
-                        }
+                if (user) {
+                    console.log("User logged in:", user.uid);
+                    this.state.isExplicitLogout = false;
+                    this.state.sessionRestoreAttempted = false;
+                    localStorage.setItem('bgtProSession', 'active');
+                    
+                    // Load user data
+                    this.loadUserData(user.uid);
+                    
+                    // Load app content
+                    this.loadAppContent();
+                    
+                    // Setup real-time listeners
+                    this.setupRealtimeListeners();
+                    
+                    // Animate app entrance
+                    this.animateAppEntrance();
+                } else {
+                    console.log("No user logged in.");
+                    
+                    if (this.state.isExplicitLogout) {
+                        console.log("User explicitly logged out, redirecting to login page...");
+                        window.location.href = 'index.html';
+                        return;
                     }
-                } catch (error) {
-                    console.error("Error in handleAuthStateChange:", error);
-                    this.showToast("Terjadi kesalahan otentikasi", "error");
-                    this.hideLoadingScreen();
+                    
+                    const hasSession = localStorage.getItem('bgtProSession') === 'active';
+                    
+                    if (hasSession && !this.state.sessionRestoreAttempted) {
+                        this.state.sessionRestoreAttempted = true;
+                        console.log("Attempting to restore session...");
+                        this.showLoadingScreen('Memulihkan sesi...');
+                        
+                        setTimeout(() => {
+                            if (!this.auth.currentUser) {
+                                console.log("Session expired, redirecting to login page...");
+                                localStorage.removeItem('bgtProSession');
+                                window.location.href = 'index.html';
+                            }
+                        }, 5000);
+                    } else if (!hasSession) {
+                        console.log("No session found, redirecting to login page...");
+                        window.location.href = 'index.html';
+                    } else {
+                        console.log("Session restore failed, redirecting to login page...");
+                        window.location.href = 'index.html';
+                    }
                 }
             },
             
+            // Load User Data
             async loadUserData(userId) {
                 try {
                     const doc = await this.db.collection('users').doc(userId).get();
@@ -1977,9 +1974,10 @@
                         this.state.currentUserData = doc.data();
                         this.updateUserProfileUI(this.state.currentUserData);
                         
+                        // Listen for PM status changes
                         this.db.collection('users').doc(userId).onSnapshot(doc => {
                             const userData = doc.data();
-                            if (userData && userData.pmStatus === 'disrupted') {
+                            if (userData.pmStatus === 'disrupted') {
                                 this.triggerDisruption();
                             } else {
                                 this.stopDisruption();
@@ -1996,15 +1994,15 @@
                     }
                 } catch (error) {
                     console.error("Error getting user document:", error);
-                    if (!this.state.isGuestMode) {
-                        this.handleFirebaseError(error);
-                    }
+                    this.handleFirebaseError(error);
                 }
             },
             
+            // Update User Profile UI
             updateUserProfileUI(userData) {
                 const imageUrl = userData.profilePicUrl || 'https://picsum.photos/seed/default-user/100/100.jpg';
                 
+                // Update header profile photo
                 const headerProfilePhoto = document.getElementById('headerProfilePhoto');
                 if (headerProfilePhoto) {
                     headerProfilePhoto.src = imageUrl;
@@ -2013,6 +2011,7 @@
                     };
                 }
                 
+                // Update profile page
                 const profilePageAvatar = document.getElementById('profilePageAvatar');
                 const profilePageUsername = document.getElementById('profilePageUsername');
                 const profilePageEmail = document.getElementById('profilePageEmail');
@@ -2030,6 +2029,7 @@
                 if (profilePageRole) profilePageRole.textContent = userData.role || 'anggota';
             },
             
+            // Load App Content
             loadAppContent() {
                 this.loadEventsFromFirebase();
                 this.loadBannersFromFirebase();
@@ -2041,6 +2041,7 @@
                 this.loadActivityData();
             },
             
+            // Open Transport App
             openTransportApp(appName) {
                 const app = this.transportApps[appName];
                 if (!app) {
@@ -2048,11 +2049,15 @@
                     return;
                 }
                 
+                // Try to open the app directly
                 window.location.href = app.url;
+                
+                // Fallback: try to open via package name
                 setTimeout(() => {
                     window.location.href = `intent://${app.package}#Intent;package=${app.package};scheme=${app.url.replace('://', '')};end`;
                 }, 1000);
                 
+                // Final fallback: open Play Store
                 setTimeout(() => {
                     window.open(`https://play.google.com/store/apps/details?id=${app.package}`, '_blank');
                 }, 2000);
@@ -2060,29 +2065,9 @@
                 this.showToast(`Membuka ${app.name}...`, 'info');
             },
             
+            // Load Kas Data
             async loadKasData() {
                 const kasContent = document.getElementById('kasContent');
-                
-                if (this.state.isGuestMode) {
-                    kasContent.innerHTML = `
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <i class="fas fa-wallet"></i>
-                                    Total Kas (Demo)
-                                </div>
-                                <div style="font-size: 20px; font-weight: 700; color: var(--success-color);">
-                                    Rp 1.500.000
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <p>Data ini adalah simulasi karena Anda berada dalam Mode Tamu.</p>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-
                 try {
                     const snapshot = await this.db.collection('kas').get();
                     let totalKas = 0;
@@ -2147,9 +2132,11 @@
                 }
             },
             
+            // Load Peta Data
             async loadPetaData() {
                 const petaContent = document.getElementById('petaContent');
                 
+                // Initialize map container
                 petaContent.innerHTML = `
                     <div class="card">
                         <div class="card-header">
@@ -2185,62 +2172,56 @@
                     </div>
                 `;
                 
+                // Initialize map after DOM is ready
                 setTimeout(() => {
                     this.initializeMap();
                     this.loadUserLocations();
                 }, 100);
             },
             
+            // Initialize Map
             initializeMap() {
                 if (!document.getElementById('map')) return;
                 
-                try {
-                    this.map = L.map('map').setView([-6.2088, 106.8456], 13);
-                    
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(this.map);
-                    
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                const { latitude, longitude } = position.coords;
-                                this.map.setView([latitude, longitude], 15);
-                                
-                                const userIcon = L.divIcon({
-                                    className: 'user-location-marker',
-                                    html: '<div class="map-dot user-dot blinking"></div>',
-                                    iconSize: [12, 12],
-                                    iconAnchor: [6, 6]
-                                });
-                                
-                                this.userMarker = L.marker([latitude, longitude], { icon: userIcon })
-                                    .addTo(this.map)
-                                    .bindPopup('Lokasi Anda')
-                                    .openPopup();
-                            },
-                            (error) => {
-                                console.error("Error getting location:", error);
-                            }
-                        );
-                    }
-                } catch (error) {
-                    console.error("Map initialization error:", error);
+                // Initialize the map
+                this.map = L.map('map').setView([-6.2088, 106.8456], 13);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.map);
+                
+                // Try to get user location
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const { latitude, longitude } = position.coords;
+                            this.map.setView([latitude, longitude], 15);
+                            
+                            // Add user marker with blinking effect
+                            const userIcon = L.divIcon({
+                                className: 'user-location-marker',
+                                html: '<div class="map-dot user-dot blinking"></div>',
+                                iconSize: [12, 12],
+                                iconAnchor: [6, 6]
+                            });
+                            
+                            this.userMarker = L.marker([latitude, longitude], { icon: userIcon })
+                                .addTo(this.map)
+                                .bindPopup('Lokasi Anda')
+                                .openPopup();
+                        },
+                        (error) => {
+                            console.error("Error getting location:", error);
+                        }
+                    );
                 }
             },
             
+            // Load User Locations
             async loadUserLocations() {
                 const locationList = document.getElementById('locationList');
                 
-                if (this.state.isGuestMode) {
-                    locationList.innerHTML = `
-                        <div class="list-item">
-                            <div class="list-item-subtitle">Data Lokasi tidak tersedia dalam Mode Tamu.</div>
-                        </div>
-                    `;
-                    return;
-                }
-
                 try {
                     const snapshot = await this.db.collection('user_locations').limit(10).get();
                     
@@ -2257,10 +2238,11 @@
                         const data = doc.data();
                         const userId = doc.id;
                         
+                        // Check if user is active (updated within last 2 minutes)
                         const now = new Date();
                         const lastSeen = data.lastSeen ? data.lastSeen.toDate() : new Date();
                         const timeDiff = now - lastSeen;
-                        const isActive = timeDiff < 120000;
+                        const isActive = timeDiff < 120000; // 2 minutes in milliseconds
                         
                         if (isActive) activeCount++;
                         
@@ -2274,6 +2256,7 @@
                         });
                     });
                     
+                    // Update active member count
                     const memberCountElement = document.getElementById('memberCount');
                     if (memberCountElement) {
                         memberCountElement.textContent = activeCount;
@@ -2289,8 +2272,10 @@
                         </div>
                     `).join('');
                     
+                    // Add markers to map
                     locations.forEach(loc => {
                         if (this.map && loc.latitude && loc.longitude) {
+                            // Create simple dot icon for user location
                             const userIcon = L.divIcon({
                                 className: 'user-location-marker',
                                 html: `<div class="map-dot ${loc.isActive ? 'active-dot' : 'inactive-dot'} ${loc.isActive ? 'blinking' : ''}"></div>`,
@@ -2306,7 +2291,10 @@
                         }
                     });
                     
+                    // Store markers for future updates
                     this.locationMarkers = markers;
+                    
+                    // Setup real-time listener for location updates
                     this.setupLocationListener();
                     
                 } catch (error) {
@@ -2315,11 +2303,13 @@
                 }
             },
             
+            // Setup Location Listener for Real-time Updates
             setupLocationListener() {
                 if (this.locationListener) {
-                    this.locationListener(); 
+                    this.locationListener(); // Detach existing listener
                 }
                 
+                // Show updating indicator
                 const mapActivityIndicator = document.getElementById('mapActivityIndicator');
                 if (mapActivityIndicator) {
                     mapActivityIndicator.classList.add('updating');
@@ -2335,21 +2325,26 @@
                             const data = doc.data();
                             const userId = doc.id;
                             
+                            // Check if user is active (updated within last 2 minutes)
                             const lastSeen = data.lastSeen ? data.lastSeen.toDate() : new Date();
                             const timeDiff = now - lastSeen;
-                            const isActive = timeDiff < 120000;
+                            const isActive = timeDiff < 120000; // 2 minutes in milliseconds
                             
                             if (isActive) activeCount++;
                             
+                            // Update or add marker
                             if (this.locationMarkers[userId]) {
+                                // Update existing marker position and status
                                 this.locationMarkers[userId].setLatLng([data.latitude, data.longitude]);
                                 
+                                // Update marker icon based on activity status
                                 const markerElement = this.locationMarkers[userId].getElement();
                                 const mapDot = markerElement.querySelector('.map-dot');
                                 if (mapDot) {
                                     mapDot.className = `map-dot ${isActive ? 'active-dot' : 'inactive-dot'} ${isActive ? 'blinking' : ''}`;
                                 }
                             } else if (data.latitude && data.longitude) {
+                                // Add new marker
                                 const userIcon = L.divIcon({
                                     className: 'user-location-marker',
                                     html: `<div class="map-dot ${isActive ? 'active-dot' : 'inactive-dot'} ${isActive ? 'blinking' : ''}"></div>`,
@@ -2367,6 +2362,7 @@
                             updatedMarkers[userId] = true;
                         });
                         
+                        // Remove markers for users no longer in the snapshot
                         Object.keys(this.locationMarkers).forEach(userId => {
                             if (!updatedMarkers[userId]) {
                                 this.map.removeLayer(this.locationMarkers[userId]);
@@ -2374,13 +2370,16 @@
                             }
                         });
                         
+                        // Update active member count
                         const memberCountElement = document.getElementById('memberCount');
                         if (memberCountElement) {
                             memberCountElement.textContent = activeCount;
                         }
                         
+                        // Update location list
                         this.updateLocationList();
                         
+                        // Hide updating indicator
                         setTimeout(() => {
                             if (mapActivityIndicator) {
                                 mapActivityIndicator.classList.remove('updating');
@@ -2394,9 +2393,9 @@
                     });
             },
             
+            // Update Location List
             async updateLocationList() {
                 const locationList = document.getElementById('locationList');
-                if (!locationList) return;
                 
                 try {
                     const snapshot = await this.db.collection('user_locations').limit(10).get();
@@ -2412,10 +2411,11 @@
                         const data = doc.data();
                         const userId = doc.id;
                         
+                        // Check if user is active (updated within last 2 minutes)
                         const now = new Date();
                         const lastSeen = data.lastSeen ? data.lastSeen.toDate() : new Date();
                         const timeDiff = now - lastSeen;
-                        const isActive = timeDiff < 120000;
+                        const isActive = timeDiff < 120000; // 2 minutes in milliseconds
                         
                         locations.push({
                             id: userId,
@@ -2442,29 +2442,10 @@
                 }
             },
             
+            // Load Pengaturan Data
             async loadPengaturanData() {
                 const pengaturanContent = document.getElementById('pengaturanContent');
                 const user = this.auth.currentUser;
-                
-                if (this.state.isGuestMode) {
-                    pengaturanContent.innerHTML = `
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <i class="fas fa-user-cog"></i>
-                                    Mode Tamu
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <p>Anda sedang berada dalam Mode Tamu. Beberapa fitur mungkin terbatas.</p>
-                                <button class="btn btn-primary btn-block" style="margin-top: 15px;" onclick="window.location.reload()">
-                                    <i class="fas fa-sync"></i> Coba Login Kembali
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
                 
                 if (!user) {
                     pengaturanContent.innerHTML = `
@@ -2541,12 +2522,8 @@
                 }
             },
             
+            // Update Notification Setting
             async updateNotificationSetting(type, value) {
-                if (this.state.isGuestMode) {
-                    this.showToast("Tidak bisa mengubah pengaturan di Mode Tamu", "warning");
-                    return;
-                }
-
                 try {
                     const user = this.auth.currentUser;
                     if (!user) return;
@@ -2557,6 +2534,7 @@
                     
                     this.showToast(`Pengaturan notifikasi ${type} diperbarui`, 'success');
                     
+                    // Reload settings
                     this.loadPengaturanData();
                     
                 } catch (error) {
@@ -2565,10 +2543,12 @@
                 }
             },
             
+            // Load Bantuan Data
             async loadBantuanData() {
                 const bantuanContent = document.getElementById('bantuanContent');
                 
                 try {
+                    // Load help articles from Firebase
                     const snapshot = await this.db.collection('help').get();
                     
                     let helpArticles = [];
@@ -2576,6 +2556,7 @@
                         helpArticles.push({ id: doc.id, ...doc.data() });
                     });
                     
+                    // Default help articles if none exist
                     if (helpArticles.length === 0) {
                         helpArticles = [
                             {
@@ -2622,27 +2603,26 @@
                 }
             },
             
+            // Load Explorer Data
             async loadExplorerData() {
                 const explorerContent = document.getElementById('explorerContent');
                 
-                if (this.state.isGuestMode) {
-                    explorerContent.innerHTML = `<div class="empty-state"><h3>Mode Tamu</h3><p>Data Explorer tidak tersedia.</p></div>`;
-                    return;
-                }
-
                 try {
+                    // Load trending content from Firebase
                     const trendingSnapshot = await this.db.collection('trending').get();
                     const trending = [];
                     trendingSnapshot.forEach(doc => {
                         trending.push({ id: doc.id, ...doc.data() });
                     });
                     
+                    // Load recommendations from Firebase
                     const recommendationsSnapshot = await this.db.collection('recommendations').get();
                     const recommendations = [];
                     recommendationsSnapshot.forEach(doc => {
                         recommendations.push({ id: doc.id, ...doc.data() });
                     });
                     
+                    // Default content if none exists
                     const defaultTrending = [
                         { title: 'Event Kopdar Malam Ini', subtitle: '235 orang tertarik' },
                         { title: 'Program Donasi', subtitle: 'Target Rp 5.000.000' },
@@ -2714,15 +2694,11 @@
                 }
             },
             
+            // Load Activity Data
             async loadActivityData() {
                 const activityContent = document.getElementById('activityContent');
                 const user = this.auth.currentUser;
                 
-                if (this.state.isGuestMode) {
-                    activityContent.innerHTML = `<div class="empty-state"><h3>Mode Tamu</h3><p>Data Aktivitas tidak tersedia.</p></div>`;
-                    return;
-                }
-
                 if (!user) {
                     activityContent.innerHTML = `
                         <div class="empty-state">
@@ -2735,9 +2711,11 @@
                 }
                 
                 try {
+                    // Load user statistics from Firebase
                     const statsDoc = await this.db.collection('user_stats').doc(user.uid).get();
                     const stats = statsDoc.exists ? statsDoc.data() : {};
                     
+                    // Load user activities from Firebase
                     const activitiesSnapshot = await this.db.collection('user_activities')
                         .doc(user.uid)
                         .collection('activities')
@@ -2750,6 +2728,7 @@
                         activities.push({ id: doc.id, ...doc.data() });
                     });
                     
+                    // Default data if none exists
                     const defaultStats = {
                         eventsAttended: 15,
                         totalContribution: 350000,
@@ -2844,6 +2823,7 @@
                 }
             },
             
+            // Format time ago
             formatTimeAgo(date) {
                 const seconds = Math.floor((new Date() - date) / 1000);
                 
@@ -2865,9 +2845,9 @@
                 return "Baru saja";
             },
             
+            // Setup Realtime Listeners
             setupRealtimeListeners() {
-                if (this.state.isGuestMode) return;
-
+                // Listen for kas changes
                 this.db.collection('kas').onSnapshot((snapshot) => {
                     if (!snapshot.metadata.hasPendingWrites) {
                         this.updateBalanceFromFirebase();
@@ -2878,6 +2858,7 @@
                     this.handleFirebaseError(error);
                 });
                 
+                // Listen for promos changes
                 this.db.collection('promos').onSnapshot((snapshot) => {
                     if (!snapshot.metadata.hasPendingWrites) {
                         this.loadBannersFromFirebase();
@@ -2887,6 +2868,7 @@
                     this.handleFirebaseError(error);
                 });
                 
+                // Listen for events changes
                 this.db.collection('events').onSnapshot((snapshot) => {
                     if (!snapshot.metadata.hasPendingWrites) {
                         this.loadEventsFromFirebase();
@@ -2901,6 +2883,7 @@
                 });
             },
             
+            // Animate App Entrance
             animateAppEntrance() {
                 document.body.style.opacity = '0';
                 document.body.style.transition = 'opacity 0.5s';
@@ -2909,6 +2892,7 @@
                 }, 100);
             },
             
+            // Initialize PWA
             initPWA() {
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
@@ -2917,6 +2901,7 @@
                 });
             },
             
+            // Show Install Prompt
             showInstallPrompt() {
                 setTimeout(() => {
                     const installPrompt = document.getElementById('installPrompt');
@@ -2926,12 +2911,14 @@
                 }, 3000);
             },
             
+            // Dismiss Install Prompt
             dismissInstallPrompt() {
                 const installPrompt = document.getElementById('installPrompt');
                 installPrompt.style.display = 'none';
                 localStorage.setItem('bgtProInstallDismissed', 'true');
             },
             
+            // Install App
             async installApp() {
                 const installPrompt = document.getElementById('installPrompt');
                 installPrompt.style.display = 'none';
@@ -2954,6 +2941,7 @@
                 }
             },
             
+            // Initialize Service Worker
             initServiceWorker() {
                 if ('serviceWorker' in navigator) {
                     window.addEventListener('load', () => {
@@ -2992,7 +2980,9 @@
                 }
             },
             
+            // Initialize Event Listeners
             initEventListeners() {
+                // Keyboard shortcuts
                 document.addEventListener('keydown', (event) => {
                     if (event.key === 'Escape') {
                         if (document.getElementById('sideMenu').classList.contains('active')) {
@@ -3007,33 +2997,24 @@
                     }
                 });
                 
+                // Window click events
                 window.onclick = (event) => { 
                     if (event.target === document.getElementById('modal')) this.closeModal();
                 };
             },
             
+            // Load Events from Firebase
             async loadEventsFromFirebase() {
                 const eventTitleText = document.getElementById('eventTitleText');
                 const eventTimeText = document.getElementById('eventTimeText');
                 const eventImage = document.getElementById('eventImage');
                 
-                if (this.state.isGuestMode) {
-                     this.currentEventData = {
-                        name: 'EVENT DEMO',
-                        description: 'Ini adalah contoh event yang muncul dalam Mode Tamu.',
-                        time: 'Senin, 20:00 WIB',
-                        imageUrl: 'https://picsum.photos/seed/event-demo/400/200.jpg'
-                    };
-                    eventImage.src = this.currentEventData.imageUrl;
-                    eventImage.style.display = 'block';
-                    eventSection.onclick = () => this.showEventModal();
-                    return;
-                }
-
                 try {
                     const snapshot = await this.db.collection('events').where('status', '==', 'active').get();
                     
                     if (snapshot.empty) {
+                        console.log("Tidak ada event aktif ditemukan di Firebase. Menampilkan default.");
+                        // Store default event data for modal
                         this.currentEventData = {
                             name: 'KOPDAR RUTIN',
                             description: 'Kopdar rutin mingguan komunitas BGT PRO',
@@ -3060,6 +3041,7 @@
                     
                     const event = events.length > 0 ? events[0] : null;
                     if (!event) {
+                        // Store default event data for modal
                         this.currentEventData = {
                             name: 'KOPDAR RUTIN',
                             description: 'Kopdar rutin mingguan komunitas BGT PRO',
@@ -3070,6 +3052,9 @@
                         return;
                     }
                     
+                    console.log("Event ditemukan:", event);
+                    
+                    // Store event data for modal
                     this.currentEventData = {
                         name: event.name || 'KOPDAR RUTIN',
                         description: event.description || 'Kopdar rutin mingguan komunitas BGT PRO',
@@ -3081,6 +3066,7 @@
                         imageUrl: event.imageUrl || null
                     };
                     
+                    // Handle event image
                     const imageUrl = event.imageUrl || '';
                     if (imageUrl) {
                         if (imageUrl.startsWith('data:image') || imageUrl.startsWith('http')) {
@@ -3109,10 +3095,12 @@
                         console.error("Gambar event gagal dimuat, menyembunyikan gambar."); 
                     };
                     
+                    // Add click event
                     document.getElementById('eventSection').onclick = () => {
                         this.showEventModal();
                     };
                     
+                    // Check for event notification
                     this.checkEventNotification();
                     
                 } catch (error) {
@@ -3122,6 +3110,7 @@
                     } else {
                         this.handleFirebaseError(error);
                     }
+                    // Store default event data for modal
                     this.currentEventData = {
                         name: 'KOPDAR RUTIN',
                         description: 'Kopdar rutin mingguan komunitas BGT PRO',
@@ -3132,6 +3121,7 @@
                 }
             },
             
+            // Show Event Modal
             showEventModal() {
                 if (!this.currentEventData) return;
                 
@@ -3139,6 +3129,7 @@
                 document.getElementById('modalTitle').textContent = 'Detail Event';
                 document.getElementById('modalDetailTitle').textContent = this.currentEventData.name;
                 
+                // Create detailed description
                 const description = `Waktu: ${this.currentEventData.time}\n\n${this.currentEventData.description}`;
                 document.getElementById('modalDetailDesc').textContent = description;
                 
@@ -3173,24 +3164,13 @@
                 document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
+            // Load Banners from Firebase
             async loadBannersFromFirebase() {
                 const container = document.getElementById('adminCarousel');
                 const indicators = document.getElementById('carouselIndicators');
                 container.innerHTML = '';
                 indicators.innerHTML = '';
                 
-                if (this.state.isGuestMode) {
-                    const slideDiv = document.createElement('div');
-                    slideDiv.className = `carousel-slide active`;
-                    slideDiv.innerHTML = `<img src="https://picsum.photos/seed/banner1/600/300.jpg" alt="Demo Banner">`;
-                    container.appendChild(slideDiv);
-                    
-                    const indicator = document.createElement('div');
-                    indicator.className = `indicator active`;
-                    indicators.appendChild(indicator);
-                    return;
-                }
-
                 try {
                     const snapshot = await this.db.collection('promos').where('status', '==', 'active').get();
                     
@@ -3240,6 +3220,7 @@
                             `;
                         }
                         
+                        // Store banner data for modal
                         slideDiv.bannerData = {
                             title: banner.title,
                             description: banner.description,
@@ -3257,6 +3238,7 @@
                         indicator.onclick = () => this.goToSlide(index);
                         indicators.appendChild(indicator);
                         
+                        // Handle Firebase Storage images
                         const firebaseImage = slideDiv.querySelector('img[data-firebase-url]');
                         if (firebaseImage) {
                             const firebaseUrl = firebaseImage.getAttribute('data-firebase-url');
@@ -3298,6 +3280,7 @@
                 }
             },
             
+            // Show Banner Modal
             showBannerModal(bannerData) {
                 const modal = document.getElementById('modal');
                 document.getElementById('modalTitle').textContent = 'Detail Promo';
@@ -3335,9 +3318,12 @@
                 document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
+            // Update Balance from Firebase
             updateBalanceFromFirebase() {
+                // Balance update logic here
             },
             
+            // Show Realtime Indicator
             showRealtimeIndicator() {
                 const indicator = document.getElementById('realtimeIndicator');
                 indicator.classList.add('active');
@@ -3346,6 +3332,7 @@
                 }, 2000);
             },
             
+            // Next Slide (for admin carousel)
             nextSlide() {
                 const slides = document.querySelectorAll('.carousel-slide');
                 const indicators = document.querySelectorAll('.indicator');
@@ -3361,6 +3348,7 @@
                 indicators[this.state.currentSlide].classList.add('active');
             },
             
+            // Go To Slide (for admin carousel)
             goToSlide(index) {
                 const slides = document.querySelectorAll('.carousel-slide');
                 const indicators = document.querySelectorAll('.indicator');
@@ -3376,20 +3364,26 @@
                 indicators[this.state.currentSlide].classList.add('active');
             },
             
+            // Check Event Notification
             checkEventNotification() {
+                // Event notification logic here
             },
             
+            // Get Valid Image URL
             async getValidImageUrl(imagePath) {
                 if (!imagePath) return null;
                 
+                // Jika base64, kembalikan langsung
                 if (imagePath.startsWith('data:image')) {
                     return imagePath;
                 }
                 
+                // Jika URL HTTP, kembalikan langsung
                 if (imagePath.startsWith('http')) {
                     return imagePath;
                 }
                 
+                // Jika URL Firebase Storage, coba dapatkan URL unduhan
                 if (imagePath.startsWith('gs://')) {
                     try {
                         const storageRef = this.storage.refFromURL(imagePath);
@@ -3403,6 +3397,7 @@
                 return null;
             },
             
+            // Handle Firebase Error
             handleFirebaseError(error) {
                 if (this.state.firebaseErrorShown) return;
                 this.state.firebaseErrorShown = true;
@@ -3417,15 +3412,16 @@
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'error-message';
                     errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>Anda tidak memiliki izin untuk mengakses data. Lihat panduan di bawah untuk mengatasi masalah ini.</span>`;
-                    document.getElementById('main-content').insertBefore(errorDiv, document.querySelector('.eventSection'));
+                    document.getElementById('main-content').insertBefore(errorDiv, document.querySelector('.event-section'));
                 } else {
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'error-message';
                     errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>Terjadi kesalahan saat mengambil data: ${error.message}</span>`;
-                    document.getElementById('main-content').insertBefore(errorDiv, document.querySelector('.eventSection'));
+                    document.getElementById('main-content').insertBefore(errorDiv, document.querySelector('.event-section'));
                 }
             },
             
+            // Handle Index Error
             handleIndexError(error) {
                 if (this.state.indexErrorShown) return;
                 this.state.indexErrorShown = true;
@@ -3439,9 +3435,10 @@
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error-message';
                 errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>Query memerlukan indeks Firebase. <a href="${indexUrl}" target="_blank">Buat indeks di sini</a></span>`;
-                document.getElementById('main-content').insertBefore(errorDiv, document.querySelector('.eventSection'));
+                document.getElementById('main-content').insertBefore(errorDiv, document.querySelector('.event-section'));
             },
             
+            // Copy Rules Code
             copyRulesCode() {
                 const rulesCode = document.getElementById('rulesCode').innerText;
                 navigator.clipboard.writeText(rulesCode).then(() => { 
@@ -3452,6 +3449,7 @@
                 });
             },
             
+            // Toggle Menu
             toggleMenu() {
                 const sideMenu = document.getElementById('sideMenu');
                 const overlay = document.getElementById('overlay');
@@ -3461,15 +3459,15 @@
                 appContainer.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : 'auto';
             },
             
-            // UPDATE: Handle Menu Click (Burger)
+            // Handle Menu Click
             handleMenuClick(item) {
                 if (item === 'Kas') {
                     this.showPage('kas-page');
                 } else if (item === 'Peta') {
                     this.showPage('peta-page');
-                } else if (item === 'Explore') {
-                    // Explore sekarang ada di Burger
-                    this.showPage('explorer-page');
+                } else if (item === 'Pesan') {
+                    // Buka halaman pesan.html
+                    window.location.href = 'pesan.html';
                 } else if (item === 'Pengaturan') {
                     this.showPage('pengaturan-page');
                 } else if (item === 'Bantuan') {
@@ -3478,48 +3476,52 @@
                 this.toggleMenu();
             },
             
-            // UPDATE: Handle Nav Click (Bottom)
+            // Handle Nav Click
             handleNavClick(element, section) {
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
                 element.classList.add('active');
                 
-                if (section === 'Home') {
+                if (section === 'Profile') {
+                    this.showPage('profile-page');
+                } else if (section === 'Home') {
                     this.showMainContent();
-                } else if (section === 'Peta') {
-                    // Peta sekarang di Bottom Nav
-                    this.showPage('peta-page');
+                } else if (section === 'Explore') {
+                    this.showPage('explorer-page');
                 } else if (section === 'Activity') {
                     this.showPage('activity-page');
-                } else if (section === 'Pesan') {
-                    // Pesan sekarang di Bottom Nav, buka file pesan.html
-                    window.location.href = 'pesan.html';
                 } else {
                     this.showToast(`Navigasi ke ${section}`, 'info');
                 }
             },
             
+            // Show Main Content
             showMainContent() {
                 document.getElementById('main-content').style.display = 'block';
                 document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
                 
+                // Reset nav item ke 'Home'
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
                 document.querySelector('.nav-item').classList.add('active');
             },
             
+            // Show Page
             showPage(pageId) {
                 document.getElementById('main-content').style.display = 'none';
                 document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
                 document.getElementById(pageId).classList.add('active');
             },
             
+            // Show Profile
             showProfile() {
                 this.showPage('profile-page');
             },
             
+            // Show Notifications
             showNotifications() {
                 this.showModal('notifications', 'Notifikasi', 'Tidak ada notifikasi baru');
             },
             
+            // Show Modal
             showModal(type, title, description, image = null) {
                 const modal = document.getElementById('modal');
                 document.getElementById('modalTitle').textContent = title;
@@ -3557,37 +3559,42 @@
                 document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
+            // Close Modal
             closeModal() {
                 document.getElementById('modal').classList.remove('active');
                 document.querySelector('.app-container').style.overflow = 'auto';
             },
             
+            // Handle Modal Action
             handleModalAction() { 
                 this.closeModal(); 
             },
             
+            // Trigger Disruption
             triggerDisruption() {
                 document.getElementById('disruption-overlay').classList.add('active');
             },
             
+            // Stop Disruption
             stopDisruption() {
                 document.getElementById('disruption-overlay').classList.remove('active');
             },
             
+            // Show Loading Screen
             showLoadingScreen(text = 'Memuat...') {
                 const loadingScreen = document.getElementById('loadingScreen');
                 const loadingText = document.getElementById('loadingText');
                 loadingText.textContent = text;
                 loadingScreen.classList.remove('hidden');
-                
-                document.getElementById('cancelLoadingBtn').style.display = 'none';
             },
             
+            // Hide Loading Screen
             hideLoadingScreen() {
                 const loadingScreen = document.getElementById('loadingScreen');
                 loadingScreen.classList.add('hidden');
             },
             
+            // Show Toast
             showToast(message, type = 'default') {
                 let toast = document.getElementById('toast');
                 if (!toast) {
@@ -3606,30 +3613,28 @@
                 }, 3000);
             },
             
+            // Logout
             logout() {
-                // Tandai logout sebagai eksplisit
+                // Set flag untuk menandai logout eksplisit
                 this.state.isExplicitLogout = true;
                 
-                // Hapus status sesi dari localStorage
+                // Hapus indikator sesi dari localStorage
                 localStorage.removeItem('bgtProSession');
                 
                 // Logout dari Firebase
-                if (this.auth.currentUser) {
-                    this.auth.signOut().then(() => {
-                        // Tidak perlu reload halaman karena handleAuthStateChange akan menanganinya
-                        this.showToast("Anda telah keluar", "success");
-                    }).catch((error) => {
-                        console.error("Error signing out:", error);
-                        this.showToast('Gagal keluar, coba lagi', 'error');
-                        this.state.isExplicitLogout = false;
-                    });
-                } else {
-                    // Jika tidak ada pengguna yang login, langsung reload halaman
-                    window.location.reload();
-                }
+                this.auth.signOut().then(() => {
+                    // Arahkan ke halaman login
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error("Error signing out:", error);
+                    this.showToast('Gagal keluar, coba lagi', 'error');
+                    // Reset flag jika gagal
+                    this.state.isExplicitLogout = false;
+                });
             }
         };
         
+        // Initialize Application
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
         });
