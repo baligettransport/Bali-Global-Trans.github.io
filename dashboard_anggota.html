@@ -1895,9 +1895,18 @@
                     
                     console.log("Firebase initialized successfully");
                     
+                    // Set persistence to LOCAL untuk menyimpan sesi pengguna
                     this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                         .then(() => {
                             console.log("Firebase auth persistence set to LOCAL");
+                            
+                            // Periksa apakah ada sesi yang tersimpan
+                            const hasSession = localStorage.getItem('bgtProSession') === 'active';
+                            
+                            if (hasSession) {
+                                console.log("Found existing session, attempting to restore...");
+                                this.showLoadingScreen('Memulihkan sesi...');
+                            }
                         })
                         .catch((error) => {
                             console.error("Error setting auth persistence:", error);
@@ -1924,6 +1933,8 @@
                         this.state.isExplicitLogout = false;
                         this.state.sessionRestoreAttempted = false;
                         this.state.isGuestMode = false;
+                        
+                        // Simpan status sesi aktif di localStorage
                         localStorage.setItem('bgtProSession', 'active');
                         
                         this.loadUserData(user.uid);
@@ -1933,33 +1944,22 @@
                     } else {
                         console.log("No user logged in.");
                         
+                        // Periksa apakah pengguna secara eksplisit logout
                         if (this.state.isExplicitLogout) {
-                            console.log("User explicitly logged out. Reload page to login.");
-                            window.location.reload(); 
+                            console.log("User explicitly logged out. Session cleared.");
                             return;
                         }
                         
+                        // Periksa apakah ada sesi yang tersimpan
                         const hasSession = localStorage.getItem('bgtProSession') === 'active';
                         
                         if (hasSession && !this.state.sessionRestoreAttempted) {
                             this.state.sessionRestoreAttempted = true;
-                            console.log("Attempting to restore session...");
-                            this.showLoadingScreen('Memulihkan sesi...');
-                            
-                            setTimeout(() => {
-                                if (!this.auth.currentUser) {
-                                    console.log("Session expired. Entering Guest Mode to prevent loop.");
-                                    localStorage.removeItem('bgtProSession');
-                                    this.enterGuestMode();
-                                } else {
-                                    this.hideLoadingScreen();
-                                }
-                            }, 5000);
+                            console.log("Session found but user is null. Entering Guest Mode to prevent loop.");
+                            localStorage.removeItem('bgtProSession');
+                            this.enterGuestMode();
                         } else if (!hasSession) {
                             console.log("No session found. Entering Guest Mode.");
-                            this.enterGuestMode();
-                        } else {
-                            console.log("Session restore failed. Entering Guest Mode.");
                             this.enterGuestMode();
                         }
                     }
@@ -3607,18 +3607,24 @@
             },
             
             logout() {
+                // Tandai logout sebagai eksplisit
                 this.state.isExplicitLogout = true;
+                
+                // Hapus status sesi dari localStorage
                 localStorage.removeItem('bgtProSession');
                 
+                // Logout dari Firebase
                 if (this.auth.currentUser) {
                     this.auth.signOut().then(() => {
-                        window.location.reload(); 
+                        // Tidak perlu reload halaman karena handleAuthStateChange akan menanganinya
+                        this.showToast("Anda telah keluar", "success");
                     }).catch((error) => {
                         console.error("Error signing out:", error);
                         this.showToast('Gagal keluar, coba lagi', 'error');
                         this.state.isExplicitLogout = false;
                     });
                 } else {
+                    // Jika tidak ada pengguna yang login, langsung reload halaman
                     window.location.reload();
                 }
             }
