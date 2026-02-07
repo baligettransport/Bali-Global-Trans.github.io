@@ -30,6 +30,7 @@
             --whatsapp-dark: #202c33;
             --whatsapp-header: #0b141a;
             --whatsapp-hover: #182229;
+            --recording-red: #dc3545;
         }
         
         /* Global Styles */
@@ -94,7 +95,7 @@
         
         .whatsapp-chat-window.active {
             display: flex;
-            animation: slideIn 0.1s ease-out; /* Cepat */
+            animation: slideIn 0.1s ease-out;
         }
         
         @keyframes slideIn {
@@ -120,7 +121,7 @@
             display: flex;
         }
 
-        /* --- MESSAGE MENU POPUP (Baru) --- */
+        /* --- MESSAGE MENU POPUP --- */
         .message-menu {
             position: absolute;
             background: white;
@@ -150,14 +151,11 @@
             transition: background 0.2s;
         }
 
-        .menu-item:hover {
-            background-color: #f5f6f6;
-        }
-
+        .menu-item:hover { background-color: #f5f6f6; }
         .menu-item.delete { color: #dc3545; }
         .menu-item.delete:hover { background-color: #ffebeb; }
         
-        /* --- REPLY BOX (Baru) --- */
+        /* --- REPLY BOX --- */
         .reply-box {
             display: none;
             background-color: var(--whatsapp-header);
@@ -189,6 +187,34 @@
             cursor: pointer;
             font-size: 16px;
         }
+
+        /* --- RECORDING OVERLAY --- */
+        .recording-overlay {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            align-items: center;
+            gap: 15px;
+            width: 90%;
+            max-width: 300px;
+            justify-content: space-between;
+        }
+        .recording-overlay.active { display: flex; }
+        .recording-time { font-family: monospace; font-size: 16px; }
+        .recording-stop {
+            width: 40px; height: 40px; background: var(--recording-red); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        }
+        .recording-stop i { color: white; }
         
         /* --- UI COMPONENTS --- */
         .whatsapp-back-btn {
@@ -410,12 +436,12 @@
             line-height: 1.4;
             font-size: 14px;
             word-wrap: break-word;
-            cursor: pointer; /* Indicate clickable */
+            cursor: pointer;
             user-select: none;
             position: relative;
+            min-width: 50px;
         }
         
-        /* Highlight selected message */
         .whatsapp-message-bubble.selected {
             box-shadow: 0 0 0 2px var(--whatsapp-green);
         }
@@ -428,6 +454,20 @@
             background-color: var(--whatsapp-msg-received);
         }
         
+        /* Media Styles */
+        .message-image {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .message-audio {
+            width: 200px;
+            height: 35px;
+            outline: none;
+        }
+
         .whatsapp-message-time {
             font-size: 10px;
             color: #999;
@@ -436,7 +476,6 @@
             float: right;
         }
 
-        /* Reply context visual inside chat */
         .reply-context {
             font-size: 11px;
             color: #555;
@@ -600,7 +639,6 @@
             <aside class="whatsapp-sidebar" id="whatsapp-sidebar">
                 <header class="whatsapp-sidebar-header">
                     <div class="whatsapp-user-profile" id="whatsapp-user-profile">
-                        <!-- Placeholder Default -->
                         <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-sidebar-profile-pic">
                         <span class="whatsapp-user-profile-name" id="whatsapp-sidebar-username">Pengguna</span>
                     </div>
@@ -621,7 +659,7 @@
                 
                 <!-- Chat List -->
                 <div class="whatsapp-chat-list" id="whatsapp-chat-list">
-                    <!-- Akan diisi JS -->
+                    <!-- JS -->
                 </div>
             </aside>
 
@@ -635,6 +673,8 @@
                         <p id="whatsapp-chat-status">Aplikasi Pesan Real-Time</p>
                     </div>
                     <div class="icons">
+                        <!-- Added Camera Icon -->
+                        <i class="fas fa-camera" id="btn-camera" title="Kirim Foto"></i>
                         <i class="fas fa-video"></i>
                         <i class="fas fa-phone"></i>
                     </div>
@@ -649,19 +689,22 @@
                     </div>
                 </div>
                 
-                <!-- Context Menu (Hidden by default) -->
+                <!-- Context Menu -->
                 <div id="message-menu" class="message-menu">
-                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('edit')">
-                        <i class="fas fa-edit"></i> Edit
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('edit')"><i class="fas fa-edit"></i> Edit</div>
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('reply')"><i class="fas fa-reply"></i> Balas</div>
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('forward')"><i class="fas fa-share"></i> Teruskan</div>
+                    <div class="menu-item delete" onclick="whatsappApp.handleMenuAction('delete')"><i class="fas fa-trash"></i> Hapus</div>
+                </div>
+
+                <!-- Recording Overlay -->
+                <div class="recording-overlay" id="recording-overlay">
+                    <div class="recording-info">
+                        <i class="fas fa-microphone" style="color:var(--recording-red)"></i>
+                        <span class="recording-time" id="recording-timer">00:00</span>
                     </div>
-                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('reply')">
-                        <i class="fas fa-reply"></i> Balas
-                    </div>
-                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('forward')">
-                        <i class="fas fa-share"></i> Teruskan
-                    </div>
-                    <div class="menu-item delete" onclick="whatsappApp.handleMenuAction('delete')">
-                        <i class="fas fa-trash"></i> Hapus
+                    <div class="recording-stop" id="btn-stop-recording">
+                        <i class="fas fa-stop"></i>
                     </div>
                 </div>
                 
@@ -679,18 +722,9 @@
                         
                         <div class="whatsapp-profile-details">
                             <h3 style="margin-bottom: 15px;">Profil Saya</h3>
-                            <div class="whatsapp-detail-item">
-                                <span>Email</span>
-                                <span id="whatsapp-detail-email">-</span>
-                            </div>
-                            <div class="whatsapp-detail-item">
-                                <span>Telepon</span>
-                                <span id="whatsapp-detail-phone">-</span>
-                            </div>
-                            <div class="whatsapp-detail-item">
-                                <span>Status</span>
-                                <span id="whatsapp-detail-status">-</span>
-                            </div>
+                            <div class="whatsapp-detail-item"><span>Email</span><span id="whatsapp-detail-email">-</span></div>
+                            <div class="whatsapp-detail-item"><span>Telepon</span><span id="whatsapp-detail-phone">-</span></div>
+                            <div class="whatsapp-detail-item"><span>Status</span><span id="whatsapp-detail-status">-</span></div>
                         </div>
                         
                         <button class="whatsapp-edit-btn" id="whatsapp-view-members-btn">Lihat Anggota Terdaftar</button>
@@ -698,7 +732,7 @@
                 </div>
                 
                 <div class="whatsapp-chat-input" id="whatsapp-chat-input-area" style="display: none;">
-                    <!-- Reply Bar (Hidden by default) -->
+                    <!-- Reply Bar -->
                     <div id="reply-box" class="reply-box">
                         <span style="font-weight: bold; margin-bottom: 2px;">Membalas pesan</span>
                         <div class="reply-text-preview" id="reply-preview-text">...</div>
@@ -707,8 +741,11 @@
 
                     <div class="input-row">
                         <i class="fas fa-smile"></i>
+                        <!-- Hidden Camera Input -->
+                        <input type="file" id="camera-input" accept="image/*" style="display: none;">
                         <i class="fas fa-paperclip"></i>
                         <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan">
+                        <!-- Mic Button -->
                         <i class="fas fa-microphone" id="whatsapp-mic-icon"></i>
                         <button id="whatsapp-send-btn" style="display: none;"><i class="fas fa-paper-plane"></i></button>
                     </div>
@@ -721,9 +758,7 @@
                     <i class="fas fa-arrow-left" id="members-back-btn"></i>
                     <h3>Anggota Terdaftar</h3>
                 </header>
-                <div class="members-content" id="members-content">
-                    <!-- Akan diisi JS -->
-                </div>
+                <div class="members-content" id="members-content"></div>
             </div>
         </div>
     </div>
@@ -752,8 +787,13 @@
                 messages: {},
                 currentUserData: null,
                 registeredMembers: [],
-                selectedMessageId: null, // ID pesan yang sedang dipilih/diklik
-                replyingTo: null // { id, text } jika sedang mode balas
+                selectedMessageId: null,
+                replyingTo: null,
+                isRecording: false,
+                mediaRecorder: null,
+                audioChunks: [],
+                recordingStartTime: 0,
+                recordingInterval: null
             },
 
             init() {
@@ -775,7 +815,6 @@
                     }
                 });
                 
-                // Klik di mana saja untuk menutup menu
                 document.addEventListener('click', (e) => {
                     const menu = document.getElementById('message-menu');
                     if (!e.target.closest('.message-menu') && !e.target.closest('.whatsapp-message-bubble')) {
@@ -854,18 +893,17 @@
                 const msgInput = document.getElementById('whatsapp-message-input');
                 const sendBtn = document.getElementById('whatsapp-send-btn');
                 const micIcon = document.getElementById('whatsapp-mic-icon');
+                const cameraBtn = document.getElementById('btn-camera');
+                const cameraInput = document.getElementById('camera-input');
+                const stopRecBtn = document.getElementById('btn-stop-recording');
 
                 userProfile.addEventListener('click', () => this.showScreen('profile'));
 
                 viewMembersBtn.addEventListener('click', () => this.showMembersListInstant());
 
-                membersBackBtn.addEventListener('click', () => {
-                    window.location.href = 'dashboard_anggota.html';
-                });
+                membersBackBtn.addEventListener('click', () => window.location.href = 'dashboard_anggota.html');
 
-                chatBackBtn.addEventListener('click', () => {
-                    window.location.href = 'pesan.html';
-                });
+                chatBackBtn.addEventListener('click', () => window.location.href = 'pesan.html');
 
                 logoutBtn.addEventListener('click', () => {
                     localStorage.removeItem('bgtProSession');
@@ -895,29 +933,107 @@
 
                 sendBtn.addEventListener('click', () => this.sendMessage());
                 msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.sendMessage(); });
+
+                // --- MIC / RECORDING LOGIC ---
+                micIcon.addEventListener('click', () => this.toggleRecording());
+                stopRecBtn.addEventListener('click', () => this.stopRecording(true));
+
+                // --- CAMERA LOGIC ---
+                cameraBtn.addEventListener('click', () => cameraInput.click());
+                cameraInput.addEventListener('change', (e) => this.handleImageUpload(e));
             },
 
-            // --- MENU LOGIC START ---
+            // --- RECORDING FUNCTIONS ---
+            async toggleRecording() {
+                if (!this.state.isRecording) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        this.state.mediaRecorder = new MediaRecorder(stream);
+                        this.state.audioChunks = [];
+
+                        this.state.mediaRecorder.ondataavailable = (event) => {
+                            this.state.audioChunks.push(event.data);
+                        };
+
+                        this.state.mediaRecorder.start();
+                        this.state.isRecording = true;
+                        this.state.recordingStartTime = Date.now();
+
+                        // UI Update
+                        document.getElementById('recording-overlay').classList.add('active');
+                        document.getElementById('whatsapp-chat-input-area').style.display = 'none';
+                        
+                        // Timer
+                        this.state.recordingInterval = setInterval(() => {
+                            const diff = Math.floor((Date.now() - this.state.recordingStartTime) / 1000);
+                            const min = String(Math.floor(diff / 60)).padStart(2, '0');
+                            const sec = String(diff % 60).padStart(2, '0');
+                            document.getElementById('recording-timer').textContent = `${min}:${sec}`;
+                        }, 1000);
+
+                    } catch (err) {
+                        console.error("Gagal akses mikrofon:", err);
+                        alert("Izin mikrofon dibutuhkan untuk merekam.");
+                    }
+                } else {
+                    this.stopRecording(true);
+                }
+            },
+
+            async stopRecording(send = false) {
+                if (this.state.mediaRecorder && this.state.isRecording) {
+                    this.state.mediaRecorder.stop();
+                    this.state.mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Release mic
+                }
+                
+                this.state.isRecording = false;
+                clearInterval(this.state.recordingInterval);
+                
+                // UI Reset
+                document.getElementById('recording-overlay').classList.remove('active');
+                document.getElementById('whatsapp-chat-input-area').style.display = 'flex';
+                document.getElementById('recording-timer').textContent = "00:00";
+
+                if (send && this.state.audioChunks.length > 0) {
+                    const audioBlob = new Blob(this.state.audioChunks, { type: 'audio/mp3' });
+                    // Convert to Base64 to store in Firestore (Demo purposes only)
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        const base64Audio = reader.result;
+                        this.sendMessage(base64Audio, 'audio');
+                    };
+                }
+                this.state.audioChunks = [];
+            },
+
+            // --- CAMERA / IMAGE FUNCTIONS ---
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = () => {
+                    const base64Image = reader.result;
+                    this.sendMessage(base64Image, 'image');
+                };
+                // Reset input
+                event.target.value = '';
+            },
 
             showMenu(e, messageId, bubbleEl) {
-                e.stopPropagation(); // Mencegah event bubbling
-
+                e.stopPropagation();
                 this.state.selectedMessageId = messageId;
                 this.highlightBubble(bubbleEl);
 
                 const menu = document.getElementById('message-menu');
-                
-                // Posisi Menu
-                // Kita gunakan posisi relatif terhadap container utama atau fixed
-                // Agar sederhana dan responsif, kita letakkan sedikit di atas atau di samping jari klik
                 const rect = bubbleEl.getBoundingClientRect();
                 const containerRect = document.querySelector('.whatsapp-chat-window').getBoundingClientRect();
                 
-                // Default posisi
                 let top = rect.top - containerRect.top - 100; 
                 let left = rect.left - containerRect.left - 50;
 
-                // Batas agar tidak keluar layar (sederhana)
                 if (top < 10) top = rect.bottom - containerRect.top + 10;
                 if (left < 10) left = 10;
                 
@@ -946,38 +1062,32 @@
                 if (!msgObj) return;
 
                 switch (action) {
-                    case 'delete':
-                        this.deleteMessage(chatId, msgId);
+                    case 'delete': this.deleteMessage(chatId, msgId); break;
+                    case 'edit': 
+                        // Edit only text messages
+                        if (!msgObj.image && !msgObj.audio) this.editMessage(chatId, msgId, msgObj.text); 
+                        else alert("Tidak bisa mengedit pesan media.");
                         break;
-                    case 'edit':
-                        this.editMessage(chatId, msgId, msgObj.text);
-                        break;
-                    case 'reply':
-                        this.enableReplyMode(msgObj);
-                        break;
-                    case 'forward':
-                        this.forwardMessage(msgObj.text);
+                    case 'reply': this.enableReplyMode(msgObj); break;
+                    case 'forward': 
+                        if(msgObj.text) this.forwardMessage(msgObj.text);
+                        else alert("Hanya bisa meneruskan teks.");
                         break;
                 }
                 this.removeSelectionHighlight();
             },
 
             async deleteMessage(chatId, msgId) {
-                // Filter out message
                 const updatedMessages = this.state.messages[chatId].filter(m => m.id !== msgId);
                 this.state.messages[chatId] = updatedMessages;
                 this.renderMessages(chatId);
 
-                // Update Firestore (overwrite for simplicity in array of objects)
                 try {
                     await db.collection('chats').doc(chatId).update({
                         messages: updatedMessages,
                         lastUpdated: new Date()
                     });
-                } catch (e) {
-                    console.error("Gagal menghapus:", e);
-                    alert("Gagal menghapus pesan");
-                }
+                } catch (e) { console.error("Gagal menghapus:", e); }
             },
 
             async editMessage(chatId, msgId, currentText) {
@@ -986,10 +1096,8 @@
                     const msgIndex = this.state.messages[chatId].findIndex(m => m.id === msgId);
                     if (msgIndex > -1) {
                         this.state.messages[chatId][msgIndex].text = newText;
-                        this.state.messages[chatId][msgIndex].edited = true; // Tandai diedit
+                        this.state.messages[chatId][msgIndex].edited = true;
                         this.renderMessages(chatId);
-
-                        // Update Firestore
                         try {
                             await db.collection('chats').doc(chatId).update({
                                 messages: this.state.messages[chatId],
@@ -1006,7 +1114,7 @@
                 const previewText = document.getElementById('reply-preview-text');
                 
                 replyBox.classList.add('active');
-                previewText.textContent = msgObj.text;
+                previewText.textContent = msgObj.text || (msgObj.image ? "[Gambar]" : "[Audio]");
                 document.getElementById('whatsapp-message-input').focus();
             },
 
@@ -1016,19 +1124,12 @@
             },
 
             forwardMessage(text) {
-                // Fitur teruskan sederhana: copy teks ke input
                 const input = document.getElementById('whatsapp-message-input');
                 input.value = text;
                 input.focus();
-                
-                // Tampilkan tombol kirim
                 document.getElementById('whatsapp-send-btn').style.display = 'flex';
                 document.getElementById('whatsapp-mic-icon').style.display = 'none';
-                
-                // Opsional: Tampilkan toast atau feedback
-                // alert("Pesan disalin ke kolom input. Pilih kontak lain untuk mengirim.");
             },
-            // --- MENU LOGIC END ---
 
             showMembersListInstant() {
                 this.showScreen('welcome');
@@ -1097,7 +1198,6 @@
                 this.loadMessages(chat.id);
                 setTimeout(() => document.getElementById('whatsapp-message-input').focus(), 300);
                 
-                // Tutup menu jika terbuka
                 document.getElementById('message-menu').style.display = 'none';
                 this.closeReply();
             },
@@ -1152,9 +1252,7 @@
                     container.appendChild(bubbleContainer);
                 }
                 
-                // Simpan scroll position untuk auto-scroll hanya jika user di paling bawah
                 const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
-
                 bubbleContainer.innerHTML = '';
 
                 msgs.forEach(msg => {
@@ -1162,64 +1260,82 @@
                     const el = document.createElement('div');
                     el.className = `whatsapp-message ${isMe ? 'sent' : 'received'}`;
                     
-                    // Menangani pesan reply (jika ada replyTo data)
-                    let replyHtml = '';
-                    if (msg.replyTo && msg.replyTo.text) {
-                        replyHtml = `<span class="reply-context">"${msg.replyTo.text}"</span>`;
+                    let contentHtml = '';
+                    
+                    // Image
+                    if (msg.image) {
+                        contentHtml += `<img src="${msg.image}" class="message-image" alt="Image">`;
+                    }
+                    
+                    // Text
+                    if (msg.text) {
+                        // Handle Reply Context visual inside message
+                        let replyHtml = '';
+                        if (msg.replyTo && msg.replyTo.text) {
+                            replyHtml = `<span class="reply-context">"${msg.replyTo.text}"</span>`;
+                        }
+                        contentHtml += `${replyHtml}<span>${msg.text}</span>`;
                     }
 
-                    // Menangani pesan edit (jika ada edited flag)
+                    // Audio
+                    if (msg.audio) {
+                        contentHtml += `<audio controls src="${msg.audio}" class="message-audio"></audio>`;
+                    }
+
                     const timeHtml = `<div class="whatsapp-message-time">${msg.edited ? 'Diedit ' : ''}10:00</div>`;
 
-                    // Tambahkan data-id untuk tracking klik menu
-                    // Menggunakan div pembungkus bubble untuk memisahkan area klik bubble dan waktu
                     el.innerHTML = `
                         <div class="whatsapp-message-bubble" data-id="${msg.id}">
-                            ${replyHtml}
-                            ${msg.text}
+                            ${contentHtml}
                             ${timeHtml}
                         </div>
                     `;
                     
-                    // Event Listener untuk Menu
                     const bubble = el.querySelector('.whatsapp-message-bubble');
                     bubble.addEventListener('click', (e) => {
-                        // Hanya milik kita yang bisa diedit/dihapus (opsional, di sini semua pesan bisa diklik untuk menu)
-                        // if (isMe) ... (uncomment jika ingin batasi fitur edit/hapus hanya milik sendiri)
+                        // Prevent menu if clicking on audio controls or image
+                        if(e.target.tagName === 'AUDIO' || e.target.tagName === 'INPUT') return;
                         this.showMenu(e, msg.id, bubble);
                     });
 
                     bubbleContainer.appendChild(el);
                 });
                 
-                if (isAtBottom) {
-                    container.scrollTop = container.scrollHeight;
-                }
+                if (isAtBottom) container.scrollTop = container.scrollHeight;
             },
 
-            async sendMessage() {
+            async sendMessage(mediaContent = null, mediaType = 'text') {
                 const input = document.getElementById('whatsapp-message-input');
                 const text = input.value.trim();
-                if (!text || !this.state.activeChatId) return;
 
-                // Siapkan objek pesan
+                // Validate: Either text exists OR media exists
+                if ((!text && !mediaContent) || !this.state.activeChatId) return;
+
                 const newMsg = { 
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9), // ID Unik
-                    text: text, 
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
                     senderId: auth.currentUser.uid, 
                     timestamp: new Date() 
                 };
 
-                // Jika sedang mode balas
+                if (mediaType === 'text') {
+                    newMsg.text = text;
+                } else if (mediaType === 'image') {
+                    newMsg.image = mediaContent;
+                    // Optional: Add caption
+                    if(text) newMsg.text = text; 
+                } else if (mediaType === 'audio') {
+                    newMsg.audio = mediaContent;
+                }
+
                 if (this.state.replyingTo) {
                     newMsg.replyTo = {
                         id: this.state.replyingTo.id,
-                        text: this.state.replyingTo.text
+                        text: this.state.replyingTo.text || (this.state.replyingTo.image ? "[Gambar]" : "[Audio]")
                     };
                     this.closeReply();
                 }
 
-                // Update lokal langsung (optimistic UI)
+                // Optimistic UI
                 this.state.messages[this.state.activeChatId].push(newMsg);
                 this.renderMessages(this.state.activeChatId);
                 
@@ -1227,13 +1343,15 @@
                 document.getElementById('whatsapp-send-btn').style.display = 'none';
                 document.getElementById('whatsapp-mic-icon').style.display = 'block';
 
-                // Kirim ke Firebase
                 try {
                     await db.collection('chats').doc(this.state.activeChatId).set({
                         messages: this.state.messages[this.state.activeChatId],
                         lastUpdated: new Date()
                     }, { merge: true });
-                } catch (e) { console.error(e); }
+                } catch (e) { 
+                    console.error("Gagal mengirim pesan:", e);
+                    alert("Gagal mengirim pesan mungkin karena ukuran terlalu besar (Max 1MB Firestore).");
+                }
             },
 
             renderChatList(filterText = '') {
