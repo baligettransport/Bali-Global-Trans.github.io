@@ -31,6 +31,7 @@
             --whatsapp-header: #0b141a;
             --whatsapp-hover: #182229;
             --recording-red: #dc3545;
+            --selection-bar-bg: #2a3942;
         }
         
         /* Global Styles */
@@ -102,6 +103,80 @@
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
         }
+
+        /* --- SELECTION BAR (Long Press) --- */
+        .whatsapp-selection-bar {
+            display: none;
+            background-color: var(--selection-bar-bg);
+            padding: 10px 15px;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            z-index: 26;
+            flex-shrink: 0;
+        }
+        
+        .whatsapp-selection-bar.active {
+            display: flex;
+        }
+
+        .selection-info {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .selection-actions {
+            display: flex;
+            gap: 20px;
+            color: white;
+        }
+        
+        .selection-actions i {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* --- DELETE CONFIRMATION POPUP (Bottom Sheet) --- */
+        .delete-popup {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            z-index: 100;
+            padding: 20px;
+            animation: slideUp 0.2s ease-out;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        }
+
+        .delete-popup.active { display: block; }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .delete-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--whatsapp-dark);
+        }
+
+        .delete-option {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .delete-option.cancel { color: var(--whatsapp-green); font-weight: bold; text-align: center; border-bottom: none; }
         
         /* --- MEMBERS LIST --- */
         .members-list {
@@ -121,7 +196,146 @@
             display: flex;
         }
 
-        /* --- MESSAGE MENU POPUP --- */
+        /* --- CAMERA MODAL (Navbar) --- */
+        .camera-modal {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 200;
+            width: 160px;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .camera-modal.active { display: flex; }
+
+        .camera-option {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #111b21;
+            transition: background 0.2s;
+        }
+        
+        .camera-option:hover { background: #f5f6f6; }
+
+        /* --- CAMERA CAPTURE UI --- */
+        .camera-capture-ui {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 250;
+            flex-direction: column;
+        }
+        .camera-capture-ui.active { display: flex; }
+
+        .camera-video-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #camera-preview-video {
+            position: absolute;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        
+        .ratio-bulat #camera-preview-video { width: 300px; height: 300px; border-radius: 50%; object-fit: cover; min-width: auto; min-height: auto; }
+        .ratio-potret #camera-preview-video { width: 300px; height: 400px; object-fit: cover; min-width: auto; min-height: auto; }
+        .ratio-lanskap #camera-preview-video { width: 350px; height: 200px; object-fit: cover; min-width: auto; min-height: auto; }
+
+        .camera-controls {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            background: #111;
+        }
+
+        .shutter-btn {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+        }
+        .shutter-btn:active { background: white; }
+
+        .camera-close-btn { color: white; font-size: 24px; cursor: pointer; }
+
+        /* --- AUDIO RECORDING OVERLAY --- */
+        .recording-overlay {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            align-items: center;
+            gap: 15px;
+            width: 90%;
+            max-width: 300px;
+            justify-content: space-between;
+        }
+        .recording-overlay.active { display: flex; }
+        .recording-time { font-family: monospace; font-size: 16px; }
+        .recording-stop {
+            width: 40px; height: 40px; background: var(--recording-red); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        }
+        .recording-stop i { color: white; }
+
+        /* --- EMOJI PICKER --- */
+        .whatsapp-emoji-picker {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            left: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 10px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            width: 280px;
+            z-index: 2000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .whatsapp-emoji-picker.active { display: grid; }
+        .emoji-btn {
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .emoji-btn:hover { background-color: #f0f2f5; }
+
+        /* --- MESSAGE MENU POPUP (Click) --- */
         .message-menu {
             position: absolute;
             background: white;
@@ -187,34 +401,6 @@
             cursor: pointer;
             font-size: 16px;
         }
-
-        /* --- RECORDING OVERLAY --- */
-        .recording-overlay {
-            display: none;
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            align-items: center;
-            gap: 15px;
-            width: 90%;
-            max-width: 300px;
-            justify-content: space-between;
-        }
-        .recording-overlay.active { display: flex; }
-        .recording-time { font-family: monospace; font-size: 16px; }
-        .recording-stop {
-            width: 40px; height: 40px; background: var(--recording-red); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-        }
-        .recording-stop i { color: white; }
         
         /* --- UI COMPONENTS --- */
         .whatsapp-back-btn {
@@ -414,7 +600,7 @@
         .whatsapp-message {
             display: flex;
             margin-bottom: 8px;
-            max-width: 80%;
+            max-width: 85%; 
             position: relative;
         }
         
@@ -440,10 +626,32 @@
             user-select: none;
             position: relative;
             min-width: 50px;
+            white-space: pre-wrap; /* Kunci paragraf */
         }
         
         .whatsapp-message-bubble.selected {
             box-shadow: 0 0 0 2px var(--whatsapp-green);
+        }
+
+        .msg-checkbox {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            color: var(--whatsapp-green);
+            display: none;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .whatsapp-message.selected-mode .msg-checkbox { display: flex; }
+        .whatsapp-message.selected-mode .whatsapp-message-bubble {
+            border-left: 4px solid var(--whatsapp-green);
+            padding-left: 8px;
         }
         
         .whatsapp-message.sent .whatsapp-message-bubble {
@@ -461,11 +669,21 @@
             margin-bottom: 5px;
             display: block;
         }
-        
+
         .message-audio {
             width: 200px;
             height: 35px;
             outline: none;
+        }
+
+        .message-file {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
         }
 
         .whatsapp-message-time {
@@ -498,26 +716,34 @@
 
         .input-row {
             display: flex;
-            align-items: center;
+            align-items: flex-end; 
             gap: 10px;
             margin-top: 5px;
         }
         
         .whatsapp-chat-input i {
             color: #8696a0;
-            font-size: 22px;
+            font-size: 20px; 
             cursor: pointer;
+            padding-bottom: 10px; 
         }
         
-        .whatsapp-chat-input input {
+        /* TEXTAREA STYLES */
+        #whatsapp-message-input {
             flex-grow: 1;
             border: none;
             background-color: var(--whatsapp-hover);
             padding: 10px 15px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
             color: white;
+            max-height: 120px;
+            overflow-y: hidden; 
+            height: 42px; 
+            line-height: 20px;
+            resize: none; 
+            font-family: inherit;
         }
         
         .whatsapp-chat-input button {
@@ -532,6 +758,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 1px; 
         }
         
         /* Welcome & Profile Views */
@@ -665,7 +892,8 @@
 
             <!-- Chat Area -->
             <main class="whatsapp-chat-window" id="whatsapp-chat-window">
-                <header class="whatsapp-chat-header">
+                <!-- Normal Chat Header -->
+                <header class="whatsapp-chat-header" id="normal-chat-header">
                     <i class="fas fa-arrow-left whatsapp-back-btn" id="whatsapp-back-btn"></i>
                     <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-chat-profile-img">
                     <div class="info">
@@ -673,12 +901,30 @@
                         <p id="whatsapp-chat-status">Aplikasi Pesan Real-Time</p>
                     </div>
                     <div class="icons">
-                        <!-- Added Camera Icon -->
-                        <i class="fas fa-camera" id="btn-camera" title="Kirim Foto"></i>
-                        <i class="fas fa-video"></i>
-                        <i class="fas fa-phone"></i>
+                        <!-- Navbar Camera (Photos) -->
+                        <i class="fas fa-camera" id="btn-camera-nav" title="Kamera"></i>
+                        <div class="camera-modal" id="camera-modal">
+                            <div class="camera-option" onclick="whatsappApp.openCameraMode('bulat')"><i class="fas fa-circle"></i> Bulat</div>
+                            <div class="camera-option" onclick="whatsappApp.openCameraMode('potret')"><i class="fas fa-portrait"></i> Potret</div>
+                            <div class="camera-option" onclick="whatsappApp.openCameraMode('lanskap')"><i class="fas fa-video"></i> Lanskap</div>
+                        </div>
+
+                        <!-- Navbar Video Call -->
+                        <i class="fas fa-video" title="Video Call" id="btn-video-call"></i>
+                        
+                        <!-- Navbar Phone Call -->
+                        <i class="fas fa-phone" title="Panggilan" id="btn-phone-call"></i>
                     </div>
                 </header>
+
+                <!-- Selection Header (Long Press) -->
+                <div class="whatsapp-selection-bar" id="selection-header">
+                    <div class="selection-info" id="selection-count">0 Dipilih</div>
+                    <div class="selection-actions">
+                        <i class="fas fa-share" title="Teruskan" onclick="whatsappApp.forwardSelectedMessages()"></i>
+                        <i class="fas fa-trash" title="Hapus" onclick="whatsappApp.showDeletePopup()"></i>
+                    </div>
+                </div>
                 
                 <!-- Welcome Screen -->
                 <div class="whatsapp-messages" id="whatsapp-messages">
@@ -689,15 +935,23 @@
                     </div>
                 </div>
                 
-                <!-- Context Menu -->
+                <!-- Single Click Context Menu -->
                 <div id="message-menu" class="message-menu">
                     <div class="menu-item" onclick="whatsappApp.handleMenuAction('edit')"><i class="fas fa-edit"></i> Edit</div>
                     <div class="menu-item" onclick="whatsappApp.handleMenuAction('reply')"><i class="fas fa-reply"></i> Balas</div>
-                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('forward')"><i class="fas fa-share"></i> Teruskan</div>
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('forward-single')"><i class="fas fa-share"></i> Teruskan</div>
                     <div class="menu-item delete" onclick="whatsappApp.handleMenuAction('delete')"><i class="fas fa-trash"></i> Hapus</div>
                 </div>
 
-                <!-- Recording Overlay -->
+                <!-- Delete Confirmation Popup -->
+                <div id="delete-popup" class="delete-popup">
+                    <div class="delete-title">Hapus Pesan</div>
+                    <div class="delete-option" onclick="whatsappApp.deleteSelectedMessages('all')">Hapus untuk semua orang</div>
+                    <div class="delete-option" onclick="whatsappApp.deleteSelectedMessages('me')">Hapus untuk saya</div>
+                    <div class="delete-option cancel" onclick="whatsappApp.hideDeletePopup()">Batal</div>
+                </div>
+
+                <!-- Audio Recording Overlay -->
                 <div class="recording-overlay" id="recording-overlay">
                     <div class="recording-info">
                         <i class="fas fa-microphone" style="color:var(--recording-red)"></i>
@@ -706,6 +960,11 @@
                     <div class="recording-stop" id="btn-stop-recording">
                         <i class="fas fa-stop"></i>
                     </div>
+                </div>
+
+                <!-- Emoji Picker -->
+                <div id="emoji-picker" class="whatsapp-emoji-picker">
+                    <!-- JS -->
                 </div>
                 
                 <!-- Profile View -->
@@ -730,6 +989,18 @@
                         <button class="whatsapp-edit-btn" id="whatsapp-view-members-btn">Lihat Anggota Terdaftar</button>
                     </div>
                 </div>
+
+                <!-- Camera Capture UI (Navbar Photo) -->
+                <div class="camera-capture-ui" id="camera-capture-ui">
+                    <div class="camera-video-container" id="camera-video-container">
+                        <video id="camera-preview-video" autoplay muted playsinline></video>
+                    </div>
+                    <div class="camera-controls">
+                        <i class="fas fa-times camera-close-btn" onclick="whatsappApp.closeCameraUI()"></i>
+                        <div class="shutter-btn" onclick="whatsappApp.takePhoto()"></div>
+                        <div style="width: 24px;"></div> <!-- Spacer -->
+                    </div>
+                </div>
                 
                 <div class="whatsapp-chat-input" id="whatsapp-chat-input-area" style="display: none;">
                     <!-- Reply Bar -->
@@ -740,12 +1011,17 @@
                     </div>
 
                     <div class="input-row">
-                        <i class="fas fa-smile"></i>
-                        <!-- Hidden Camera Input -->
+                        <!-- Hidden Inputs -->
                         <input type="file" id="camera-input" accept="image/*" style="display: none;">
-                        <i class="fas fa-paperclip"></i>
-                        <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan">
-                        <!-- Mic Button -->
+                        <input type="file" id="file-input" style="display: none;">
+
+                        <i class="fas fa-smile" id="btn-emoji" title="Emoji"></i>
+                        <i class="fas fa-paperclip" id="btn-attach" title="Sematkan Dokumen"></i>
+                        
+                        <!-- Textarea -->
+                        <textarea id="whatsapp-message-input" placeholder="Ketik pesan" rows="1"></textarea>
+                        
+                        <!-- Action Icons -->
                         <i class="fas fa-microphone" id="whatsapp-mic-icon"></i>
                         <button id="whatsapp-send-btn" style="display: none;"><i class="fas fa-paper-plane"></i></button>
                     </div>
@@ -756,7 +1032,7 @@
             <div class="members-list" id="members-list">
                 <header class="members-header">
                     <i class="fas fa-arrow-left" id="members-back-btn"></i>
-                    <h3>Anggota Terdaftar</h3>
+                    <h3 id="members-header-title">Anggota Terdaftar</h3>
                 </header>
                 <div class="members-content" id="members-content"></div>
             </div>
@@ -788,12 +1064,19 @@
                 currentUserData: null,
                 registeredMembers: [],
                 selectedMessageId: null,
+                selectedMessageIds: new Set(),
                 replyingTo: null,
-                isRecording: false,
+                isRecordingAudio: false,
                 mediaRecorder: null,
                 audioChunks: [],
                 recordingStartTime: 0,
-                recordingInterval: null
+                recordingInterval: null,
+                isCameraOpen: false,
+                cameraStream: null,
+                cameraMode: 'potret',
+                isForwardingMode: false,
+                messagesToForward: [],
+                swipeStartX: 0
             },
 
             init() {
@@ -804,6 +1087,7 @@
 
                 this.renderChatList();
                 this.renderMembersContent();
+                this.initEmojiPicker();
 
                 auth.onAuthStateChanged(user => {
                     if (user) {
@@ -817,11 +1101,46 @@
                 
                 document.addEventListener('click', (e) => {
                     const menu = document.getElementById('message-menu');
-                    if (!e.target.closest('.message-menu') && !e.target.closest('.whatsapp-message-bubble')) {
+                    const cameraModal = document.getElementById('camera-modal');
+                    const emojiPicker = document.getElementById('emoji-picker');
+                    
+                    if (!e.target.closest('.message-menu') && !e.target.closest('.whatsapp-message-bubble') && !e.target.closest('.whatsapp-message')) {
                         menu.style.display = 'none';
-                        this.removeSelectionHighlight();
+                        if(this.state.selectedMessageIds.size === 0) this.removeSelectionHighlight();
+                    }
+                    if (!e.target.closest('#btn-camera-nav') && !e.target.closest('.camera-modal')) {
+                        cameraModal.classList.remove('active');
+                    }
+                    if (!e.target.closest('#btn-emoji') && !e.target.closest('.whatsapp-emoji-picker')) {
+                        emojiPicker.classList.remove('active');
                     }
                 });
+            },
+
+            initEmojiPicker() {
+                const emojis = ["😀","😂","😍","🥰","😎","😭","😡","👍","👎","🙏","🎉","🔥","❤️","💔","👀","👋","🤔","😴","😷","🤒","👻","💩","👽","🤖","👶","👧","👦","🧑","👱","👨","🧔","👩","🧕","👴","👵","🙍","🙎","🙅","🙆","💁","🙋","🙇","🤦","🤷","👂","👃","👀","👅","👄"];
+                const picker = document.getElementById('emoji-picker');
+                emojis.forEach(emoji => {
+                    const span = document.createElement('span');
+                    span.textContent = emoji;
+                    span.className = 'emoji-btn';
+                    span.onclick = () => this.insertEmoji(emoji);
+                    picker.appendChild(span);
+                });
+            },
+
+            insertEmoji(emoji) {
+                const textarea = document.getElementById('whatsapp-message-input');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const text = textarea.value;
+                const before = text.substring(0, start);
+                const after = text.substring(end, text.length);
+                
+                textarea.value = before + emoji + after;
+                textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+                textarea.dispatchEvent(new Event('input'));
+                textarea.focus();
             },
 
             async loadUserData(userId) {
@@ -867,9 +1186,7 @@
             updateProfileUI() {
                 const user = this.state.currentUserData;
                 if (!user) return;
-                
                 const imgUrl = user.profilePicUrl || `https://ui-avatars.com/api/?name=${user.username || 'User'}&background=random`;
-                
                 document.getElementById('whatsapp-sidebar-profile-pic').src = imgUrl;
                 document.getElementById('whatsapp-profile-pic-large').src = imgUrl;
                 document.getElementById('whatsapp-sidebar-username').textContent = user.username || 'Pengguna';
@@ -878,7 +1195,6 @@
                 document.getElementById('whatsapp-detail-email').textContent = user.email || '-';
                 document.getElementById('whatsapp-detail-phone').textContent = user.phone || '-';
                 document.getElementById('whatsapp-detail-status').textContent = user.status || 'Aktif';
-
                 JsBarcode("#whatsapp-barcode", user.id, { format: "CODE128", width: 1.5, height: 30, displayValue: false });
             },
 
@@ -893,18 +1209,23 @@
                 const msgInput = document.getElementById('whatsapp-message-input');
                 const sendBtn = document.getElementById('whatsapp-send-btn');
                 const micIcon = document.getElementById('whatsapp-mic-icon');
-                const cameraBtn = document.getElementById('btn-camera');
+                const cameraNavBtn = document.getElementById('btn-camera-nav');
                 const cameraInput = document.getElementById('camera-input');
                 const stopRecBtn = document.getElementById('btn-stop-recording');
+                const emojiBtn = document.getElementById('btn-emoji');
+                const attachBtn = document.getElementById('btn-attach');
+                const attachInput = document.getElementById('file-input');
+                const btnVideoCall = document.getElementById('btn-video-call');
+                const btnPhoneCall = document.getElementById('btn-phone-call');
 
                 userProfile.addEventListener('click', () => this.showScreen('profile'));
-
-                viewMembersBtn.addEventListener('click', () => this.showMembersListInstant());
+                viewMembersBtn.addEventListener('click', () => {
+                    this.state.isForwardingMode = false;
+                    this.showMembersListInstant();
+                });
 
                 membersBackBtn.addEventListener('click', () => window.location.href = 'dashboard_anggota.html');
-
                 chatBackBtn.addEventListener('click', () => window.location.href = 'pesan.html');
-
                 logoutBtn.addEventListener('click', () => {
                     localStorage.removeItem('bgtProSession');
                     window.location.href = 'dashboard_anggota.html';
@@ -921,108 +1242,259 @@
 
                 searchInput.addEventListener('input', (e) => this.renderChatList(e.target.value));
 
-                msgInput.addEventListener('input', (e) => {
-                    if (e.target.value.trim()) {
+                // TEXTAREA LOGIC
+                msgInput.addEventListener('input', function() {
+                    this.style.height = 'auto'; 
+                    this.style.height = (this.scrollHeight) + 'px'; 
+                    if (this.value.trim()) {
                         sendBtn.style.display = 'flex';
                         micIcon.style.display = 'none';
                     } else {
                         sendBtn.style.display = 'none';
                         micIcon.style.display = 'block';
+                        this.style.height = '42px';
                     }
                 });
 
                 sendBtn.addEventListener('click', () => this.sendMessage());
-                msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.sendMessage(); });
 
-                // --- MIC / RECORDING LOGIC ---
-                micIcon.addEventListener('click', () => this.toggleRecording());
-                stopRecBtn.addEventListener('click', () => this.stopRecording(true));
+                // --- AUDIO RECORDING ---
+                micIcon.addEventListener('click', () => this.toggleAudioRecording());
+                stopRecBtn.addEventListener('click', () => this.stopAudioRecording(true));
 
-                // --- CAMERA LOGIC ---
-                cameraBtn.addEventListener('click', () => cameraInput.click());
+                // --- CAMERA NAVBAR (Photo) ---
+                cameraNavBtn.addEventListener('click', () => {
+                    document.getElementById('camera-modal').classList.toggle('active');
+                });
+
+                // --- CAMERA (Image Gallery Backup) ---
                 cameraInput.addEventListener('change', (e) => this.handleImageUpload(e));
+
+                // --- CALLS ---
+                btnVideoCall.addEventListener('click', () => alert("Memulai Video Call..."));
+                btnPhoneCall.addEventListener('click', () => alert("Memanggil..."));
+
+                // --- EMOJI ---
+                emojiBtn.addEventListener('click', () => {
+                    document.getElementById('emoji-picker').classList.toggle('active');
+                });
+
+                // --- ATTACH FILE ---
+                attachBtn.addEventListener('click', () => attachInput.click());
+                attachInput.addEventListener('change', (e) => this.handleFileAttach(e));
             },
 
-            // --- RECORDING FUNCTIONS ---
-            async toggleRecording() {
-                if (!this.state.isRecording) {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        this.state.mediaRecorder = new MediaRecorder(stream);
-                        this.state.audioChunks = [];
+            // --- CAMERA UI LOGIC ---
+            async openCameraMode(mode) {
+                this.state.cameraMode = mode;
+                document.getElementById('camera-modal').classList.remove('active');
+                const ui = document.getElementById('camera-capture-ui');
+                const videoContainer = document.getElementById('camera-video-container');
+                const video = document.getElementById('camera-preview-video');
+                
+                videoContainer.className = 'camera-video-container ratio-' + mode;
+                ui.classList.add('active');
 
-                        this.state.mediaRecorder.ondataavailable = (event) => {
-                            this.state.audioChunks.push(event.data);
-                        };
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                    this.state.cameraStream = stream;
+                    video.srcObject = stream;
+                } catch(err) {
+                    alert("Gagal akses kamera: " + err.message);
+                    this.closeCameraUI();
+                }
+            },
 
-                        this.state.mediaRecorder.start();
-                        this.state.isRecording = true;
-                        this.state.recordingStartTime = Date.now();
+            closeCameraUI() {
+                if(this.state.cameraStream) {
+                    this.state.cameraStream.getTracks().forEach(track => track.stop());
+                }
+                document.getElementById('camera-capture-ui').classList.remove('active');
+            },
 
-                        // UI Update
-                        document.getElementById('recording-overlay').classList.add('active');
-                        document.getElementById('whatsapp-chat-input-area').style.display = 'none';
-                        
-                        // Timer
-                        this.state.recordingInterval = setInterval(() => {
-                            const diff = Math.floor((Date.now() - this.state.recordingStartTime) / 1000);
-                            const min = String(Math.floor(diff / 60)).padStart(2, '0');
-                            const sec = String(diff % 60).padStart(2, '0');
-                            document.getElementById('recording-timer').textContent = `${min}:${sec}`;
-                        }, 1000);
+            takePhoto() {
+                const video = document.getElementById('camera-preview-video');
+                const canvas = document.createElement('canvas');
+                const mode = this.state.cameraMode;
 
-                    } catch (err) {
-                        console.error("Gagal akses mikrofon:", err);
-                        alert("Izin mikrofon dibutuhkan untuk merekam.");
-                    }
+                if (mode === 'bulat') {
+                    canvas.width = 300; canvas.height = 300;
+                } else if (mode === 'potret') {
+                    canvas.width = 300; canvas.height = 400;
                 } else {
-                    this.stopRecording(true);
+                    canvas.width = 350; canvas.height = 200;
                 }
+
+                const ctx = canvas.getContext('2d');
+                const vRatio = video.videoWidth / video.videoHeight;
+                const cRatio = canvas.width / canvas.height;
+                let sWidth, sHeight, sx, sy;
+
+                if (vRatio > cRatio) {
+                    sHeight = video.videoHeight;
+                    sWidth = sHeight * cRatio;
+                    sx = (video.videoWidth - sWidth) / 2;
+                    sy = 0;
+                } else {
+                    sWidth = video.videoWidth;
+                    sHeight = sWidth / cRatio;
+                    sx = 0;
+                    sy = (video.videoHeight - sHeight) / 2;
+                }
+
+                ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                this.closeCameraUI();
+                this.sendMessage(dataUrl, 'image');
             },
 
-            async stopRecording(send = false) {
-                if (this.state.mediaRecorder && this.state.isRecording) {
-                    this.state.mediaRecorder.stop();
-                    this.state.mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Release mic
-                }
-                
-                this.state.isRecording = false;
-                clearInterval(this.state.recordingInterval);
-                
-                // UI Reset
-                document.getElementById('recording-overlay').classList.remove('active');
-                document.getElementById('whatsapp-chat-input-area').style.display = 'flex';
-                document.getElementById('recording-timer').textContent = "00:00";
-
-                if (send && this.state.audioChunks.length > 0) {
-                    const audioBlob = new Blob(this.state.audioChunks, { type: 'audio/mp3' });
-                    // Convert to Base64 to store in Firestore (Demo purposes only)
+            // --- IMAGE COMPRESSION ---
+            async compressImage(file) {
+                return new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => {
-                        const base64Audio = reader.result;
-                        this.sendMessage(base64Audio, 'audio');
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const maxWidth = 800; 
+                            if (width > maxWidth) {
+                                height *= maxWidth / width;
+                                width = maxWidth;
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            let quality = 0.7;
+                            let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            while(dataUrl.length > 1300000 && quality > 0.1) {
+                                quality -= 0.1;
+                                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            }
+                            resolve(dataUrl);
+                        };
+                        img.onerror = (err) => reject(err);
                     };
-                }
-                this.state.audioChunks = [];
+                    reader.onerror = (err) => reject(err);
+                });
             },
 
-            // --- CAMERA / IMAGE FUNCTIONS ---
-            handleImageUpload(event) {
+            async handleImageUpload(event) {
                 const file = event.target.files[0];
                 if (!file) return;
-
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onloadend = () => {
-                    const base64Image = reader.result;
-                    this.sendMessage(base64Image, 'image');
-                };
-                // Reset input
+                const compressedImage = await this.compressImage(file);
+                this.sendMessage(compressedImage, 'image');
                 event.target.value = '';
             },
 
+            // --- MULTI SELECT LOGIC ---
+            handleLongPress(msgId, event) {
+                event.preventDefault();
+                this.toggleSelection(msgId);
+                this.updateSelectionUI();
+            },
+
+            toggleSelection(msgId) {
+                if(this.state.selectedMessageIds.has(msgId)) {
+                    this.state.selectedMessageIds.delete(msgId);
+                } else {
+                    if(this.state.selectedMessageIds.size >= 100) {
+                        alert("Maksimal 100 pesan.");
+                        return;
+                    }
+                    this.state.selectedMessageIds.add(msgId);
+                }
+                this.updateSelectionUI();
+                this.renderMessages(this.state.activeChatId);
+            },
+
+            updateSelectionUI() {
+                const count = this.state.selectedMessageIds.size;
+                const selectionHeader = document.getElementById('selection-header');
+                const normalHeader = document.getElementById('normal-chat-header');
+                const countDisplay = document.getElementById('selection-count');
+
+                if (count > 0) {
+                    selectionHeader.classList.add('active');
+                    normalHeader.style.display = 'none';
+                    countDisplay.textContent = `${count} Dipilih`;
+                    document.getElementById('whatsapp-chat-input-area').style.display = 'none';
+                } else {
+                    selectionHeader.classList.remove('active');
+                    normalHeader.style.display = 'flex';
+                    document.getElementById('whatsapp-chat-input-area').style.display = 'flex';
+                    this.renderMessages(this.state.activeChatId); 
+                }
+            },
+
+            clearSelection() {
+                this.state.selectedMessageIds.clear();
+                this.updateSelectionUI();
+            },
+
+            showDeletePopup() {
+                document.getElementById('delete-popup').classList.add('active');
+            },
+
+            hideDeletePopup() {
+                document.getElementById('delete-popup').classList.remove('active');
+            },
+
+            async deleteSelectedMessages(mode) {
+                this.hideDeletePopup();
+                const chatId = this.state.activeChatId;
+                const toDelete = Array.from(this.state.selectedMessageIds);
+                
+                if (mode === 'all') {
+                    if(!confirm("Hapus untuk semua orang?")) return;
+                    // Update DB
+                    const updatedMessages = this.state.messages[chatId].filter(m => !toDelete.includes(m.id));
+                    this.state.messages[chatId] = updatedMessages;
+                    try {
+                        await db.collection('chats').doc(chatId).update({
+                            messages: updatedMessages,
+                            lastUpdated: new Date()
+                        });
+                    } catch (e) { console.error(e); }
+                } else {
+                    // Delete for me only (Local only)
+                    // In a real app, you'd add a "deletedFor" field. 
+                    // Here we just remove from local view.
+                    if(!confirm("Hapus untuk saya?")) return;
+                    // We keep DB sync but just remove local data? 
+                    // For demo, let's just update local state to mimic "deleted for me"
+                    // And not save to DB to keep it simple, or we can reload from DB to get it back.
+                }
+
+                // Apply deletion locally
+                this.state.messages[chatId] = this.state.messages[chatId].filter(m => !toDelete.includes(m.id));
+                
+                this.clearSelection();
+                this.renderMessages(chatId);
+            },
+
+            forwardSelectedMessages() {
+                const chatId = this.state.activeChatId;
+                const ids = Array.from(this.state.selectedMessageIds);
+                this.state.messagesToForward = this.state.messages[chatId].filter(m => ids.includes(m.id));
+                
+                this.state.isForwardingMode = true;
+                this.clearSelection();
+                
+                document.getElementById('members-header-title').textContent = "Teruskan Ke...";
+                document.getElementById('members-list').classList.add('active');
+                document.getElementById('whatsapp-chat-window').classList.remove('active');
+                this.renderMembersContent();
+            },
+
+            // --- SINGLE CLICK MENU LOGIC ---
             showMenu(e, messageId, bubbleEl) {
+                if (this.state.selectedMessageIds.size > 0) return;
+
                 e.stopPropagation();
                 this.state.selectedMessageId = messageId;
                 this.highlightBubble(bubbleEl);
@@ -1064,14 +1536,15 @@
                 switch (action) {
                     case 'delete': this.deleteMessage(chatId, msgId); break;
                     case 'edit': 
-                        // Edit only text messages
-                        if (!msgObj.image && !msgObj.audio) this.editMessage(chatId, msgId, msgObj.text); 
+                        if (!msgObj.image && !msgObj.audio && !msgObj.file) this.editMessage(chatId, msgId, msgObj.text); 
                         else alert("Tidak bisa mengedit pesan media.");
                         break;
                     case 'reply': this.enableReplyMode(msgObj); break;
-                    case 'forward': 
-                        if(msgObj.text) this.forwardMessage(msgObj.text);
-                        else alert("Hanya bisa meneruskan teks.");
+                    case 'forward-single':
+                        this.state.messagesToForward = [msgObj];
+                        this.state.isForwardingMode = true;
+                        this.showMembersListInstant();
+                        document.getElementById('members-header-title').textContent = "Teruskan Ke...";
                         break;
                 }
                 this.removeSelectionHighlight();
@@ -1081,7 +1554,6 @@
                 const updatedMessages = this.state.messages[chatId].filter(m => m.id !== msgId);
                 this.state.messages[chatId] = updatedMessages;
                 this.renderMessages(chatId);
-
                 try {
                     await db.collection('chats').doc(chatId).update({
                         messages: updatedMessages,
@@ -1114,7 +1586,7 @@
                 const previewText = document.getElementById('reply-preview-text');
                 
                 replyBox.classList.add('active');
-                previewText.textContent = msgObj.text || (msgObj.image ? "[Gambar]" : "[Audio]");
+                previewText.textContent = msgObj.text || (msgObj.image ? "[Gambar]" : (msgObj.audio ? "[Audio]" : "[File]"));
                 document.getElementById('whatsapp-message-input').focus();
             },
 
@@ -1123,25 +1595,67 @@
                 document.getElementById('reply-box').classList.remove('active');
             },
 
-            forwardMessage(text) {
-                const input = document.getElementById('whatsapp-message-input');
-                input.value = text;
-                input.focus();
-                document.getElementById('whatsapp-send-btn').style.display = 'flex';
-                document.getElementById('whatsapp-mic-icon').style.display = 'none';
+            // --- AUDIO RECORDING ---
+            async toggleAudioRecording() {
+                if (!this.state.isRecordingAudio) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        this.state.mediaRecorder = new MediaRecorder(stream);
+                        this.state.audioChunks = [];
+                        this.state.mediaRecorder.ondataavailable = (event) => { this.state.audioChunks.push(event.data); };
+                        this.state.mediaRecorder.start();
+                        this.state.isRecordingAudio = true;
+                        this.state.recordingStartTime = Date.now();
+                        document.getElementById('recording-overlay').classList.add('active');
+                        document.getElementById('whatsapp-chat-input-area').style.display = 'none';
+                        this.state.recordingInterval = setInterval(() => {
+                            const diff = Math.floor((Date.now() - this.state.recordingStartTime) / 1000);
+                            const min = String(Math.floor(diff / 60)).padStart(2, '0');
+                            const sec = String(diff % 60).padStart(2, '0');
+                            document.getElementById('recording-timer').textContent = `${min}:${sec}`;
+                        }, 1000);
+                    } catch (err) { alert("Izin mikrofon dibutuhkan."); }
+                } else {
+                    this.stopAudioRecording(true);
+                }
+            },
+
+            async stopAudioRecording(send = false) {
+                if (this.state.mediaRecorder && this.state.isRecordingAudio) {
+                    this.state.mediaRecorder.stop();
+                    this.state.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
+                this.state.isRecordingAudio = false;
+                clearInterval(this.state.recordingInterval);
+                document.getElementById('recording-overlay').classList.remove('active');
+                document.getElementById('whatsapp-chat-input-area').style.display = 'flex';
+                if (send && this.state.audioChunks.length > 0) {
+                    const audioBlob = new Blob(this.state.audioChunks, { type: 'audio/mp3' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => { this.sendMessage(reader.result, 'audio'); };
+                }
+                this.state.audioChunks = [];
+            },
+
+            handleFileAttach(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                this.sendMessage(`📄 Dokumen: ${file.name}`, 'text');
+                event.target.value = '';
             },
 
             showMembersListInstant() {
                 this.showScreen('welcome');
                 document.getElementById('members-list').classList.add('active');
                 document.getElementById('whatsapp-chat-window').classList.remove('active');
+                document.getElementById('members-header-title').textContent = "Anggota Terdaftar";
                 this.renderMembersContent();
             },
 
             renderMembersContent() {
                 const container = document.getElementById('members-content');
                 container.innerHTML = '';
-
                 if(this.state.registeredMembers.length === 0) {
                     container.innerHTML = '<p style="text-align:center; color:#667781; padding:20px;">Tidak ada anggota lain.</p>';
                     return;
@@ -1151,7 +1665,6 @@
                     const item = document.createElement('div');
                     item.className = 'member-item';
                     const avatarUrl = member.profilePicUrl || `https://ui-avatars.com/api/?name=${member.username}&background=random`;
-
                     item.innerHTML = `
                         <img src="${avatarUrl}" class="member-avatar">
                         <div class="member-info">
@@ -1160,8 +1673,13 @@
                         </div>
                         <i class="fas fa-comment-dots" style="color: #8696a0;"></i>
                     `;
-
-                    item.addEventListener('click', () => this.openChatFromMembers(member));
+                    item.addEventListener('click', () => {
+                        if(this.state.isForwardingMode) {
+                            this.executeForward(member.id);
+                        } else {
+                            this.openChatFromMembers(member);
+                        }
+                    });
                     container.appendChild(item);
                 });
             },
@@ -1178,6 +1696,40 @@
                     };
                 }
                 this.openChat(chat);
+            },
+
+            async executeForward(targetChatId) {
+                if(!confirm("Teruskan pesan ini?")) return;
+                
+                if(!this.state.messages[targetChatId]) this.state.messages[targetChatId] = [];
+                
+                const msgsToSend = this.state.messagesToForward.map(m => ({
+                    ...m,
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                    senderId: auth.currentUser.uid,
+                    timestamp: new Date(),
+                    replyTo: null 
+                }));
+
+                this.state.messages[targetChatId].push(...msgsToSend);
+                
+                if(targetChatId === this.state.activeChatId) {
+                    this.renderMessages(targetChatId);
+                }
+
+                try {
+                    await db.collection('chats').doc(targetChatId).set({
+                        messages: this.state.messages[targetChatId],
+                        lastUpdated: new Date()
+                    }, { merge: true });
+                } catch (e) { console.error(e); }
+
+                this.state.isForwardingMode = false;
+                this.state.messagesToForward = [];
+                document.getElementById('members-list').classList.remove('active');
+                
+                const targetMember = this.state.registeredMembers.find(m => m.id === targetChatId);
+                if(targetMember) this.openChatFromMembers(targetMember);
             },
 
             openChat(chat) {
@@ -1257,34 +1809,33 @@
 
                 msgs.forEach(msg => {
                     const isMe = msg.senderId === auth.currentUser.uid || msg.senderId === 'me';
+                    const isSelected = this.state.selectedMessageIds.has(msg.id);
+                    
                     const el = document.createElement('div');
-                    el.className = `whatsapp-message ${isMe ? 'sent' : 'received'}`;
+                    el.className = `whatsapp-message ${isMe ? 'sent' : 'received'} ${isSelected ? 'selected-mode' : ''}`;
                     
+                    const checkbox = document.createElement('div');
+                    checkbox.className = 'msg-checkbox';
+                    checkbox.innerHTML = isSelected ? '<i class="fas fa-check"></i>' : '';
+                    el.appendChild(checkbox);
+
                     let contentHtml = '';
+                    if (msg.image) contentHtml += `<img src="${msg.image}" class="message-image" alt="Image">`;
                     
-                    // Image
-                    if (msg.image) {
-                        contentHtml += `<img src="${msg.image}" class="message-image" alt="Image">`;
-                    }
+                    if (msg.file) contentHtml += `<div class="message-file"><i class="fas fa-file-alt fa-lg"></i> <span>${msg.text}</span></div>`;
                     
-                    // Text
-                    if (msg.text) {
-                        // Handle Reply Context visual inside message
+                    if (msg.text && !msg.file) { 
                         let replyHtml = '';
                         if (msg.replyTo && msg.replyTo.text) {
                             replyHtml = `<span class="reply-context">"${msg.replyTo.text}"</span>`;
                         }
                         contentHtml += `${replyHtml}<span>${msg.text}</span>`;
                     }
-
-                    // Audio
-                    if (msg.audio) {
-                        contentHtml += `<audio controls src="${msg.audio}" class="message-audio"></audio>`;
-                    }
+                    if (msg.audio) contentHtml += `<audio controls src="${msg.audio}" class="message-audio"></audio>`;
 
                     const timeHtml = `<div class="whatsapp-message-time">${msg.edited ? 'Diedit ' : ''}10:00</div>`;
 
-                    el.innerHTML = `
+                    el.innerHTML += `
                         <div class="whatsapp-message-bubble" data-id="${msg.id}">
                             ${contentHtml}
                             ${timeHtml}
@@ -1292,10 +1843,45 @@
                     `;
                     
                     const bubble = el.querySelector('.whatsapp-message-bubble');
+                    
+                    // --- INTERACTION LOGIC (SWIPE, LONG PRESS, CLICK) ---
+                    let pressTimer;
+                    let isSwipe = false;
+
+                    el.addEventListener('touchstart', (e) => {
+                        this.state.swipeStartX = e.touches[0].clientX;
+                        pressTimer = setTimeout(() => {
+                            this.handleLongPress(msg.id, e);
+                        }, 500);
+                    }, {passive: false});
+                    
+                    el.addEventListener('touchend', (e) => {
+                        clearTimeout(pressTimer);
+                        const endX = e.changedTouches[0].clientX;
+                        const diffX = this.state.swipeStartX - endX;
+
+                        // Check Swipe (Left or Right)
+                        if (Math.abs(diffX) > 50) {
+                            // Swipe detected -> Reply
+                            isSwipe = true;
+                            this.enableReplyMode(msg);
+                        }
+                    });
+
                     bubble.addEventListener('click', (e) => {
-                        // Prevent menu if clicking on audio controls or image
                         if(e.target.tagName === 'AUDIO' || e.target.tagName === 'INPUT') return;
-                        this.showMenu(e, msg.id, bubble);
+                        
+                        // Prevent click if swipe happened
+                        if (isSwipe) {
+                            isSwipe = false; 
+                            return;
+                        }
+
+                        if (this.state.selectedMessageIds.size > 0) {
+                            this.toggleSelection(msg.id);
+                        } else {
+                            this.showMenu(e, msg.id, bubble);
+                        }
                     });
 
                     bubbleContainer.appendChild(el);
@@ -1305,10 +1891,9 @@
             },
 
             async sendMessage(mediaContent = null, mediaType = 'text') {
-                const input = document.getElementById('whatsapp-message-input');
-                const text = input.value.trim();
+                const textarea = document.getElementById('whatsapp-message-input');
+                const text = textarea.value.trim();
 
-                // Validate: Either text exists OR media exists
                 if ((!text && !mediaContent) || !this.state.activeChatId) return;
 
                 const newMsg = { 
@@ -1321,7 +1906,6 @@
                     newMsg.text = text;
                 } else if (mediaType === 'image') {
                     newMsg.image = mediaContent;
-                    // Optional: Add caption
                     if(text) newMsg.text = text; 
                 } else if (mediaType === 'audio') {
                     newMsg.audio = mediaContent;
@@ -1330,16 +1914,16 @@
                 if (this.state.replyingTo) {
                     newMsg.replyTo = {
                         id: this.state.replyingTo.id,
-                        text: this.state.replyingTo.text || (this.state.replyingTo.image ? "[Gambar]" : "[Audio]")
+                        text: this.state.replyingTo.text || (this.state.replyingTo.image ? "[Gambar]" : (this.state.replyingTo.audio ? "[Audio]" : "[File]"))
                     };
                     this.closeReply();
                 }
 
-                // Optimistic UI
                 this.state.messages[this.state.activeChatId].push(newMsg);
                 this.renderMessages(this.state.activeChatId);
                 
-                input.value = '';
+                textarea.value = '';
+                textarea.style.height = '42px';
                 document.getElementById('whatsapp-send-btn').style.display = 'none';
                 document.getElementById('whatsapp-mic-icon').style.display = 'block';
 
@@ -1350,7 +1934,7 @@
                     }, { merge: true });
                 } catch (e) { 
                     console.error("Gagal mengirim pesan:", e);
-                    alert("Gagal mengirim pesan mungkin karena ukuran terlalu besar (Max 1MB Firestore).");
+                    alert("Gagal mengirim pesan. Ukuran mungkin melebihi batas Firestore (1MB).");
                 }
             },
 
