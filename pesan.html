@@ -3,388 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BGT PRO - Aplikasi Pesan Real-Time</title>
+    <title>Pesan - BGT PRO</title>
+    
+    <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
+    
     <!-- Tambahkan library JsBarcode untuk barcode yang fungsional -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
     <style>
-        /* --- VARIABEL & GAYA DASAR --- */
-        :root { 
-            --bg: #f0f2f5; 
-            --sidebar: #111b21; 
-            --chat-bg: #e5ddd5; 
-            --msg-sent: #d9fdd3; 
-            --msg-received: #fff; 
-            --green: #25d366; 
-            --dark: #202c33; 
-            --header: #0b141a;
-            --hover: #182229;
-            --filter-active: #8696a0;
-            --sidebar-width: 350px; /* Variabel untuk lebar sidebar */
+        /* CSS Variables untuk Theme Support */
+        :root {
+            --primary-color: #4285f4;
+            --primary-dark: #1a73e8;
+            --secondary-color: #ff6b6b;
+            --secondary-dark: #ee5a24;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
             
-            /* Variabel untuk mode terang */
-            --light-bg: #f0f2f5;
-            --light-sidebar: #ffffff;
-            --light-header: #f0f2f5;
-            --light-hover: #e4e6eb;
-            --light-text: #1c1e21;
-            --light-text-secondary: #65676b;
-            --light-message-bg: #ffffff;
-            --light-message-sent: #0084ff;
+            /* Light Theme */
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #e9ecef;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --overlay-bg: rgba(0, 0, 0, 0.5);
+            --header-bg: linear-gradient(135deg, #4285f4, #1a73e8);
+            --nav-bg: #ffffff;
+            
+            /* Transitions */
+            --transition-fast: 0.2s;
+            --transition-normal: 0.3s;
+            --transition-slow: 0.5s;
+            
+            /* WhatsApp Theme Variables */
+            --whatsapp-bg: #f0f2f5;
+            --whatsapp-sidebar: #111b21;
+            --whatsapp-chat-bg: #e5ddd5;
+            --whatsapp-msg-sent: #d9fdd3;
+            --whatsapp-msg-received: #fff;
+            --whatsapp-green: #25d366;
+            --whatsapp-dark: #202c33;
+            --whatsapp-header: #0b141a;
+            --whatsapp-hover: #182229;
+            --whatsapp-filter-active: #8696a0;
+            --whatsapp-sidebar-width: 350px;
         }
         
-        /* Variabel untuk mode gelap (default) */
         [data-theme="dark"] {
-            --bg: #f0f2f5; 
-            --sidebar: #111b21; 
-            --chat-bg: #e5ddd5; 
-            --msg-sent: #d9fdd3; 
-            --msg-received: #fff; 
-            --green: #25d366; 
-            --dark: #202c33; 
-            --header: #0b141a;
-            --hover: #182229;
-            --filter-active: #8696a0;
-            
-            /* Warna teks untuk mode gelap */
-            --text-primary: #ffffff;
-            --text-secondary: #8696a0;
-            --text-inverted: #111b21;
-            --sidebar-text: #e9edef;
-            --chat-header-text: #ffffff;
-            --profile-text: #ffffff;
-            --profile-detail-text: #ffffff;
-            --profile-detail-label: #b1b1b1;
-            --profile-detail-value: #ffffff;
-            --welcome-text: #8696a0;
+            /* Dark Theme */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --overlay-bg: rgba(0, 0, 0, 0.7);
+            --header-bg: linear-gradient(135deg, #1a73e8, #0d47a1);
+            --nav-bg: #1e1e1e;
         }
         
-        /* Variabel untuk mode terang */
-        [data-theme="light"] {
-            --bg: var(--light-bg);
-            --sidebar: var(--light-sidebar);
-            --header: var(--light-header);
-            --hover: var(--light-hover);
-            --chat-bg: #f0f2f5;
-            --msg-sent: var(--light-message-sent);
-            --msg-received: var(--light-message-bg);
-            
-            /* Warna teks untuk mode terang */
-            --text-primary: #1c1e21;
-            --text-secondary: #65676b;
-            --text-inverted: #ffffff;
-            --sidebar-text: #1c1e21;
-            --chat-header-text: #1c1e21;
-            --profile-text: #1c1e21;
-            --profile-detail-text: #1c1e21;
-            --profile-detail-label: #65676b;
-            --profile-detail-value: #1c1e21;
-            --welcome-text: #65676b;
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-        }
-        
-        /* Mencegah scroll horizontal di seluruh halaman */
-        html, body {
-            overflow-x: hidden;
-        }
-
         body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color);
             display: flex; 
-            height: 100vh; 
-            background-color: var(--bg); 
-            overflow: hidden; /* Mencegah scroll di body */
-            color: var(--text-primary); /* Warna teks utama */
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color var(--transition-normal), color var(--transition-normal);
         }
-
-        /* --- KONTAINER UTAMA --- */
-        .app-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        
+        /* Phone Container */
+        .phone-container { 
+            width: 350px; 
+            height: 750px; 
+            background-color: var(--card-bg); 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px var(--shadow-color); 
+            overflow: hidden; 
+            position: relative; 
+            transition: background-color var(--transition-normal);
+        }
+        
+        /* WhatsApp Container */
+        .whatsapp-container {
             display: flex;
             flex-direction: column;
+            height: 100%;
+            background-color: var(--whatsapp-bg);
+            overflow: hidden;
         }
         
-        .sidebar { 
-            background-color: var(--sidebar); 
-            display: flex; 
-            flex-direction: column; 
+        .whatsapp-sidebar {
+            background-color: var(--whatsapp-sidebar);
+            display: flex;
+            flex-direction: column;
             width: 100%;
             height: 100%;
             flex-shrink: 0;
         }
         
-        .chat-window { 
-            display: flex; 
-            flex-direction: column; 
+        .whatsapp-chat-window {
+            display: none;
+            flex-direction: column;
             background-color: #efeae2;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             width: 100%;
             height: 100%;
-            position: relative;
         }
         
-        .back-btn {
-            display: block;
+        .whatsapp-chat-window.active {
+            display: flex;
+        }
+        
+        .whatsapp-back-btn {
+            display: none;
             margin-right: 15px;
             color: #8696a0;
             font-size: 20px;
             cursor: pointer;
         }
-
-        /* --- TAMPILAN TABLET (768px ke atas) --- */
-        @media (min-width: 768px) {
-            body {
-                flex-direction: row;
-            }
-            .sidebar {
-                width: var(--sidebar-width);
-                position: static;
-                border-right: 1px solid rgba(0,0,0,0.1);
-            }
-            .chat-window {
-                position: static;
-                left: auto;
-                flex-grow: 1;
-                transition: none;
-                width: calc(100% - var(--sidebar-width));
-            }
-            .back-btn {
-                display: none !important;
-            }
-        }
-
-        /* --- TAMPILAN MOBILE (di bawah 768px) --- */
-        @media (max-width: 767px) {
-            body {
-                flex-direction: column;
-            }
-            .sidebar {
-                position: relative;
-                z-index: 1;
-                width: 100%;
-            }
-            .chat-window {
-                position: absolute;
-                top: 0;
-                left: 100%;
-                transition: left 0.3s ease-out;
-                z-index: 2;
-                width: 100%;
-            }
-            .chat-window.active {
-                left: 0;
-            }
-        }
-
-        /* --- TAMPILAN DESKTOP BESAR (1200px ke atas) --- */
-        @media (min-width: 1200px) {
-            .sidebar {
-                width: var(--sidebar-width);
-            }
-            .chat-window {
-                width: calc(100% - var(--sidebar-width));
-            }
-        }
-
-        /* --- GAYA KOMPONEN --- */
-        .sidebar-header { 
-            padding: 10px 16px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            background-color: var(--header);
-            color: white; 
+        
+        .whatsapp-sidebar-header {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--whatsapp-header);
+            color: white;
             height: 60px;
-            flex-shrink: 0; /* Mencegah header menyusut */
+            flex-shrink: 0;
         }
         
-        /* Gaya untuk profil pengguna di sidebar header */
-        .user-profile {
+        .whatsapp-user-profile {
             display: flex;
             align-items: center;
             cursor: pointer;
             padding: 5px;
             border-radius: 8px;
             transition: background-color 0.2s;
-            width: 100%;
         }
         
-        .user-profile:hover {
+        .whatsapp-user-profile:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
         
-        .user-profile img {
+        .whatsapp-user-profile img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             margin-right: 12px;
             object-fit: cover;
-            /* Invert gambar profil di mode gelap */
-            transition: filter 0.3s;
         }
         
-        /* Invert warna gambar profil di mode gelap */
-        [data-theme="dark"] .user-profile img,
-        [data-theme="dark"] .profile-header img,
-        [data-theme="dark"] .chat-header img {
-            filter: invert(1);
-        }
-        
-        .user-profile-name {
+        .whatsapp-user-profile-name {
             font-size: 18px;
             font-weight: 500;
-            color: white; /* Teks putih di mode gelap */
         }
         
-        .filter-tabs {
+        .whatsapp-sidebar-header .icons {
             display: flex;
-            background-color: var(--header);
+            gap: 25px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .whatsapp-sidebar-header .icons i {
+            color: #8696a0;
+        }
+        
+        .whatsapp-filter-tabs {
+            display: flex;
+            background-color: var(--whatsapp-header);
             color: #8696a0;
             padding: 0 16px;
             height: 44px;
             align-items: center;
-            justify-content: center; /* Membuat tab filter menjadi center */
             flex-shrink: 0;
         }
         
-        .filter-tab {
+        .whatsapp-filter-tab {
             padding: 6px 12px;
-            margin: 0 10px; /* Mengubah margin agar simetris */
+            margin-right: 20px;
             cursor: pointer;
             font-size: 14px;
             border-radius: 10px;
             transition: all 0.2s;
         }
         
-        .filter-tab.active {
-            background-color: var(--hover);
+        .whatsapp-filter-tab.active {
+            background-color: var(--whatsapp-hover);
             color: white;
         }
         
-        .search-box { 
-            padding: 8px 16px; 
-            background-color: var(--header); 
+        .whatsapp-search-box {
+            padding: 8px 16px;
+            background-color: var(--whatsapp-header);
             flex-shrink: 0;
         }
         
-        .search-box input { 
-            width: 100%; 
-            padding: 9px 12px; 
-            border-radius: 8px; 
-            background-color: var(--hover); 
-            border: none; 
+        .whatsapp-search-box input {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 8px;
+            background-color: var(--whatsapp-hover);
+            border: none;
             color: #e9edef;
-            outline: none; 
+            outline: none;
             font-size: 14px;
         }
         
-        .search-box input::placeholder {
+        .whatsapp-search-box input::placeholder {
             color: #8696a0;
         }
         
-        /* Area yang bisa di-scroll */
-        .chat-list { 
-            flex-grow: 1; /* Mengisi sisa ruang vertikal */
-            overflow-y: auto; /* Hanya area ini yang bisa di-scroll */
-            overflow-x: hidden; /* Mencegah scroll horizontal di dalam list */
+        .whatsapp-chat-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
-        .chat-item { 
-            display: flex; 
-            align-items: center; 
-            padding: 12px 16px; 
-            cursor: pointer; 
-            color: white; 
-            transition: background-color 0.2s; 
+        .whatsapp-chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.2s;
             position: relative;
         }
         
-        .chat-item:hover { 
-            background-color: var(--hover); 
+        .whatsapp-chat-item:hover {
+            background-color: var(--whatsapp-hover);
         }
         
-        .chat-item img { 
-            width: 49px; 
-            height: 49px; 
-            border-radius: 50%; 
-            margin-right: 13px; 
+        .whatsapp-chat-item img {
+            width: 49px;
+            height: 49px;
+            border-radius: 50%;
+            margin-right: 13px;
             object-fit: cover;
-            /* Invert gambar profil di mode gelap */
-            transition: filter 0.3s;
         }
         
-        /* Invert warna gambar profil di mode gelap */
-        [data-theme="dark"] .chat-item img {
-            filter: invert(1);
-        }
-        
-        .chat-item-details { 
-            flex-grow: 1; 
+        .whatsapp-chat-item-details {
+            flex-grow: 1;
             display: flex;
             justify-content: space-between;
             width: 100%;
         }
         
-        .chat-item-info {
+        .whatsapp-chat-item-info {
             overflow: hidden;
         }
         
-        .chat-item-details h4 { 
-            font-size: 16px; 
-            font-weight: 400; 
+        .whatsapp-chat-item-details h4 {
+            font-size: 16px;
+            font-weight: 400;
             margin-bottom: 2px;
-            color: white; /* Teks putih di mode gelap */
         }
         
-        .chat-item-details p { 
-            font-size: 13px; 
-            color: #8696a0; 
+        .whatsapp-chat-item-details p {
+            font-size: 13px;
+            color: #8696a0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             width: 200px;
         }
         
-        .chat-item-time {
+        .whatsapp-chat-item-time {
             font-size: 12px;
             color: #8696a0;
             margin-top: 3px;
         }
         
-        .chat-item-meta {
+        .whatsapp-chat-item-meta {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
         }
         
-        .message-status {
+        .whatsapp-message-status {
             display: flex;
             align-items: center;
             margin-top: 2px;
         }
         
-        .message-status i {
+        .whatsapp-message-status i {
             font-size: 12px;
             margin-left: 2px;
         }
         
-        .message-status.read {
+        .whatsapp-message-status.read {
             color: #53bdeb;
         }
         
-        .message-status.unread {
+        .whatsapp-message-status.unread {
             color: #8696a0;
         }
         
-        .unread-badge {
-            background-color: var(--green);
+        .whatsapp-unread-badge {
+            background-color: var(--whatsapp-green);
             color: white;
             border-radius: 50%;
             width: 20px;
@@ -396,174 +336,161 @@
             margin-top: 3px;
         }
         
-        .chat-header { 
-            padding: 10px 16px; 
-            background-color: var(--header); 
-            display: flex; 
-            align-items: center; 
+        .whatsapp-chat-header {
+            padding: 10px 16px;
+            background-color: var(--whatsapp-header);
+            display: flex;
+            align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             height: 60px;
             flex-shrink: 0;
         }
         
-        .chat-header img { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            margin-right: 13px; 
+        .whatsapp-chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 13px;
             object-fit: cover;
         }
         
-        .chat-header .info { 
-            flex-grow: 1; 
+        .whatsapp-chat-header .info {
+            flex-grow: 1;
         }
         
-        .chat-header .info h3 { 
-            font-size: 18px; 
-            color: white; /* Teks putih di mode gelap */
+        .whatsapp-chat-header .info h3 {
+            font-size: 18px;
+            color: white;
         }
         
-        .chat-header .info p { 
-            font-size: 13px; 
-            color: #8696a0; 
+        .whatsapp-chat-header .info p {
+            font-size: 13px;
+            color: #8696a0;
         }
         
-        .chat-header .icons { 
-            display: flex; 
-            gap: 25px; 
-            font-size: 20px; 
-            color: #8696a0; 
-            cursor: pointer; 
+        .whatsapp-chat-header .icons {
+            display: flex;
+            gap: 25px;
+            font-size: 20px;
+            color: #8696a0;
+            cursor: pointer;
         }
         
-        .messages { 
-            flex-grow: 1; 
-            padding: 20px 10px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
+        .whatsapp-messages {
+            flex-grow: 1;
+            padding: 20px 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         
-        .message { 
-            display: flex; 
-            margin-bottom: 8px; 
-            max-width: 75%; 
+        .whatsapp-message {
+            display: flex;
+            margin-bottom: 8px;
+            max-width: 75%;
         }
         
-        .message.sent { 
-            align-self: flex-end; 
-            flex-direction: column; 
-            align-items: flex-end; 
+        .whatsapp-message.sent {
+            align-self: flex-end;
+            flex-direction: column;
+            align-items: flex-end;
         }
         
-        .message.received { 
-            align-self: flex-start; 
-            flex-direction: column; 
-            align-items: flex-start; 
+        .whatsapp-message.received {
+            align-self: flex-start;
+            flex-direction: column;
+            align-items: flex-start;
         }
         
-        .message-bubble { 
-            padding: 8px 12px; 
-            border-radius: 7.5px; 
+        .whatsapp-message-bubble {
+            padding: 8px 12px;
+            border-radius: 7.5px;
             line-height: 1.4;
             position: relative;
             max-width: 100%;
             word-wrap: break-word;
         }
         
-        .message.sent .message-bubble { 
-            background-color: #dcf8c6; 
-            color: #111b21; /* Teks hitam di pesan terkirim */
+        .whatsapp-message.sent .whatsapp-message-bubble {
+            background-color: #dcf8c6;
         }
         
-        .message.received .message-bubble { 
-            background-color: white; 
-            color: #111b21; /* Teks hitam di pesan diterima */
+        .whatsapp-message.received .whatsapp-message-bubble {
+            background-color: white;
         }
         
-        .message-time { 
-            font-size: 11px; 
-            color: #999; 
-            margin-top: 4px; 
+        .whatsapp-message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
         }
         
-        .chat-input { 
-            padding: 10px 16px; 
-            background-color: var(--header); 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
+        .whatsapp-chat-input {
+            padding: 10px 16px;
+            background-color: var(--whatsapp-header);
+            display: flex;
+            align-items: center;
+            gap: 12px;
             flex-shrink: 0;
         }
         
-        .chat-input i { 
-            color: #8696a0; 
-            font-size: 24px; 
-            cursor: pointer; 
+        .whatsapp-chat-input i {
+            color: #8696a0;
+            font-size: 24px;
+            cursor: pointer;
         }
         
-        .chat-input input { 
-            flex-grow: 1; 
-            border: none; 
-            background-color: var(--hover); 
-            padding: 9px 12px; 
-            border-radius: 20px; 
-            font-size: 15px; 
-            outline: none; 
+        .whatsapp-chat-input input {
+            flex-grow: 1;
+            border: none;
+            background-color: var(--whatsapp-hover);
+            padding: 9px 12px;
+            border-radius: 20px;
+            font-size: 15px;
+            outline: none;
             color: white;
         }
         
-        .chat-input input::placeholder {
+        .whatsapp-chat-input input::placeholder {
             color: #8696a0;
         }
         
-        .chat-input button { 
-            background-color: var(--green); 
-            color: white; 
-            border: none; 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            font-size: 18px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        .whatsapp-chat-input button {
+            background-color: var(--whatsapp-green);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .welcome-screen { 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100%; 
-            color: #8696a0; 
+        .whatsapp-welcome-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #8696a0;
             background-color: #efeae2;
         }
         
-        .welcome-screen i { 
-            font-size: 100px; 
-            margin-bottom: 20px; 
-        }
-        
-        /* --- GAYA UNTUK PROFIL VIEW --- */
-        .profile-view {
+        .whatsapp-profile-view {
             display: none;
             flex-direction: column;
             height: 100%;
             background-color: #efeae2;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 3;
         }
         
-        .profile-view.active {
+        .whatsapp-profile-view.active {
             display: flex;
         }
         
-        .profile-content {
+        .whatsapp-profile-content {
             flex-grow: 1;
             overflow-y: auto;
             padding: 30px 20px;
@@ -572,16 +499,15 @@
             align-items: center;
         }
         
-        .profile-header {
+        .whatsapp-profile-header {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-bottom: 30px;
             text-align: center;
-            position: relative;
         }
         
-        .profile-header img {
+        .whatsapp-profile-header img {
             width: 150px;
             height: 150px;
             border-radius: 50%;
@@ -589,156 +515,70 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             object-fit: cover;
-            /* Invert gambar profil di mode gelap */
-            transition: filter 0.3s;
         }
         
-        .profile-header h2 {
-            color: #1c1e21; /* Teks hitam di mode terang */
+        .whatsapp-profile-header h2 {
+            color: var(--whatsapp-dark);
             font-size: 24px;
             margin-bottom: 5px;
         }
         
-        /* Status online/offline */
-        .profile-status {
-            display: flex;
-            align-items: center;
-            margin-top: 5px;
-            font-size: 14px;
-            color: #667781;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-        
-        .status-indicator.online {
-            background-color: #25d366;
-        }
-        
-        .status-indicator.offline {
-            background-color: #8a8a8a;
-            animation: none;
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-            }
-        }
-        
-        .profile-title-barcode {
+        .whatsapp-profile-title-barcode {
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 15px;
             margin-top: 10px;
         }
         
-        .profile-title-barcode #barcode {
+        .whatsapp-profile-title-barcode p {
+            color: #667781;
+            font-size: 16px;
+        }
+        
+        .whatsapp-profile-title-barcode #barcode {
             height: 40px;
         }
         
-        /* Tombol aksi di profil */
-        .profile-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .profile-action-btn {
-            background-color: rgba(0, 0, 0, 0.05);
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #667781;
-            font-size: 18px;
-        }
-        
-        .profile-action-btn:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-            transform: scale(1.05);
-        }
-        
-        .profile-section {
+        .whatsapp-profile-details {
             background-color: white;
             border-radius: 10px;
             padding: 20px;
             width: 100%;
             max-width: 500px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
         }
         
-        .profile-section h3 {
-            color: #1c1e21;
+        .whatsapp-profile-details h3 {
+            color: var(--whatsapp-dark);
             margin-bottom: 15px;
             font-size: 18px;
         }
         
-        .detail-item {
+        .whatsapp-detail-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #f0f2f5;
-            cursor: pointer;
-            transition: background-color 0.2s;
         }
         
-        .detail-item:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-        
-        .detail-item:last-child {
+        .whatsapp-detail-item:last-child {
             border-bottom: none;
         }
         
-        .detail-item-left {
-            display: flex;
-            align-items: center;
-        }
-        
-        .detail-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: #f0f2f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: #65676b;
-        }
-        
-        .detail-label {
+        .whatsapp-detail-label {
             color: #667781;
             font-size: 16px;
         }
         
-        .detail-value {
-            color: #1c1e21;
+        .whatsapp-detail-value {
+            color: var(--whatsapp-dark);
             font-size: 16px;
             font-weight: 500;
         }
         
-        .edit-btn {
-            background-color: var(--green);
+        .whatsapp-edit-btn {
+            background-color: var(--whatsapp-green);
             color: white;
             border: none;
             padding: 12px 25px;
@@ -750,1484 +590,1165 @@
             transition: background-color 0.2s;
         }
         
-        .edit-btn:hover {
+        .whatsapp-edit-btn:hover {
             background-color: #128c7e;
         }
         
-        /* --- GAYA UNTUK MODAL --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal {
-            background-color: white;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transform: translateY(20px);
-            transition: transform 0.3s;
-        }
-        
-        .modal-overlay.active .modal {
-            transform: translateY(0);
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #f0f2f5;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .modal-header h2 {
-            font-size: 20px;
-            color: #1c1e21;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #65676b;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-        }
-        
-        .modal-close:hover {
+        /* Members List */
+        .members-list {
+            display: none;
+            flex-direction: column;
+            height: 100%;
             background-color: #f0f2f5;
+            overflow: hidden;
         }
         
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #65676b;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            border-color: #1877f2;
-        }
-        
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #f0f2f5;
+        .members-list.active {
             display: flex;
-            justify-content: flex-end;
-            gap: 10px;
         }
         
-        .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 500;
+        .members-header {
+            padding: 10px 16px;
+            background-color: #0b141a;
+            color: white;
+            display: flex;
+            align-items: center;
+            height: 60px;
+            flex-shrink: 0;
+        }
+        
+        .members-header h3 {
+            font-size: 18px;
+            margin-left: 15px;
+        }
+        
+        .members-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
+            transition: transform 0.2s;
         }
         
-        .btn-primary {
-            background-color: #1877f2;
+        .member-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        
+        .member-info {
+            flex-grow: 1;
+        }
+        
+        .member-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #202c33;
+            margin-bottom: 4px;
+        }
+        
+        .member-status {
+            font-size: 13px;
+            color: #667781;
+        }
+        
+        .member-status.active {
+            color: #25d366;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding: 12px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            z-index: 1001;
+            opacity: 0;
+            transition: all var(--transition-normal);
+            font-size: 14px;
+            font-weight: 600;
+            max-width: 300px;
+            text-align: center;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background-color: var(--success-color);
             color: white;
         }
         
-        .btn-primary:hover {
-            background-color: #166fe5;
+        .toast.error {
+            background-color: var(--danger-color);
+            color: white;
         }
         
-        .btn-secondary {
-            background-color: #e4e6eb;
-            color: #1c1e21;
+        .toast.warning {
+            background-color: var(--warning-color);
+            color: white;
         }
         
-        .btn-secondary:hover {
-            background-color: #d8dadf;
+        .toast.info {
+            background-color: var(--info-color);
+            color: white;
         }
         
-        /* --- GAYA UNTUK MODAL PENGATURAN --- */
-        .settings-list {
-            list-style: none;
-        }
-        
-        .settings-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f2f5;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .settings-item:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-        
-        .settings-item:last-child {
-            border-bottom: none;
-        }
-        
-        .settings-item-header {
+        /* Loading State */
+        .loading-state {
             display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
-        }
-        
-        .settings-item-title {
-            font-size: 16px;
-            color: #1c1e21;
-            font-weight: 500;
-        }
-        
-        .settings-item-value {
-            font-size: 14px;
-            color: #65676b;
-        }
-        
-        .settings-item-description {
-            font-size: 13px;
+            height: 100%;
             color: #8696a0;
-            margin-top: 5px;
+            background-color: #efeae2;
         }
         
-        /* --- GAYA UNTUK TOGGLE SWITCH --- */
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 15px 0;
-        }
-        
-        .toggle-label {
-            font-size: 16px;
-            color: #1c1e21;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #25d366;
             border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
         
-        input:checked + .toggle-slider {
-            background-color: #25d366;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        input:checked + .toggle-slider:before {
-            transform: translateX(26px);
-        }
-        
-        /* --- GAYA UNTUK FOOTER --- */
-        .app-footer {
-            padding: 10px;
-            text-align: center;
-            font-size: 12px;
-            color: #8696a0;
-            background-color: var(--header);
-            margin-top: auto;
-        }
-        
-        /* --- RESPONSIVITAS TAMBAHAN --- */
+        /* Responsive Design */
         @media (max-width: 480px) {
-            .sidebar-header .logo {
-                font-size: 18px;
+            .phone-container { 
+                width: 100%; 
+                height: 100vh; 
+                border-radius: 0; 
+            }
+            body { 
+                padding: 0; 
             }
             
-            .filter-tab {
-                font-size: 13px;
-                padding: 5px 10px;
-                margin: 0 5px;
-            }
-            
-            .chat-item img {
-                width: 45px;
-                height: 45px;
-                margin-right: 10px;
-            }
-            
-            .chat-item-details h4 {
-                font-size: 15px;
-            }
-            
-            .chat-item-details p {
-                font-size: 12px;
-                width: 180px;
-            }
-            
-            .profile-content {
-                padding: 20px 15px;
-            }
-            
-            .profile-header img {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .profile-section {
-                padding: 15px;
-            }
-            
-            .detail-item {
-                padding: 10px 0;
-            }
-            
-            .detail-label, .detail-value {
-                font-size: 14px;
-            }
-            
-            .profile-action-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-            }
-            
-            .modal {
-                width: 95%;
-            }
-            
-            .modal-header {
-                padding: 15px;
-            }
-            
-            .modal-body {
-                padding: 15px;
-            }
-            
-            .modal-footer {
-                padding: 10px 15px;
+            .whatsapp-back-btn {
+                display: block;
             }
         }
     </style>
 </head>
-<body data-theme="dark">
-    <div class="app-container" id="app-container">
-        <aside class="sidebar">
-            <header class="sidebar-header">
-                <!-- Profil pengguna yang login -->
-                <div class="user-profile" id="user-profile">
-                    <img src="" alt="Profile" id="sidebar-profile-pic">
-                    <span class="user-profile-name" id="sidebar-user-name"></span>
+<body>
+    <div class="phone-container">
+        <div class="whatsapp-container">
+            <aside class="whatsapp-sidebar">
+                <header class="whatsapp-sidebar-header">
+                    <!-- Tombol kembali di posisi ikon kamera -->
+                    <div class="icons">
+                        <i class="fas fa-arrow-left" id="whatsapp-back-to-main"></i>
+                    </div>
+                    
+                    <!-- Profil pengguna yang login - akan diupdate secara dinamis -->
+                    <div class="whatsapp-user-profile" id="whatsapp-user-profile">
+                        <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-sidebar-profile-pic">
+                        <span class="whatsapp-user-profile-name" id="whatsapp-sidebar-username">Memuat...</span>
+                    </div>
+                </header>
+                
+                <div class="whatsapp-filter-tabs">
+                    <div class="whatsapp-filter-tab active" data-filter="all">Semua</div>
+                    <div class="whatsapp-filter-tab" data-filter="unread">Belum dibaca</div>
+                    <div class="whatsapp-filter-tab" data-filter="groups">Grup</div>
                 </div>
-            </header>
-            
-            <div class="filter-tabs">
-                <div class="filter-tab active" data-filter="all">Semua</div>
-                <div class="filter-tab" data-filter="unread">Belum dibaca</div>
-                <div class="filter-tab" data-filter="groups">Grup</div>
-            </div>
-            
-            <div class="search-box">
-                <input type="text" placeholder="Cari atau mulai chat baru">
-            </div>
-            
-            <div class="chat-list" id="chat-list">
-                <p style="color: #8696a0; text-align: center; padding: 20px;">Belum ada kontak</p>
-            </div>
-        </aside>
+                
+                <div class="whatsapp-search-box">
+                    <input type="text" placeholder="Cari atau mulai chat baru" id="whatsapp-search-input">
+                </div>
+                
+                <div class="whatsapp-chat-list" id="whatsapp-chat-list">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Memuat daftar chat...</p>
+                    </div>
+                </div>
+            </aside>
 
-        <main class="chat-window" id="chat-window">
-            <header class="chat-header">
-                <i class="fas fa-arrow-left back-btn" id="back-btn"></i>
-                <img src="https://i.pravatar.cc/150?img=69" alt="Profile" id="chat-profile-img">
-                <div class="info">
-                    <h3 id="chat-name">BGT PRO</h3>
-                    <p id="chat-status">Aplikasi Pesan Real-Time</p>
+            <main class="whatsapp-chat-window" id="whatsapp-chat-window">
+                <header class="whatsapp-chat-header">
+                    <i class="fas fa-arrow-left whatsapp-back-btn" id="whatsapp-back-btn"></i>
+                    <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-chat-profile-img">
+                    <div class="info">
+                        <h3 id="whatsapp-chat-name">BGT PRO</h3>
+                        <p id="whatsapp-chat-status">Aplikasi Pesan Real-Time</p>
+                    </div>
+                    <div class="icons">
+                        <i class="fas fa-video"></i>
+                        <i class="fas fa-phone"></i>
+                        <i class="fas fa-search"></i>
+                    </div>
+                </header>
+                
+                <!-- Welcome Screen (default) -->
+                <div class="whatsapp-messages" id="whatsapp-messages">
+                    <div class="whatsapp-welcome-screen">
+                        <i class="fab fa-whatsapp"></i>
+                        <h3>Selamat datang di WhatsApp BGT PRO</h3>
+                        <p>Kirim dan terima pesan tanpa menyimpan nomor telepon</p>
+                    </div>
                 </div>
-                <div class="icons">
-                    <i class="fas fa-video"></i>
-                    <i class="fas fa-phone"></i>
-                    <i class="fas fa-search"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                </div>
-            </header>
-            
-            <!-- Welcome Screen (default) -->
-            <div class="messages" id="messages">
-                <div class="welcome-screen">
-                    <i class="fab fa-whatsapp"></i>
-                </div>
-            </div>
-            
-            <!-- Profile View (hidden by default) -->
-            <div class="profile-view" id="profile-view">
-                <div class="profile-content">
-                    <div class="profile-header">
-                        <img src="" alt="Profile" id="profile-pic-large">
-                        <h2 id="profile-header-name"></h2>
-                        <!-- Status online/offline -->
-                        <div class="profile-status">
-                            <span class="status-indicator online" id="status-indicator"></span>
-                            <span id="profile-online-status">Aktif</span>
-                        </div>
-                        <div class="profile-title-barcode">
-                            <!-- Barcode akan digenerate oleh JsBarcode -->
-                            <svg id="barcode"></svg>
+                
+                <!-- Profile View (hidden by default) -->
+                <div class="whatsapp-profile-view" id="whatsapp-profile-view">
+                    <div class="whatsapp-profile-content">
+                        <div class="whatsapp-profile-header">
+                            <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-profile-pic-large">
+                            <h2 id="whatsapp-profile-username">Memuat...</h2>
+                            <div class="whatsapp-profile-title-barcode">
+                                <p id="whatsapp-profile-role">Memuat...</p>
+                                <!-- Barcode akan digenerate oleh JsBarcode -->
+                                <svg id="whatsapp-barcode"></svg>
+                            </div>
                         </div>
                         
-                        <!-- Tombol aksi di profil -->
-                        <div class="profile-actions">
-                            <!-- Tombol kamera -->
-                            <button class="profile-action-btn" id="profile-camera-btn" title="Ganti Foto Profil">
-                                <i class="fas fa-camera"></i>
-                            </button>
-                            <!-- Tombol mode terang/gelap -->
-                            <button class="profile-action-btn" id="profile-theme-btn" title="Mode Terang/Gelap">
-                                <i class="fas fa-moon"></i>
-                            </button>
-                            <!-- Tombol edit -->
-                            <button class="profile-action-btn" id="profile-edit-btn" title="Edit Profil">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                        <div class="whatsapp-profile-details">
+                            <h3>Data Lengkap Anggota</h3>
+                            <div class="whatsapp-detail-item">
+                                <span class="whatsapp-detail-label">Nama Lengkap</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-name">Memuat...</span>
+                            </div>
+                            <div class="whatsapp-detail-item">
+                                <span class="whatsapp-detail-label">Email</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-email">Memuat...</span>
+                            </div>
+                            <div class="whatsapp-detail-item">
+                                <span class="whatsapp-detail-label">Telepon</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-phone">Memuat...</span>
+                            </div>
+                            <div class="whatsapp-detail-item">
+                                <span class="whatsapp-detail-label">Status</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-status">Memuat...</span>
+                            </div>
+                            <div class="whatsapp-detail-item">
+                                <span class="whatsapp-detail-label">Bergabung</span>
+                                <span class="whatsapp-detail-value" id="whatsapp-detail-joined">Memuat...</span>
+                            </div>
                         </div>
+                        
+                        <button class="whatsapp-edit-btn" id="whatsapp-edit-profile-btn">Lihat Anggota</button>
                     </div>
-                    
-                    <!-- Data Lengkap Anggota -->
-                    <div class="profile-section">
-                        <h3>Data Lengkap Anggota</h3>
-                        <div class="detail-item">
-                            <span class="detail-label">Nama Lengkap</span>
-                            <span class="detail-value" id="profile-name">Ahmad Rizki</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Email</span>
-                            <span class="detail-value" id="profile-email">ahmad.rizki@example.com</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Telepon</span>
-                            <span class="detail-value" id="profile-phone">+62 812-3456-7890</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Status</span>
-                            <span class="detail-value" id="profile-status">Aktif</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Status Online</span>
-                            <span class="detail-value" id="profile-online-status-detail">Online</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Bergabung</span>
-                            <span class="detail-value">1 Januari 2023</span>
-                        </div>
+                </div>
+                
+                <div class="whatsapp-chat-input">
+                    <i class="fas fa-smile"></i>
+                    <i class="fas fa-paperclip"></i>
+                    <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan" disabled>
+                    <i class="fas fa-microphone" id="whatsapp-mic-icon"></i>
+                    <button id="whatsapp-send-btn" disabled><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </main>
+            
+            <!-- Members List View -->
+            <div class="members-list" id="members-list">
+                <header class="members-header">
+                    <i class="fas fa-arrow-left" id="members-back-btn"></i>
+                    <h3>Anggota Terdaftar</h3>
+                </header>
+                <div class="members-content" id="members-content">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Memuat daftar anggota...</p>
                     </div>
-                    
-                    <!-- Pengaturan -->
-                    <div class="profile-section">
-                        <h3>Pengaturan</h3>
-                        <div class="detail-item" id="profile-setting">
-                            <div class="detail-item-left">
-                                <div class="detail-icon">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <span class="detail-label">Profil</span>
-                            </div>
-                            <i class="fas fa-chevron-right" style="color: #8696a0;"></i>
-                        </div>
-                        <div class="detail-item" id="language-setting">
-                            <div class="detail-item-left">
-                                <div class="detail-icon">
-                                    <i class="fas fa-language"></i>
-                                </div>
-                                <span class="detail-label">Bahasa</span>
-                            </div>
-                            <i class="fas fa-chevron-right" style="color: #8696a0;"></i>
-                        </div>
-                        <div class="detail-item" id="notification-setting">
-                            <div class="detail-item-left">
-                                <div class="detail-icon">
-                                    <i class="fas fa-bell"></i>
-                                </div>
-                                <span class="detail-label">Notifikasi</span>
-                            </div>
-                            <i class="fas fa-chevron-right" style="color: #8696a0;"></i>
-                        </div>
-                        <div class="detail-item" id="privacy-setting">
-                            <div class="detail-item-left">
-                                <div class="detail-icon">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <span class="detail-label">Privasi</span>
-                            </div>
-                            <i class="fas fa-chevron-right" style="color: #8696a0;"></i>
-                        </div>
-                    </div>
-                    
-                    <button class="edit-btn" id="edit-profile-btn">Edit Profil</button>
                 </div>
             </div>
-            
-            <div class="chat-input">
-                <i class="fas fa-smile"></i>
-                <i class="fas fa-paperclip"></i>
-                <input type="text" id="message-input" placeholder="" disabled>
-                <i class="fas fa-microphone"></i>
-                <button id="send-btn" disabled><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="app-footer">
-            desai @leong 2026 hakcipta
-        </footer>
+        </div>
     </div>
 
-    <!-- Hidden file input for changing profile picture -->
-    <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
-    <input type="file" id="ringtone-input" accept="audio/*" style="display: none;">
+    <!-- Toast Container -->
+    <div id="toast" class="toast"></div>
     
-    <!-- Modal Edit Profil -->
-    <div class="modal-overlay" id="edit-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Edit Profil</h2>
-                <button class="modal-close" id="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="edit-name">Nama Lengkap</label>
-                    <input type="text" id="edit-name" value="Ahmad Rizki">
-                </div>
-                <div class="form-group">
-                    <label for="edit-email">Email</label>
-                    <input type="email" id="edit-email" value="ahmad.rizki@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="edit-phone">Telepon</label>
-                    <input type="tel" id="edit-phone" value="+62 812-3456-7890">
-                </div>
-                <div class="form-group">
-                    <label for="edit-status">Status</label>
-                    <select id="edit-status">
-                        <option value="Aktif" selected>Aktif</option>
-                        <option value="Sibuk">Sibuk</option>
-                        <option value="Away">Away</option>
-                        <option value="Tidak Aktif">Tidak Aktif</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-online-status">Status Online</label>
-                    <select id="edit-online-status">
-                        <option value="online" selected>Online</option>
-                        <option value="offline">Offline</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancel-edit">Batal</button>
-                <button class="btn btn-primary" id="save-edit">Simpan</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Bahasa -->
-    <div class="modal-overlay" id="language-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Pengaturan Bahasa</h2>
-                <button class="modal-close" id="language-modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul class="settings-list">
-                    <li class="settings-item" data-lang="id">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Bahasa Indonesia</span>
-                            <span class="settings-item-value" id="current-lang">Indonesia</span>
-                        </div>
-                        <div class="settings-item-description">Bahasa resmi Indonesia</div>
-                    </li>
-                    <li class="settings-item" data-lang="en">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">English</span>
-                            <span class="settings-item-value">English</span>
-                        </div>
-                        <div class="settings-item-description">English language</div>
-                    </li>
-                    <li class="settings-item" data-lang="zh">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">中文</span>
-                            <span class="settings-item-value">Chinese</span>
-                        </div>
-                        <div class="settings-item-description">中文语言</div>
-                    </li>
-                    <li class="settings-item" data-lang="ar">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">العربية</span>
-                            <span class="settings-item-value">Arabic</span>
-                        </div>
-                        <div class="settings-item-description">اللغة العربية</div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Notifikasi -->
-    <div class="modal-overlay" id="notification-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Pengaturan Notifikasi</h2>
-                <button class="modal-close" id="notification-modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="toggle-container">
-                    <span class="toggle-label">Notifikasi Pesan</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="notification-toggle-input" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                
-                <div class="toggle-container">
-                    <span class="toggle-label">Suara Notifikasi</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="sound-toggle-input" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                </div>
-                
-                <div class="toggle-container">
-                    <span class="toggle-label">Getaran</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="vibration-toggle-input" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                </div>
-                
-                <div class="settings-item" id="ringtone-setting">
-                    <div class="settings-item-header">
-                        <span class="settings-item-title">Nada Dering</span>
-                        <span class="settings-item-value" id="ringtone-name">Default</span>
-                    </div>
-                    <div class="settings-item-description">Pilih nada dering untuk notifikasi</div>
-                </div>
-                
-                <div class="settings-item" id="custom-ringtone">
-                    <div class="settings-item-header">
-                        <span class="settings-item-title">Nada Dering Kustom</span>
-                        <span class="settings-item-value">Pilih dari Perangkat</span>
-                    </div>
-                    <div class="settings-item-description">Pilih file audio dari perangkat Anda</div>
-                </div>
-                
-                <div class="settings-item" id="test-notification">
-                    <div class="settings-item-header">
-                        <span class="settings-item-title">Uji Notifikasi</span>
-                        <i class="fas fa-play" style="color: #25d366;"></i>
-                    </div>
-                    <div class="settings-item-description">Kirim notifikasi uji coba</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Nada Dering -->
-    <div class="modal-overlay" id="ringtone-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Pilih Nada Dering</h2>
-                <button class="modal-close" id="ringtone-modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul class="settings-list">
-                    <li class="settings-item ringtone-item" data-ringtone="default">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Default</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering default</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="marimba">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Marimba</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering marimba</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="alarm">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Alarm</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering alarm</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="chime">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Chime</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering chime</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="bell">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Bell</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering bell</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="digital">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Digital</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering digital</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="ascending">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Ascending</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Nada dering ascending</div>
-                    </li>
-                    <li class="settings-item ringtone-item" data-ringtone="vibrate">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Vibrate Only</span>
-                            <i class="fas fa-play" style="color: #25d366;"></i>
-                        </div>
-                        <div class="settings-item-description">Hanya getaran</div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Privasi -->
-    <div class="modal-overlay" id="privacy-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Pengaturan Privasi</h2>
-                <button class="modal-close" id="privacy-modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul class="settings-list">
-                    <li class="settings-item" id="last-seen-toggle">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Terakhir Dilihat</span>
-                            <span class="settings-item-value" id="last-seen-status">Semua Orang</span>
-                        </div>
-                        <div class="settings-item-description">Siapa yang dapat melihat status terakhir dilihat Anda</div>
-                    </li>
-                    <li class="settings-item" id="profile-photo-toggle">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Foto Profil</span>
-                            <span class="settings-item-value" id="profile-photo-status">Semua Orang</span>
-                        </div>
-                        <div class="settings-item-description">Siapa yang dapat melihat foto profil Anda</div>
-                    </li>
-                    <li class="settings-item" id="about-toggle">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Tentang</span>
-                            <span class="settings-item-value" id="about-status">Semua Orang</span>
-                        </div>
-                        <div class="settings-item-description">Siapa yang dapat melihat info tentang Anda</div>
-                    </li>
-                    <li class="settings-item" id="blocked-toggle">
-                        <div class="settings-item-header">
-                            <span class="settings-item-title">Pengguna Diblokir</span>
-                            <span class="settings-item-value">0 Pengguna</span>
-                        </div>
-                        <div class="settings-item-description">Kelola pengguna yang Anda blokir</div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <!-- Hidden file input for profile picture -->
+    <input type="file" id="whatsapp-profile-pic-input" accept="image/*" style="display: none;">
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- ELEMEN DOM ---
-            const chatList = document.getElementById('chat-list');
-            const messagesEl = document.getElementById('messages');
-            const messageInput = document.getElementById('message-input');
-            const sendBtn = document.getElementById('send-btn');
-            const chatName = document.getElementById('chat-name');
-            const chatStatus = document.getElementById('chat-status');
-            const chatProfileImg = document.getElementById('chat-profile-img');
-            const chatWindow = document.getElementById('chat-window');
-            const backBtn = document.getElementById('back-btn');
-            const filterTabs = document.querySelectorAll('.filter-tab');
-            
-            // Elemen profil baru
-            const userProfileTrigger = document.getElementById('user-profile');
-            const profileView = document.getElementById('profile-view');
-            const welcomeScreen = document.querySelector('.welcome-screen');
-            const profilePicInput = document.getElementById('profile-pic-input');
-            const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
-            const sidebarUserName = document.getElementById('sidebar-user-name');
-            const profilePicLarge = document.getElementById('profile-pic-large');
-            const editProfileBtn = document.getElementById('edit-profile-btn');
-            const barcodeEl = document.getElementById('barcode');
-            
-            // Elemen tombol aksi di profil
-            const profileCameraBtn = document.getElementById('profile-camera-btn');
-            const profileThemeBtn = document.getElementById('profile-theme-btn');
-            const profileEditBtn = document.getElementById('profile-edit-btn');
-            const themeIcon = profileThemeBtn.querySelector('i');
-            const body = document.body;
-            
-            // Elemen status online/offline
-            const statusIndicator = document.getElementById('status-indicator');
-            const profileOnlineStatus = document.getElementById('profile-online-status');
-            const profileOnlineStatusDetail = document.getElementById('profile-online-status-detail');
-            
-            // Elemen modal edit profil
-            const editModal = document.getElementById('edit-modal');
-            const modalClose = document.getElementById('modal-close');
-            const cancelEdit = document.getElementById('cancel-edit');
-            const saveEdit = document.getElementById('save-edit');
-            
-            // Elemen form edit
-            const editName = document.getElementById('edit-name');
-            const editEmail = document.getElementById('edit-email');
-            const editPhone = document.getElementById('edit-phone');
-            const editStatus = document.getElementById('edit-status');
-            const editOnlineStatus = document.getElementById('edit-online-status');
-            
-            // Elemen tampilan profil
-            const profileName = document.getElementById('profile-name');
-            const profileEmail = document.getElementById('profile-email');
-            const profilePhone = document.getElementById('profile-phone');
-            const profileStatus = document.getElementById('profile-status');
-            const profileHeaderName = document.getElementById('profile-header-name');
-            
-            // Elemen pengaturan
-            const profileSetting = document.getElementById('profile-setting');
-            const languageSetting = document.getElementById('language-setting');
-            const notificationSetting = document.getElementById('notification-setting');
-            const privacySetting = document.getElementById('privacy-setting');
-            
-            // Modal pengaturan
-            const languageModal = document.getElementById('language-modal');
-            const languageModalClose = document.getElementById('language-modal-close');
-            const notificationModal = document.getElementById('notification-modal');
-            const notificationModalClose = document.getElementById('notification-modal-close');
-            const ringtoneModal = document.getElementById('ringtone-modal');
-            const ringtoneModalClose = document.getElementById('ringtone-modal-close');
-            const privacyModal = document.getElementById('privacy-modal');
-            const privacyModalClose = document.getElementById('privacy-modal-close');
-            
-            // Elemen untuk toggle
-            const notificationToggleInput = document.getElementById('notification-toggle-input');
-            const soundToggleInput = document.getElementById('sound-toggle-input');
-            const vibrationToggleInput = document.getElementById('vibration-toggle-input');
-            
-            // Elemen nada dering
-            const ringtoneInput = document.getElementById('ringtone-input');
-            const customRingtone = document.getElementById('custom-ringtone');
-            const testNotification = document.getElementById('test-notification');
-            
-            let activeChat = null;
-            let activeFilter = 'all';
-            let isOnline = true; // Status online/offline
-            
-            // --- PENGATURAN NOTIFIKASI ---
-            let notificationSettings = {
-                enabled: true,
-                soundEnabled: true,
-                vibrationEnabled: true,
-                ringtone: 'default',
-                customRingtone: null
-            };
-            
-            // --- PENGATURAN PRIVASI ---
-            let privacySettings = {
-                lastSeen: 'everyone',
-                profilePhoto: 'everyone',
-                about: 'everyone',
-                blockedUsers: []
-            };
-            
-            // --- FUNGSI PENYIMPANAN DATA ---
-            function saveProfileData() {
-                const profileData = {
-                    name: profileName.textContent,
-                    email: profileEmail.textContent,
-                    phone: profilePhone.textContent,
-                    status: profileStatus.textContent,
-                    onlineStatus: isOnline ? 'online' : 'offline',
-                    profilePicture: sidebarProfilePic.src
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCahZIFKFXMCokFNxCpFokNSVtKzN4llus",
+            authDomain: "cedar-setup-425414-d7.firebaseapp.com",
+            databaseURL: "https://cedar-setup-425414-d7-default-rtdb.firebaseio.com",
+            projectId: "cedar-setup-425414-d7",
+            storageBucket: "cedar-setup-425414-d7.firebasestorage.app",
+            messagingSenderId: "723545991983",
+            appId: "1:723545991983:web:379548d2b425a502a60fda",
+            measurementId: "G-FPL6PF3KWJ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const storage = firebase.storage();
+
+        // WhatsApp App State
+        const whatsappApp = {
+            state: {
+                activeChat: null,
+                activeFilter: 'all',
+                chats: [],
+                messages: {},
+                currentUserData: null,
+                registeredMembers: [],
+                groups: [],
+                chatWindows: {} // Store multiple chat windows
+            },
+
+            // Initialize WhatsApp App
+            init() {
+                // Check for existing session first
+                this.checkExistingSession();
+                
+                // Initialize Firebase auth
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        this.loadUserData(user.uid);
+                        this.initWhatsApp();
+                        this.loadRegisteredMembers();
+                        this.loadGroups();
+                    } else {
+                        // No user found, redirect to dashboard_anggota.html
+                        window.location.href = 'dashboard_anggota.html';
+                    }
+                });
+            },
+
+            // Check for existing session
+            checkExistingSession() {
+                const session = localStorage.getItem('bgtProSession');
+                if (session === 'active') {
+                    // Session exists, continue
+                    console.log('Session found, continuing...');
+                } else {
+                    // No session, check if we're coming from dashboard
+                    const referrer = document.referrer;
+                    if (referrer && referrer.includes('dashboard_anggota.html')) {
+                        // Coming from dashboard, set session
+                        localStorage.setItem('bgtProSession', 'active');
+                        console.log('Session set from dashboard');
+                    }
+                }
+            },
+
+            // Load user data
+            async loadUserData(userId) {
+                try {
+                    const doc = await db.collection('users').doc(userId).get();
+                    if (doc.exists) {
+                        this.state.currentUserData = doc.data();
+                        this.updateUserProfileUI(this.state.currentUserData);
+                    }
+                } catch (error) {
+                    console.error("Error loading user data:", error);
+                }
+            },
+
+            // Load registered members from Firebase
+            async loadRegisteredMembers() {
+                try {
+                    const snapshot = await db.collection('users').get();
+                    this.state.registeredMembers = [];
+                    
+                    snapshot.forEach(doc => {
+                        const memberData = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        this.state.registeredMembers.push(memberData);
+                    });
+                    
+                    // Update sample chats with registered members
+                    this.updateChatsWithRegisteredMembers();
+                } catch (error) {
+                    console.error("Error loading registered members:", error);
+                    this.showToast("Gagal memuat data anggota", "error");
+                }
+            },
+
+            // Load groups from Firebase
+            async loadGroups() {
+                try {
+                    const snapshot = await db.collection('groups').get();
+                    this.state.groups = [];
+                    
+                    snapshot.forEach(doc => {
+                        const groupData = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        this.state.groups.push(groupData);
+                    });
+                    
+                    // Update chats with groups
+                    this.updateChatsWithGroups();
+                } catch (error) {
+                    console.error("Error loading groups:", error);
+                    // Groups might not exist yet, which is fine
+                }
+            },
+
+            // Update chats with registered members
+            updateChatsWithRegisteredMembers() {
+                // Create sample chats with registered members
+                const sampleChats = [];
+                
+                // Add registered members as chats (excluding current user)
+                this.state.registeredMembers.forEach((member, index) => {
+                    if (member.id !== auth.currentUser.uid) { // Don't add self
+                        sampleChats.push({
+                            id: `member_${member.id}`,
+                            name: member.username || 'Anggota',
+                            avatar: member.profilePicUrl || `https://i.pravatar.cc/150?img=${index + 10}`,
+                            lastMessage: 'Halo, apa kabar?',
+                            time: this.getRandomTime(),
+                            unread: Math.floor(Math.random() * 3),
+                            isGroup: false,
+                            userId: member.id // Store user ID for navigation
+                        });
+                    }
+                });
+                
+                this.state.chats = sampleChats;
+                
+                // Load sample messages for each chat
+                sampleChats.forEach(chat => {
+                    this.state.messages[chat.id] = this.generateSampleMessages(chat.id);
+                });
+                
+                // Render chat list
+                this.renderChatList();
+            },
+
+            // Update chats with groups
+            updateChatsWithGroups() {
+                // Add groups to chats if they exist
+                this.state.groups.forEach(group => {
+                    this.state.chats.push({
+                        id: `group_${group.id}`,
+                        name: group.name || 'Grup',
+                        avatar: group.avatar || 'https://i.pravatar.cc/150?img=12',
+                        lastMessage: group.lastMessage || 'Admin: Jangan lupa iuran bulanan',
+                        time: this.getRandomTime(),
+                        unread: Math.floor(Math.random() * 3),
+                        isGroup: true,
+                        groupId: group.id // Store group ID for navigation
+                    });
+                });
+                
+                // Re-render chat list
+                this.renderChatList();
+            },
+
+            // Get random time for sample data
+            getRandomTime() {
+                const times = ['10:30', 'Kemarin', 'Senin', 'Minggu', '2 hari yang lalu'];
+                return times[Math.floor(Math.random() * times.length)];
+            },
+
+            // Update user profile UI with dynamic data
+            updateUserProfileUI(userData) {
+                const imageUrl = userData.profilePicUrl || 'https://picsum.photos/seed/default-user/100/100.jpg';
+                const username = userData.username || 'Pengguna';
+                
+                // Update all profile-related elements
+                const elements = {
+                    'whatsapp-sidebar-profile-pic': imageUrl,
+                    'whatsapp-profile-pic-large': imageUrl,
+                    'whatsapp-chat-profile-img': imageUrl,
+                    'whatsapp-sidebar-username': username,
+                    'whatsapp-profile-username': username,
+                    'whatsapp-profile-role': userData.role || 'Anggota',
+                    'whatsapp-detail-name': username,
+                    'whatsapp-detail-email': userData.email || 'Email tidak tersedia',
+                    'whatsapp-detail-phone': userData.phone || 'Telepon tidak tersedia',
+                    'whatsapp-detail-status': userData.status || 'Aktif',
+                    'whatsapp-detail-joined': userData.joinDate ? 
+                        new Date(userData.joinDate.toDate()).toLocaleDateString('id-ID') : 
+                        'Tidak diketahui'
                 };
-                localStorage.setItem('userProfile', JSON.stringify(profileData));
-            }
-            
-            function loadProfileData() {
-                const savedData = localStorage.getItem('userProfile');
-                if (savedData) {
-                    const profileData = JSON.parse(savedData);
-                    
-                    // Update semua elemen dengan data yang tersimpan
-                    profileName.textContent = profileData.name || 'Ahmad Rizki';
-                    profileEmail.textContent = profileData.email || 'ahmad.rizki@example.com';
-                    profilePhone.textContent = profileData.phone || '+62 812-3456-7890';
-                    profileStatus.textContent = profileData.status || 'Aktif';
-                    profileHeaderName.textContent = profileData.name || 'Ahmad Rizki';
-                    sidebarUserName.textContent = profileData.name || 'Ahmad Rizki';
-                    
-                    // Update foto profil jika ada
-                    if (profileData.profilePicture && profileData.profilePicture !== 'https://i.pravatar.cc/150?img=5') {
-                        sidebarProfilePic.src = profileData.profilePicture;
-                        profilePicLarge.src = profileData.profilePicture;
-                        chatProfileImg.src = profileData.profilePicture;
+                
+                // Update all elements
+                Object.keys(elements).forEach(elementId => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        if (elementId.includes('pic') || elementId.includes('img')) {
+                            element.src = elements[elementId];
+                            element.onerror = () => {
+                                element.src = 'https://picsum.photos/seed/default-user/100/100.jpg';
+                            };
+                        } else {
+                            element.textContent = elements[elementId];
+                        }
                     }
-                    
-                    // Update status online/offline
-                    isOnline = profileData.onlineStatus === 'online';
-                    updateOnlineStatus(isOnline);
-                    
-                    // Update form edit dengan data yang tersimpan
-                    editName.value = profileData.name || 'Ahmad Rizki';
-                    editEmail.value = profileData.email || 'ahmad.rizki@example.com';
-                    editPhone.value = profileData.phone || '+62 812-3456-7890';
-                    editStatus.value = profileData.status || 'Aktif';
-                    editOnlineStatus.value = profileData.onlineStatus || 'online';
-                }
-            }
-            
-            // --- INISIALISASI BARCODE ---
-            // Generate barcode menggunakan JsBarcode
-            JsBarcode(barcodeEl, "USER-12345678", {
-                format: "CODE128",
-                width: 1.5,
-                height: 40,
-                displayValue: false
-            });
-            
-            // --- FUNGSI UNTUK MODE TERANG/GELAP ---
-            function setTheme(theme) {
-                body.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
+                });
                 
-                // Update ikon
-                if (theme === 'light') {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                } else {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
-                
-                // Update warna teks berdasarkan tema
-                updateTextColors(theme);
-            }
-            
-            // Fungsi untuk memperbarui warna teks
-            function updateTextColors(theme) {
-                const textElements = document.querySelectorAll('.user-profile-name, .chat-item-details h4, .chat-header .info h3, .profile-header h2, .profile-details h3, .detail-value');
-                const secondaryTextElements = document.querySelectorAll('.chat-item-details p, .chat-item-time, .chat-header .info p, .detail-label');
-                
-                if (theme === 'light') {
-                    // Teks utama menjadi hitam
-                    textElements.forEach(el => {
-                        el.style.color = '#1c1e21';
-                    });
-                    
-                    // Teks sekunder menjadi abu-abu gelap
-                    secondaryTextElements.forEach(el => {
-                        el.style.color = '#65676b';
-                    });
-                    
-                    // Warna background untuk pesan
-                    document.querySelectorAll('.message-bubble').forEach(el => {
-                        el.style.color = '#111b21';
-                    });
-                } else {
-                    // Teks utama menjadi putih
-                    textElements.forEach(el => {
-                        el.style.color = '#ffffff';
-                    });
-                    
-                    // Teks sekunder menjadi abu-abu terang
-                    secondaryTextElements.forEach(el => {
-                        el.style.color = '#8696a0';
-                    });
-                    
-                    // Warna background untuk pesan
-                    document.querySelectorAll('.message-bubble').forEach(el => {
-                        el.style.color = '#111b21';
+                // Generate barcode with user ID
+                const barcodeEl = document.getElementById('whatsapp-barcode');
+                if (barcodeEl && userData.id) {
+                    JsBarcode(barcodeEl, userData.id, {
+                        format: "CODE128",
+                        width: 1.5,
+                        height: 40,
+                        displayValue: false
                     });
                 }
-            }
-            
-            // --- FUNGSI UNTUK UPDATE STATUS ONLINE/OFFLINE ---
-            function updateOnlineStatus(online) {
-                isOnline = online;
+            },
+
+            // Initialize WhatsApp functionality
+            initWhatsApp() {
+                // WhatsApp elements
+                const whatsappChatList = document.getElementById('whatsapp-chat-list');
+                const whatsappMessages = document.getElementById('whatsapp-messages');
+                const whatsappMessageInput = document.getElementById('whatsapp-message-input');
+                const whatsappSendBtn = document.getElementById('whatsapp-send-btn');
+                const whatsappChatName = document.getElementById('whatsapp-chat-name');
+                const whatsappChatStatus = document.getElementById('whatsapp-chat-status');
+                const whatsappChatProfileImg = document.getElementById('whatsapp-chat-profile-img');
+                const whatsappChatWindow = document.getElementById('whatsapp-chat-window');
+                const whatsappBackBtn = document.getElementById('whatsapp-back-btn');
+                const whatsappBackToMain = document.getElementById('whatsapp-back-to-main');
+                const whatsappFilterTabs = document.querySelectorAll('.whatsapp-filter-tab');
+                const whatsappSearchInput = document.getElementById('whatsapp-search-input');
+                const whatsappMicIcon = document.getElementById('whatsapp-mic-icon');
                 
-                if (online) {
-                    statusIndicator.classList.remove('offline');
-                    statusIndicator.classList.add('online');
-                    profileOnlineStatus.textContent = 'Online';
-                    profileOnlineStatusDetail.textContent = 'Online';
-                } else {
-                    statusIndicator.classList.remove('online');
-                    statusIndicator.classList.add('offline');
-                    profileOnlineStatus.textContent = 'Offline';
-                    profileOnlineStatusDetail.textContent = 'Offline';
-                }
+                // WhatsApp profile elements
+                const whatsappUserProfileTrigger = document.getElementById('whatsapp-user-profile');
+                const whatsappProfileView = document.getElementById('whatsapp-profile-view');
+                const whatsappWelcomeScreen = document.querySelector('.whatsapp-welcome-screen');
+                const whatsappEditProfileBtn = document.getElementById('whatsapp-edit-profile-btn');
                 
-                // Simpan status online ke localStorage
-                saveProfileData();
-            }
-            
-            // --- FUNGSI UNTUK MEMAINKAN NADA DERING ---
-            function playRingtone(ringtoneName) {
-                // Jika nada dering kustom, mainkan file audio
-                if (ringtoneName === 'custom' && notificationSettings.customRingtone) {
-                    const audio = new Audio(notificationSettings.customRingtone);
-                    audio.play();
+                // Members list elements
+                const membersList = document.getElementById('members-list');
+                const membersBackBtn = document.getElementById('members-back-btn');
+                const membersContent = document.getElementById('members-content');
+                
+                // WhatsApp filter tabs
+                whatsappFilterTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        whatsappFilterTabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.state.activeFilter = tab.dataset.filter;
+                        this.filterChats();
+                    });
+                });
+                
+                // WhatsApp search
+                whatsappSearchInput.addEventListener('input', (e) => {
+                    this.searchChats(e.target.value);
+                });
+                
+                // WhatsApp event listeners
+                
+                // Open/close profile view
+                whatsappUserProfileTrigger.addEventListener('click', () => {
+                    whatsappWelcomeScreen.style.display = 'none';
+                    whatsappProfileView.classList.add('active');
+                    whatsappChatName.textContent = 'Profil Saya';
+                    whatsappChatStatus.textContent = 'Data Diri';
+                    whatsappChatProfileImg.src = document.getElementById('whatsapp-sidebar-profile-pic').src;
                     
-                    // Getar jika diaktifkan
-                    if (notificationSettings.vibrationEnabled && 'vibrate' in navigator) {
-                        navigator.vibrate(200);
+                    // In mobile, ensure chat window is active
+                    if (window.innerWidth <= 767) {
+                        whatsappChatWindow.classList.add('active');
                     }
+                });
+                
+                // Back button (main) - Mengarah ke dashboard_anggota.html
+                whatsappBackToMain.addEventListener('click', () => {
+                    // Clear session
+                    localStorage.removeItem('bgtProSession');
+                    window.location.href = 'dashboard_anggota.html';
+                });
+                
+                // Back button (chat)
+                whatsappBackBtn.addEventListener('click', () => {
+                    // If profile view is active, go back to welcome screen
+                    if (whatsappProfileView.classList.contains('active')) {
+                        whatsappProfileView.classList.remove('active');
+                        whatsappWelcomeScreen.style.display = 'flex';
+                        whatsappChatName.textContent = 'BGT PRO';
+                        whatsappChatStatus.textContent = 'Aplikasi Pesan Real-Time';
+                        
+                        // In mobile, go back to sidebar
+                        if (window.innerWidth <= 767) {
+                            whatsappChatWindow.classList.remove('active');
+                        }
+                    } else {
+                        // Otherwise, go back to chat list
+                        whatsappChatWindow.classList.remove('active');
+                        this.state.activeChat = null;
+                    }
+                });
+                
+                // Edit profile button - now shows members list
+                whatsappEditProfileBtn.addEventListener('click', () => {
+                    this.showMembersList();
+                });
+                
+                // Members back button
+                membersBackBtn.addEventListener('click', () => {
+                    membersList.classList.remove('active');
+                    whatsappProfileView.classList.add('active');
+                });
+                
+                // Message input
+                whatsappMessageInput.addEventListener('input', (e) => {
+                    // Toggle between send button and mic icon based on input
+                    if (e.target.value.trim() === '') {
+                        whatsappSendBtn.style.display = 'none';
+                        whatsappMicIcon.style.display = 'block';
+                    } else {
+                        whatsappSendBtn.style.display = 'flex';
+                        whatsappMicIcon.style.display = 'none';
+                    }
+                });
+                
+                // Send message
+                whatsappSendBtn.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+                
+                // Send message on Enter key
+                whatsappMessageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+            },
+
+            // Show members list
+            showMembersList() {
+                const membersList = document.getElementById('members-list');
+                const membersContent = document.getElementById('members-content');
+                
+                // Hide profile view and show members list
+                document.getElementById('whatsapp-profile-view').classList.remove('active');
+                membersList.classList.add('active');
+                
+                // Render members list
+                this.renderMembersList();
+            },
+
+            // Render members list
+            renderMembersList() {
+                const membersContent = document.getElementById('members-content');
+                
+                if (this.state.registeredMembers.length === 0) {
+                    membersContent.innerHTML = '<p style="text-align: center; color: #667781; padding: 20px;">Tidak ada anggota terdaftar</p>';
                     return;
                 }
                 
-                // Mainkan nada dering default
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
+                membersContent.innerHTML = '';
                 
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                // Definisi nada dering
-                const ringtones = {
-                    default: () => {
-                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                        oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.1);
-                        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
-                        return 0.3;
-                    },
-                    marimba: () => {
-                        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-                        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
-                        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
-                        return 0.4;
-                    },
-                    alarm: () => {
-                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4
-                        oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 0.1); // A5
-                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.2); // A4
-                        return 0.5;
-                    },
-                    chime: () => {
-                        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-                        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.15); // E5
-                        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.3); // G5
-                        return 0.6;
-                    },
-                    bell: () => {
-                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
-                        oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2);
-                        return 0.4;
-                    },
-                    digital: () => {
-                        oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime); // C6
-                        oscillator.frequency.setValueAtTime(1318.51, audioContext.currentTime + 0.1); // E6
-                        oscillator.frequency.setValueAtTime(1567.98, audioContext.currentTime + 0.2); // G6
-                        return 0.3;
-                    },
-                    ascending: () => {
-                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4
-                        oscillator.frequency.setValueAtTime(554.37, audioContext.currentTime + 0.1); // C#5
-                        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2); // E5
-                        return 0.4;
-                    },
-                    vibrate: () => {
-                        // Hanya getar, tidak ada suara
-                        if ('vibrate' in navigator) {
-                            navigator.vibrate([200, 100, 200]);
-                        }
-                        return 0;
-                    }
-                };
-                
-                // Mainkan nada dering
-                const duration = ringtones[ringtoneName] ? ringtones[ringtoneName]() : ringtones.default();
-                
-                if (ringtoneName !== 'vibrate') {
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + duration);
-                }
-                
-                // Getar jika diaktifkan
-                if (notificationSettings.vibrationEnabled && 'vibrate' in navigator) {
-                    navigator.vibrate(200);
-                }
-            }
-            
-            // --- FUNGSI UNTUK MENAMPILKAN NOTIFIKASI ---
-            function showNotification(message, playSound = true) {
-                // Buat elemen notifikasi
-                const notification = document.createElement('div');
-                notification.style.cssText = `
+                this.state.registeredMembers.forEach(member => {
+                    const memberItem = document.createElement('div');
+                    memberItem.className = 'member-item';
+                    
+                    // Determine if member is online (random for demo)
+                    const isOnline = Math.random() > 0.5;
+                    
+                    memberItem.innerHTML = `
+                        <img src="${member.profilePicUrl || 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random() * 70)}" alt="${member.username}" class="member-avatar">
+                        <div class="member-info">
+                            <div class="member-name">${member.username || 'Anggota'}</div>
+                            <div class="member-status ${isOnline ? 'active' : ''}">${isOnline ? 'Aktif' : 'Tidak aktif'}</div>
+                        </div>
+                    `;
+                    
+                    memberItem.addEventListener('click', () => {
+                        this.showMemberDetails(member);
+                    });
+                    
+                    membersContent.appendChild(memberItem);
+                });
+            },
+
+            // Show member details
+            showMemberDetails(member) {
+                // Create a simple modal with member details
+                const modal = document.createElement('div');
+                modal.style.cssText = `
                     position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background-color: #25d366;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                    z-index: 1001;
-                    transform: translateX(100%);
-                    transition: transform 0.3s ease-out;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 2000;
                 `;
-                notification.textContent = message;
                 
-                // Tambahkan ke body
-                document.body.appendChild(notification);
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background-color: white;
+                    border-radius: 16px;
+                    width: 90%;
+                    max-width: 320px;
+                    max-height: 80%;
+                    overflow: hidden;
+                    position: relative;
+                    padding: 20px;
+                `;
                 
-                // Tampilkan dengan animasi
-                setTimeout(() => {
-                    notification.style.transform = 'translateX(0)';
-                }, 100);
-                
-                // Mainkan nada dering jika diaktifkan
-                if (playSound && notificationSettings.soundEnabled) {
-                    playRingtone(notificationSettings.ringtone);
-                }
-                
-                // Sembunyikan setelah 3 detik
-                setTimeout(() => {
-                    notification.style.transform = 'translateX(100%)';
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
-                }, 3000);
-            }
-            
-            // --- FUNGSI UNTUK MENAMPILKAN MODAL ---
-            function showModal(modal) {
-                modal.classList.add('active');
-            }
-            
-            function hideModal(modal) {
-                modal.classList.remove('active');
-            }
-            
-            // --- FUNGSI UNTUK MENYIMPAN PENGATURAN ---
-            function saveSettings() {
-                localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
-                localStorage.setItem('privacySettings', JSON.stringify(privacySettings));
-            }
-            
-            function loadSettings() {
-                const savedNotificationSettings = localStorage.getItem('notificationSettings');
-                if (savedNotificationSettings) {
-                    notificationSettings = JSON.parse(savedNotificationSettings);
-                }
-                
-                const savedPrivacySettings = localStorage.getItem('privacySettings');
-                if (savedPrivacySettings) {
-                    privacySettings = JSON.parse(savedPrivacySettings);
-                }
-            }
-            
-            // --- FUNGSI UNTUK UPDATE TAMPILAN PENGATURAN ---
-            function updateNotificationDisplay() {
-                const ringtoneName = document.getElementById('ringtone-name');
-                
-                ringtoneName.textContent = notificationSettings.ringtone === 'custom' 
-                    ? 'Kustom' 
-                    : notificationSettings.ringtone.charAt(0).toUpperCase() + notificationSettings.ringtone.slice(1);
-            }
-            
-            function updatePrivacyDisplay() {
-                const lastSeenStatus = document.getElementById('last-seen-status');
-                const profilePhotoStatus = document.getElementById('profile-photo-status');
-                const aboutStatus = document.getElementById('about-status');
-                
-                lastSeenStatus.textContent = privacySettings.lastSeen === 'everyone' ? 'Semua Orang' : 'Kontak Saya';
-                profilePhotoStatus.textContent = privacySettings.profilePhoto === 'everyone' ? 'Semua Orang' : 'Kontak Saya';
-                aboutStatus.textContent = privacySettings.about === 'everyone' ? 'Semua Orang' : 'Kontak Saya';
-            }
-            
-            // --- EVENT LISTENERS ---
-            
-            // Cek preferensi tema yang tersimpan
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            setTheme(savedTheme);
-            
-            // Load data profil dan pengaturan saat halaman dimuat
-            loadProfileData();
-            loadSettings();
-            updateNotificationDisplay();
-            updatePrivacyDisplay();
-            
-            // Event listener untuk tombol mode terang/gelap di profil
-            profileThemeBtn.addEventListener('click', () => {
-                const currentTheme = body.getAttribute('data-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                setTheme(newTheme);
-            });
-            
-            // --- FUNGSI UNTUK FILTER TABS ---
-            filterTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    filterTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    activeFilter = tab.dataset.filter;
-                    // Tetap tampilkan pesan kosong
-                    chatList.innerHTML = '<p style="color: #8696a0; text-align: center; padding: 20px;">Belum ada kontak</p>';
-                });
-            });
-            
-            // --- EVENT LISTENERS UNTUK PROFIL ---
-            
-            // Buka/tutup profil view
-            userProfileTrigger.addEventListener('click', () => {
-                console.log('Profile clicked'); // Debug log
-                welcomeScreen.style.display = 'none';
-                profileView.classList.add('active');
-                chatName.textContent = 'Profil Saya';
-                chatStatus.textContent = 'Data Diri';
-                chatProfileImg.src = sidebarProfilePic.src;
-                
-                // Update warna teks untuk profil
-                const currentTheme = body.getAttribute('data-theme');
-                updateTextColors(currentTheme);
-                
-                // Update status online/offline
-                updateOnlineStatus(isOnline);
-                
-                // Di mobile, pastikan chat window aktif
-                if (window.innerWidth <= 767) {
-                    chatWindow.classList.add('active');
-                }
-            });
-            
-            // Tombol kembali
-            backBtn.addEventListener('click', () => {
-                // Jika profil view sedang aktif, kembali ke welcome screen
-                if (profileView.classList.contains('active')) {
-                    profileView.classList.remove('active');
-                    welcomeScreen.style.display = 'flex';
-                    chatName.textContent = 'BGT PRO';
-                    chatStatus.textContent = 'Aplikasi Pesan Real-Time';
+                modalContent.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${member.profilePicUrl || 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random() * 70)}" alt="${member.username}" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 10px;">
+                        <h3 style="margin: 0; color: #202c33;">${member.username || 'Anggota'}</h3>
+                        <p style="margin: 5px 0; color: #667781;">${member.email || 'Email tidak tersedia'}</p>
+                    </div>
                     
-                    // Di mobile, kembali ke sidebar
-                    if (window.innerWidth <= 767) {
-                        chatWindow.classList.remove('active');
-                    }
-                }
-                // Logika kembali dari chat bisa ditambahkan di sini di masa depan
-            });
-            
-            // Klik tombol kamera di profil untuk ganti foto profil
-            profileCameraBtn.addEventListener('click', () => {
-                profilePicInput.click();
-            });
-            
-            // Handle perubahan file input (ganti foto profil)
-            profilePicInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const newImageUrl = e.target.result;
-                        sidebarProfilePic.src = newImageUrl;
-                        profilePicLarge.src = newImageUrl;
-                        chatProfileImg.src = newImageUrl;
-                        
-                        // Simpan foto profil ke localStorage
-                        saveProfileData();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            // Event listener untuk pengaturan
-            profileSetting.addEventListener('click', () => {
-                showModal(editModal);
-            });
-            
-            languageSetting.addEventListener('click', () => {
-                showModal(languageModal);
-            });
-            
-            notificationSetting.addEventListener('click', () => {
-                showModal(notificationModal);
-            });
-            
-            privacySetting.addEventListener('click', () => {
-                showModal(privacyModal);
-            });
-            
-            // --- EVENT LISTENERS UNTUK MODAL BAHASA ---
-            const languageItems = document.querySelectorAll('#language-modal .settings-item');
-            languageItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const lang = item.dataset.lang;
-                    const currentLang = document.getElementById('current-lang');
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f5;">
+                            <span style="color: #667781;">Status</span>
+                            <span style="color: #202c33;">${member.status || 'Aktif'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f5;">
+                            <span style="color: #667781;">Bergabung</span>
+                            <span style="color: #202c33;">${member.joinDate ? new Date(member.joinDate.toDate()).toLocaleDateString('id-ID') : 'Tidak diketahui'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                            <span style="color: #667781;">Role</span>
+                            <span style="color: #202c33;">${member.role || 'Anggota'}</span>
+                        </div>
+                    </div>
                     
-                    // Update tampilan bahasa
-                    const langNames = {
-                        id: 'Indonesia',
-                        en: 'English',
-                        zh: 'Chinese',
-                        ar: 'Arabic'
-                    };
-                    currentLang.textContent = langNames[lang];
-                    
-                    // Simpan preferensi bahasa
-                    localStorage.setItem('language', lang);
-                    
-                    hideModal(languageModal);
-                    showNotification(`Bahasa diubah ke ${langNames[lang]}`);
-                });
-            });
-            
-            // --- EVENT LISTENERS UNTUK MODAL NOTIFIKASI ---
-            notificationToggleInput.addEventListener('change', () => {
-                notificationSettings.enabled = notificationToggleInput.checked;
-                saveSettings();
-            });
-            
-            soundToggleInput.addEventListener('change', () => {
-                notificationSettings.soundEnabled = soundToggleInput.checked;
-                saveSettings();
-            });
-            
-            vibrationToggleInput.addEventListener('change', () => {
-                notificationSettings.vibrationEnabled = vibrationToggleInput.checked;
-                saveSettings();
-            });
-            
-            document.getElementById('ringtone-setting').addEventListener('click', () => {
-                showModal(ringtoneModal);
-            });
-            
-            document.getElementById('custom-ringtone').addEventListener('click', () => {
-                ringtoneInput.click();
-            });
-            
-            ringtoneInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('audio/')) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        notificationSettings.customRingtone = event.target.result;
-                        saveSettings();
-                        updateNotificationDisplay();
-                        showNotification('Nada dering kustom berhasil diunggah!');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            testNotification.addEventListener('click', () => {
-                showNotification('Ini adalah notifikasi uji coba!', true);
-            });
-            
-            // --- EVENT LISTENERS UNTUK MODAL NADA DERING ---
-            const ringtoneItems = document.querySelectorAll('#ringtone-modal .ringtone-item');
-            ringtoneItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const ringtone = item.dataset.ringtone;
-                    notificationSettings.ringtone = ringtone;
-                    saveSettings();
-                    updateNotificationDisplay();
-                    hideModal(ringtoneModal);
-                    showNotification(`Nada dering diubah ke ${ringtone.charAt(0).toUpperCase() + ringtone.slice(1)}`);
-                    
-                    // Mainkan nada dering untuk preview
-                    playRingtone(ringtone);
-                });
-            });
-            
-            // --- EVENT LISTENERS UNTUK MODAL PRIVASI ---
-            document.getElementById('last-seen-toggle').addEventListener('click', () => {
-                privacySettings.lastSeen = privacySettings.lastSeen === 'everyone' ? 'contacts' : 'everyone';
-                saveSettings();
-                updatePrivacyDisplay();
-            });
-            
-            document.getElementById('profile-photo-toggle').addEventListener('click', () => {
-                privacySettings.profilePhoto = privacySettings.profilePhoto === 'everyone' ? 'contacts' : 'everyone';
-                saveSettings();
-                updatePrivacyDisplay();
-            });
-            
-            document.getElementById('about-toggle').addEventListener('click', () => {
-                privacySettings.about = privacySettings.about === 'everyone' ? 'contacts' : 'everyone';
-                saveSettings();
-                updatePrivacyDisplay();
-            });
-            
-            document.getElementById('blocked-toggle').addEventListener('click', () => {
-                showNotification('Fitur pengguna diblokir akan segera hadir!');
-            });
-            
-            // --- EVENT LISTENERS UNTUK MODAL CLOSE ---
-            [modalClose, languageModalClose, notificationModalClose, ringtoneModalClose, privacyModalClose].forEach(closeBtn => {
-                closeBtn.addEventListener('click', () => {
-                    hideModal(closeBtn.closest('.modal-overlay'));
-                });
-            });
-            
-            // Tutup modal saat klik di luar modal
-            [editModal, languageModal, notificationModal, ringtoneModal, privacyModal].forEach(modal => {
+                    <button style="background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;" onclick="this.parentElement.parentElement.remove()">
+                        Tutup
+                    </button>
+                `;
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+                
+                // Close modal when clicking outside
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
-                        hideModal(modal);
+                        document.body.removeChild(modal);
                     }
                 });
-            });
-            
-            // --- FUNGSI UNTUK MODAL EDIT PROFIL ---
-            function openEditModal() {
-                // Isi form dengan data saat ini
-                editName.value = profileName.textContent;
-                editEmail.value = profileEmail.textContent;
-                editPhone.value = profilePhone.textContent;
-                editStatus.value = profileStatus.textContent;
-                editOnlineStatus.value = isOnline ? 'online' : 'offline';
+            },
+
+            // Render chat list
+            renderChatList() {
+                const whatsappChatList = document.getElementById('whatsapp-chat-list');
                 
-                // Tampilkan modal
-                showModal(editModal);
-            }
-            
-            function closeEditModal() {
-                hideModal(editModal);
-            }
-            
-            function saveProfileChanges() {
-                // Ambil nilai dari form
-                const newName = editName.value.trim();
-                const newEmail = editEmail.value.trim();
-                const newPhone = editPhone.value.trim();
-                const newStatus = editStatus.value;
-                const newOnlineStatus = editOnlineStatus.value;
-                
-                // Validasi sederhana
-                if (!newName) {
-                    alert('Nama tidak boleh kosong');
+                if (this.state.chats.length === 0) {
+                    whatsappChatList.innerHTML = `
+                        <div class="loading-state">
+                            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                            <p>Belum ada chat</p>
+                        </div>
+                    `;
                     return;
                 }
                 
-                if (!newEmail || !newEmail.includes('@')) {
-                    alert('Email tidak valid');
+                whatsappChatList.innerHTML = '';
+                
+                this.state.chats.forEach(chat => {
+                    // Apply filter
+                    if (this.state.activeFilter === 'unread' && chat.unread === 0) return;
+                    if (this.state.activeFilter === 'groups' && !chat.isGroup) return;
+                    
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'whatsapp-chat-item';
+                    chatItem.dataset.chatId = chat.id;
+                    
+                    chatItem.innerHTML = `
+                        <img src="${chat.avatar}" alt="${chat.name}">
+                        <div class="whatsapp-chat-item-details">
+                            <div class="whatsapp-chat-item-info">
+                                <h4>${chat.name}</h4>
+                                <p>${chat.lastMessage}</p>
+                            </div>
+                            <div class="whatsapp-chat-item-meta">
+                                <div class="whatsapp-chat-item-time">${chat.time}</div>
+                                ${chat.unread > 0 ? `<div class="whatsapp-unread-badge">${chat.unread}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add click event to open chat
+                    chatItem.addEventListener('click', () => {
+                        this.openChat(chat);
+                    });
+                    
+                    whatsappChatList.appendChild(chatItem);
+                });
+            },
+
+            // Open chat window
+            openChat(chat) {
+                const whatsappChatWindow = document.getElementById('whatsapp-chat-window');
+                const whatsappChatName = document.getElementById('whatsapp-chat-name');
+                const whatsappChatStatus = document.getElementById('whatsapp-chat-status');
+                const whatsappChatProfileImg = document.getElementById('whatsapp-chat-profile-img');
+                const whatsappMessages = document.getElementById('whatsapp-messages');
+                const whatsappMessageInput = document.getElementById('whatsapp-message-input');
+                const whatsappWelcomeScreen = document.querySelector('.whatsapp-welcome-screen');
+                
+                // Update chat header
+                whatsappChatName.textContent = chat.name;
+                whatsappChatStatus.textContent = chat.isGroup ? 'Grup' : 'Online';
+                whatsappChatProfileImg.src = chat.avatar;
+                
+                // Hide welcome screen and show messages
+                whatsappWelcomeScreen.style.display = 'none';
+                
+                // Show chat window
+                whatsappChatWindow.classList.add('active');
+                
+                // Enable message input
+                whatsappMessageInput.disabled = false;
+                whatsappMessageInput.placeholder = 'Ketik pesan';
+                
+                // Store active chat
+                this.state.activeChat = chat.id;
+                
+                // Load or create messages
+                this.loadChatMessages(chat.id);
+                
+                // Focus on input
+                whatsappMessageInput.focus();
+            },
+
+            // Load or create chat messages
+            loadChatMessages(chatId) {
+                const whatsappMessages = document.getElementById('whatsapp-messages');
+                
+                // Check if we already have messages for this chat
+                if (this.state.messages[chatId]) {
+                    this.renderMessages(chatId);
+                } else {
+                    // Create initial messages
+                    this.state.messages[chatId] = this.generateSampleMessages(chatId);
+                    this.renderMessages(chatId);
+                }
+                
+                // Setup real-time listener for this chat
+                this.setupChatListener(chatId);
+            },
+
+            // Setup real-time listener for chat
+            setupChatListener(chatId) {
+                const chatRef = db.collection('chats').doc(chatId);
+                
+                chatRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const chatData = doc.data();
+                        if (chatData.messages) {
+                            this.state.messages[chatId] = chatData.messages;
+                            this.renderMessages(chatId);
+                        }
+                    }
+                });
+            },
+
+            // Render messages
+            renderMessages(chatId) {
+                const whatsappMessages = document.getElementById('whatsapp-messages');
+                const messages = this.state.messages[chatId] || [];
+                
+                whatsappMessages.innerHTML = '';
+                
+                // Add date separator
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                let lastDate = null;
+                
+                messages.forEach(message => {
+                    const messageDate = new Date(message.timestamp);
+                    const dateStr = messageDate.toDateString();
+                    
+                    // Add date separator if needed
+                    if (lastDate !== dateStr) {
+                        const dateSeparator = document.createElement('div');
+                        dateSeparator.style.textAlign = 'center';
+                        dateSeparator.style.margin = '10px 0';
+                        dateSeparator.style.fontSize = '12px';
+                        dateSeparator.style.color = '#999';
+                        
+                        if (dateStr === today.toDateString()) {
+                            dateSeparator.textContent = 'Hari ini';
+                        } else if (dateStr === yesterday.toDateString()) {
+                            dateSeparator.textContent = 'Kemarin';
+                        } else {
+                            dateSeparator.textContent = messageDate.toLocaleDateString('id-ID', { 
+                                weekday: 'long', 
+                                day: 'numeric', 
+                                month: 'long' 
+                            });
+                        }
+                        
+                        whatsappMessages.appendChild(dateSeparator);
+                        lastDate = dateStr;
+                    }
+                    
+                    // Create message element
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `whatsapp-message ${message.senderId === auth.currentUser.uid ? 'sent' : 'received'}`;
+                    
+                    messageElement.innerHTML = `
+                        <div class="whatsapp-message-bubble">${message.text}</div>
+                        <div class="whatsapp-message-time">${message.timestamp.toLocaleTimeString('id-ID', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        })}</div>
+                    `;
+                    
+                    whatsappMessages.appendChild(messageElement);
+                });
+                
+                // Scroll to bottom
+                whatsappMessages.scrollTop = whatsappMessages.scrollHeight;
+            },
+
+            // Send message
+            async sendMessage() {
+                const messageInput = document.getElementById('whatsapp-message-input');
+                const messageText = messageInput.value.trim();
+                
+                if (!messageText || !this.state.activeChat) return;
+                
+                const newMessage = {
+                    text: messageText,
+                    senderId: auth.currentUser.uid,
+                    senderName: this.state.currentUserData.username || 'Pengguna',
+                    timestamp: new Date()
+                };
+                
+                try {
+                    // Save to Firebase
+                    const chatRef = db.collection('chats').doc(this.state.activeChat);
+                    await chatRef.update({
+                        messages: firebase.firestore.FieldValue.arrayUnion(newMessage),
+                        lastMessage: messageText,
+                        lastMessageTime: new Date()
+                    });
+                    
+                    // Update local state
+                    if (!this.state.messages[this.state.activeChat]) {
+                        this.state.messages[this.state.activeChat] = [];
+                    }
+                    this.state.messages[this.state.activeChat].push(newMessage);
+                    
+                    // Update chat in list
+                    const chat = this.state.chats.find(c => c.id === this.state.activeChat);
+                    if (chat) {
+                        chat.lastMessage = messageText;
+                        chat.time = 'Baru saja';
+                    }
+                    
+                    // Clear input
+                    messageInput.value = '';
+                    document.getElementById('whatsapp-send-btn').style.display = 'none';
+                    document.getElementById('whatsapp-mic-icon').style.display = 'block';
+                    
+                    // Re-render messages
+                    this.renderMessages(this.state.activeChat);
+                    this.renderChatList();
+                    
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    this.showToast("Gagal mengirim pesan", "error");
+                }
+            },
+
+            // Generate sample messages for a chat
+            generateSampleMessages(chatId) {
+                const messages = [];
+                const now = new Date();
+                
+                // Generate different messages based on chat ID
+                if (chatId.startsWith('member_')) {
+                    messages.push(
+                        { 
+                            text: 'Halo, apa kabar?', 
+                            senderId: 'other', 
+                            senderName: 'Teman', 
+                            timestamp: new Date(now.getTime() - 3600000) 
+                        },
+                        { 
+                            text: 'Baik, kamu bagaimana?', 
+                            senderId: auth.currentUser.uid, 
+                            senderName: this.state.currentUserData.username || 'Saya', 
+                            timestamp: new Date(now.getTime() - 3000000) 
+                        },
+                        { 
+                            text: 'Juga baik. Ada acara komunitas besok?', 
+                            senderId: 'other', 
+                            senderName: 'Teman', 
+                            timestamp: new Date(now.getTime() - 2400000) 
+                        },
+                        { 
+                            text: 'Iya, ada rapat rutin jam 10 pagi', 
+                            senderId: auth.currentUser.uid, 
+                            senderName: this.state.currentUserData.username || 'Saya', 
+                            timestamp: new Date(now.getTime() - 1800000) 
+                        }
+                    );
+                } else if (chatId.startsWith('group_')) {
+                    messages.push(
+                        { 
+                            text: 'Admin: Jangan lupa iuran bulanan', 
+                            senderId: 'admin', 
+                            senderName: 'Admin', 
+                            timestamp: new Date(now.getTime() - 86400000) 
+                        },
+                        { 
+                            text: 'Sudah saya transfer pak', 
+                            senderId: 'member1', 
+                            senderName: 'Anggota 1', 
+                            timestamp: new Date(now.getTime() - 80000000) 
+                        },
+                        { 
+                            text: 'Budi: Belum, nanti malam', 
+                            senderId: 'member2', 
+                            senderName: 'Budi', 
+                            timestamp: new Date(now.getTime() - 70000000) 
+                        },
+                        { 
+                            text: 'Siti: Ok, saya transfer besok', 
+                            senderId: 'member3', 
+                            senderName: 'Siti', 
+                            timestamp: new Date(now.getTime() - 60000000) 
+                        }
+                    );
+                } else {
+                    messages.push(
+                        { 
+                            text: 'Halo', 
+                            senderId: 'other', 
+                            senderName: 'Teman', 
+                            timestamp: new Date(now.getTime() - 3600000) 
+                        },
+                        { 
+                            text: 'Halo juga', 
+                            senderId: auth.currentUser.uid, 
+                            senderName: this.state.currentUserData.username || 'Saya', 
+                            timestamp: new Date(now.getTime() - 3000000) 
+                        }
+                    );
+                }
+                
+                return messages;
+            },
+
+            // Filter chats
+            filterChats() {
+                this.renderChatList();
+            },
+
+            // Search chats
+            searchChats(query) {
+                const whatsappChatList = document.getElementById('whatsapp-chat-list');
+                
+                if (!query.trim()) {
+                    this.renderChatList();
                     return;
                 }
                 
-                // Update tampilan profil
-                profileName.textContent = newName;
-                profileEmail.textContent = newEmail;
-                profilePhone.textContent = newPhone;
-                profileStatus.textContent = newStatus;
-                profileHeaderName.textContent = newName;
-                sidebarUserName.textContent = newName;
+                const filteredChats = this.state.chats.filter(chat => 
+                    chat.name.toLowerCase().includes(query.toLowerCase()) ||
+                    chat.lastMessage.toLowerCase().includes(query.toLowerCase())
+                );
                 
-                // Update status online/offline
-                updateOnlineStatus(newOnlineStatus === 'online');
+                whatsappChatList.innerHTML = '';
                 
-                // Simpan semua data ke localStorage
-                saveProfileData();
+                if (filteredChats.length === 0) {
+                    whatsappChatList.innerHTML = `
+                        <div class="loading-state">
+                            <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                            <p>Tidak ada hasil untuk "${query}"</p>
+                        </div>
+                    `;
+                    return;
+                }
                 
-                // Tutup modal
-                hideModal(editModal);
+                filteredChats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'whatsapp-chat-item';
+                    chatItem.dataset.chatId = chat.id;
+                    
+                    chatItem.innerHTML = `
+                        <img src="${chat.avatar}" alt="${chat.name}">
+                        <div class="whatsapp-chat-item-details">
+                            <div class="whatsapp-chat-item-info">
+                                <h4>${chat.name}</h4>
+                                <p>${chat.lastMessage}</p>
+                            </div>
+                            <div class="whatsapp-chat-item-meta">
+                                <div class="whatsapp-chat-item-time">${chat.time}</div>
+                                ${chat.unread > 0 ? `<div class="whatsapp-unread-badge">${chat.unread}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add click event to open chat
+                    chatItem.addEventListener('click', () => {
+                        this.openChat(chat);
+                    });
+                    
+                    whatsappChatList.appendChild(chatItem);
+                });
+            },
+
+            // Show toast notification
+            showToast(message, type = 'default') {
+                let toast = document.getElementById('toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.className = 'toast';
+                    document.querySelector('.phone-container').appendChild(toast);
+                }
                 
-                // Tampilkan notifikasi sukses
-                showNotification('Profil berhasil diperbarui!');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
             }
-            
-            // Event listener untuk tombol edit profil
-            editProfileBtn.addEventListener('click', openEditModal);
-            profileEditBtn.addEventListener('click', openEditModal);
-            
-            // Event listener untuk tombol modal
-            cancelEdit.addEventListener('click', closeEditModal);
-            saveEdit.addEventListener('click', saveProfileChanges);
-            
-            // Fungsi-fungsi Firebase dinonaktifkan sepenuhnya
-            // Tidak ada koneksi ke database
-            // Tidak ada data yang akan dimuat
+        };
+
+        // Initialize WhatsApp app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            whatsappApp.init();
         });
     </script>
 </body>
