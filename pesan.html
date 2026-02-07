@@ -32,7 +32,7 @@
             --whatsapp-hover: #182229;
         }
         
-        /* Global Styles - NO MARGIN/PADDING */
+        /* Global Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -40,7 +40,6 @@
             background-color: #000; 
             color: var(--whatsapp-dark); 
             width: 100vw;
-            /* Layout Fleksibel Mengikuti Perangkat */
             height: 100vh; 
             height: 100dvh; 
             display: flex; 
@@ -49,7 +48,7 @@
             overflow: hidden; 
         }
         
-        /* Phone Container - FULL SIZE FLEKSIBEL */
+        /* Phone Container */
         .phone-container { 
             width: 100%; 
             height: 100%; 
@@ -114,11 +113,81 @@
             left: 0;
             width: 100%;
             z-index: 30;
-            animation: fadeIn 0.1s; /* Cepat */
+            animation: fadeIn 0.1s;
         }
         
         .members-list.active {
             display: flex;
+        }
+
+        /* --- MESSAGE MENU POPUP (Baru) --- */
+        .message-menu {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            width: 150px;
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+            overflow: hidden;
+            animation: fadeInMenu 0.15s ease-out;
+        }
+
+        @keyframes fadeInMenu {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            font-size: 14px;
+            color: #111b21;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover {
+            background-color: #f5f6f6;
+        }
+
+        .menu-item.delete { color: #dc3545; }
+        .menu-item.delete:hover { background-color: #ffebeb; }
+        
+        /* --- REPLY BOX (Baru) --- */
+        .reply-box {
+            display: none;
+            background-color: var(--whatsapp-header);
+            padding: 8px 10px;
+            border-left: 4px solid var(--whatsapp-green);
+            flex-direction: column;
+            justify-content: center;
+            font-size: 12px;
+            color: #e9edef;
+            position: relative;
+        }
+
+        .reply-box.active { display: flex; }
+
+        .reply-text-preview {
+            color: #8696a0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+        }
+
+        .reply-close-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8696a0;
+            cursor: pointer;
+            font-size: 16px;
         }
         
         /* --- UI COMPONENTS --- */
@@ -151,7 +220,6 @@
             flex-grow: 1;
         }
         
-        /* PASTIKAN FOTO PROFIL KECIL (TIDAK BESAR) */
         .whatsapp-chat-header img, 
         .whatsapp-user-profile img,
         .whatsapp-profile-header img {
@@ -321,6 +389,7 @@
             display: flex;
             margin-bottom: 8px;
             max-width: 80%;
+            position: relative;
         }
         
         .whatsapp-message.sent {
@@ -341,6 +410,14 @@
             line-height: 1.4;
             font-size: 14px;
             word-wrap: break-word;
+            cursor: pointer; /* Indicate clickable */
+            user-select: none;
+            position: relative;
+        }
+        
+        /* Highlight selected message */
+        .whatsapp-message-bubble.selected {
+            box-shadow: 0 0 0 2px var(--whatsapp-green);
         }
         
         .whatsapp-message.sent .whatsapp-message-bubble {
@@ -358,15 +435,33 @@
             margin-left: 5px;
             float: right;
         }
+
+        /* Reply context visual inside chat */
+        .reply-context {
+            font-size: 11px;
+            color: #555;
+            border-left: 3px solid rgba(0,0,0,0.2);
+            padding-left: 5px;
+            margin-bottom: 4px;
+            font-style: italic;
+            opacity: 0.8;
+            display: block;
+        }
         
         /* Input Area */
         .whatsapp-chat-input {
             padding: 8px 12px;
             background-color: var(--whatsapp-header);
             display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .input-row {
+            display: flex;
             align-items: center;
             gap: 10px;
-            flex-shrink: 0;
+            margin-top: 5px;
         }
         
         .whatsapp-chat-input i {
@@ -505,7 +600,7 @@
             <aside class="whatsapp-sidebar" id="whatsapp-sidebar">
                 <header class="whatsapp-sidebar-header">
                     <div class="whatsapp-user-profile" id="whatsapp-user-profile">
-                        <!-- Placeholder Default (Agar tidak kosong/tidak loading) -->
+                        <!-- Placeholder Default -->
                         <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-sidebar-profile-pic">
                         <span class="whatsapp-user-profile-name" id="whatsapp-sidebar-username">Pengguna</span>
                     </div>
@@ -524,7 +619,7 @@
                     <input type="text" placeholder="Cari..." id="whatsapp-search-input">
                 </div>
                 
-                <!-- Chat List: KOSONG SAAT AWAL (Tanpa Loading) -->
+                <!-- Chat List -->
                 <div class="whatsapp-chat-list" id="whatsapp-chat-list">
                     <!-- Akan diisi JS -->
                 </div>
@@ -533,7 +628,6 @@
             <!-- Chat Area -->
             <main class="whatsapp-chat-window" id="whatsapp-chat-window">
                 <header class="whatsapp-chat-header">
-                    <!-- Tombol Kembali: Refresh ke pesan.html -->
                     <i class="fas fa-arrow-left whatsapp-back-btn" id="whatsapp-back-btn"></i>
                     <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-chat-profile-img">
                     <div class="info">
@@ -552,6 +646,22 @@
                         <i class="fab fa-whatsapp" style="font-size: 48px; margin-bottom: 20px; color: #25d366;"></i>
                         <h3>Selamat datang di BGT PRO</h3>
                         <p>Pilih anggota untuk mulai chatting</p>
+                    </div>
+                </div>
+                
+                <!-- Context Menu (Hidden by default) -->
+                <div id="message-menu" class="message-menu">
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('edit')">
+                        <i class="fas fa-edit"></i> Edit
+                    </div>
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('reply')">
+                        <i class="fas fa-reply"></i> Balas
+                    </div>
+                    <div class="menu-item" onclick="whatsappApp.handleMenuAction('forward')">
+                        <i class="fas fa-share"></i> Teruskan
+                    </div>
+                    <div class="menu-item delete" onclick="whatsappApp.handleMenuAction('delete')">
+                        <i class="fas fa-trash"></i> Hapus
                     </div>
                 </div>
                 
@@ -588,11 +698,20 @@
                 </div>
                 
                 <div class="whatsapp-chat-input" id="whatsapp-chat-input-area" style="display: none;">
-                    <i class="fas fa-smile"></i>
-                    <i class="fas fa-paperclip"></i>
-                    <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan">
-                    <i class="fas fa-microphone" id="whatsapp-mic-icon"></i>
-                    <button id="whatsapp-send-btn" style="display: none;"><i class="fas fa-paper-plane"></i></button>
+                    <!-- Reply Bar (Hidden by default) -->
+                    <div id="reply-box" class="reply-box">
+                        <span style="font-weight: bold; margin-bottom: 2px;">Membalas pesan</span>
+                        <div class="reply-text-preview" id="reply-preview-text">...</div>
+                        <i class="fas fa-times reply-close-btn" onclick="whatsappApp.closeReply()"></i>
+                    </div>
+
+                    <div class="input-row">
+                        <i class="fas fa-smile"></i>
+                        <i class="fas fa-paperclip"></i>
+                        <input type="text" id="whatsapp-message-input" placeholder="Ketik pesan">
+                        <i class="fas fa-microphone" id="whatsapp-mic-icon"></i>
+                        <button id="whatsapp-send-btn" style="display: none;"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </main>
             
@@ -632,17 +751,17 @@
                 chats: [],
                 messages: {},
                 currentUserData: null,
-                registeredMembers: []
+                registeredMembers: [],
+                selectedMessageId: null, // ID pesan yang sedang dipilih/diklik
+                replyingTo: null // { id, text } jika sedang mode balas
             },
 
             init() {
-                // Cek session tanpa loading, langsung redirect jika tidak ada
                 if (localStorage.getItem('bgtProSession') !== 'active') {
                     window.location.href = 'dashboard_anggota.html';
                     return;
                 }
 
-                // Render state awal kosong (Instant view)
                 this.renderChatList();
                 this.renderMembersContent();
 
@@ -653,6 +772,15 @@
                         this.loadRegisteredMembers();
                     } else {
                         window.location.href = 'dashboard_anggota.html';
+                    }
+                });
+                
+                // Klik di mana saja untuk menutup menu
+                document.addEventListener('click', (e) => {
+                    const menu = document.getElementById('message-menu');
+                    if (!e.target.closest('.message-menu') && !e.target.closest('.whatsapp-message-bubble')) {
+                        menu.style.display = 'none';
+                        this.removeSelectionHighlight();
                     }
                 });
             },
@@ -679,7 +807,7 @@
                     this.generateSampleChats();
                 } catch (e) { 
                     console.error(e);
-                    this.renderChatList(); // Render ulang jika error
+                    this.renderChatList();
                 }
             },
 
@@ -769,6 +897,139 @@
                 msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.sendMessage(); });
             },
 
+            // --- MENU LOGIC START ---
+
+            showMenu(e, messageId, bubbleEl) {
+                e.stopPropagation(); // Mencegah event bubbling
+
+                this.state.selectedMessageId = messageId;
+                this.highlightBubble(bubbleEl);
+
+                const menu = document.getElementById('message-menu');
+                
+                // Posisi Menu
+                // Kita gunakan posisi relatif terhadap container utama atau fixed
+                // Agar sederhana dan responsif, kita letakkan sedikit di atas atau di samping jari klik
+                const rect = bubbleEl.getBoundingClientRect();
+                const containerRect = document.querySelector('.whatsapp-chat-window').getBoundingClientRect();
+                
+                // Default posisi
+                let top = rect.top - containerRect.top - 100; 
+                let left = rect.left - containerRect.left - 50;
+
+                // Batas agar tidak keluar layar (sederhana)
+                if (top < 10) top = rect.bottom - containerRect.top + 10;
+                if (left < 10) left = 10;
+                
+                menu.style.top = `${top}px`;
+                menu.style.left = `${left}px`;
+                menu.style.display = 'flex';
+            },
+
+            highlightBubble(bubbleEl) {
+                document.querySelectorAll('.whatsapp-message-bubble').forEach(el => el.classList.remove('selected'));
+                if(bubbleEl) bubbleEl.classList.add('selected');
+            },
+
+            removeSelectionHighlight() {
+                document.querySelectorAll('.whatsapp-message-bubble').forEach(el => el.classList.remove('selected'));
+            },
+
+            handleMenuAction(action) {
+                const menu = document.getElementById('message-menu');
+                menu.style.display = 'none';
+                
+                const chatId = this.state.activeChatId;
+                const msgId = this.state.selectedMessageId;
+                const msgObj = this.state.messages[chatId].find(m => m.id === msgId);
+
+                if (!msgObj) return;
+
+                switch (action) {
+                    case 'delete':
+                        this.deleteMessage(chatId, msgId);
+                        break;
+                    case 'edit':
+                        this.editMessage(chatId, msgId, msgObj.text);
+                        break;
+                    case 'reply':
+                        this.enableReplyMode(msgObj);
+                        break;
+                    case 'forward':
+                        this.forwardMessage(msgObj.text);
+                        break;
+                }
+                this.removeSelectionHighlight();
+            },
+
+            async deleteMessage(chatId, msgId) {
+                // Filter out message
+                const updatedMessages = this.state.messages[chatId].filter(m => m.id !== msgId);
+                this.state.messages[chatId] = updatedMessages;
+                this.renderMessages(chatId);
+
+                // Update Firestore (overwrite for simplicity in array of objects)
+                try {
+                    await db.collection('chats').doc(chatId).update({
+                        messages: updatedMessages,
+                        lastUpdated: new Date()
+                    });
+                } catch (e) {
+                    console.error("Gagal menghapus:", e);
+                    alert("Gagal menghapus pesan");
+                }
+            },
+
+            async editMessage(chatId, msgId, currentText) {
+                const newText = prompt("Edit pesan:", currentText);
+                if (newText && newText.trim() !== "") {
+                    const msgIndex = this.state.messages[chatId].findIndex(m => m.id === msgId);
+                    if (msgIndex > -1) {
+                        this.state.messages[chatId][msgIndex].text = newText;
+                        this.state.messages[chatId][msgIndex].edited = true; // Tandai diedit
+                        this.renderMessages(chatId);
+
+                        // Update Firestore
+                        try {
+                            await db.collection('chats').doc(chatId).update({
+                                messages: this.state.messages[chatId],
+                                lastUpdated: new Date()
+                            });
+                        } catch (e) { console.error("Gagal edit:", e); }
+                    }
+                }
+            },
+
+            enableReplyMode(msgObj) {
+                this.state.replyingTo = msgObj;
+                const replyBox = document.getElementById('reply-box');
+                const previewText = document.getElementById('reply-preview-text');
+                
+                replyBox.classList.add('active');
+                previewText.textContent = msgObj.text;
+                document.getElementById('whatsapp-message-input').focus();
+            },
+
+            closeReply() {
+                this.state.replyingTo = null;
+                document.getElementById('reply-box').classList.remove('active');
+            },
+
+            forwardMessage(text) {
+                // Fitur teruskan sederhana: copy teks ke input
+                const input = document.getElementById('whatsapp-message-input');
+                input.value = text;
+                input.focus();
+                
+                // Tampilkan tombol kirim
+                document.getElementById('whatsapp-send-btn').style.display = 'flex';
+                document.getElementById('whatsapp-mic-icon').style.display = 'none';
+                
+                // Opsional: Tampilkan toast atau feedback
+                // alert("Pesan disalin ke kolom input. Pilih kontak lain untuk mengirim.");
+            },
+            // --- MENU LOGIC END ---
+
             showMembersListInstant() {
                 this.showScreen('welcome');
                 document.getElementById('members-list').classList.add('active');
@@ -835,6 +1096,10 @@
                 this.state.activeChatId = chat.id;
                 this.loadMessages(chat.id);
                 setTimeout(() => document.getElementById('whatsapp-message-input').focus(), 300);
+                
+                // Tutup menu jika terbuka
+                document.getElementById('message-menu').style.display = 'none';
+                this.closeReply();
             },
 
             showScreen(screenName) {
@@ -861,10 +1126,7 @@
             loadMessages(chatId) {
                 const container = document.getElementById('whatsapp-messages');
                 if (!this.state.messages[chatId]) {
-                    this.state.messages[chatId] = [
-                       // { text: 'Halo!', senderId: 'other', timestamp: new Date() },
-                        //{ text: 'Hai, apa kabar?', senderId: 'me', timestamp: new Date() }
-                    ];
+                    this.state.messages[chatId] = [];
                 }
                 this.renderMessages(chatId);
 
@@ -889,19 +1151,50 @@
                     bubbleContainer.style.width = '100%';
                     container.appendChild(bubbleContainer);
                 }
+                
+                // Simpan scroll position untuk auto-scroll hanya jika user di paling bawah
+                const isAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+
                 bubbleContainer.innerHTML = '';
 
                 msgs.forEach(msg => {
                     const isMe = msg.senderId === auth.currentUser.uid || msg.senderId === 'me';
                     const el = document.createElement('div');
                     el.className = `whatsapp-message ${isMe ? 'sent' : 'received'}`;
+                    
+                    // Menangani pesan reply (jika ada replyTo data)
+                    let replyHtml = '';
+                    if (msg.replyTo && msg.replyTo.text) {
+                        replyHtml = `<span class="reply-context">"${msg.replyTo.text}"</span>`;
+                    }
+
+                    // Menangani pesan edit (jika ada edited flag)
+                    const timeHtml = `<div class="whatsapp-message-time">${msg.edited ? 'Diedit ' : ''}10:00</div>`;
+
+                    // Tambahkan data-id untuk tracking klik menu
+                    // Menggunakan div pembungkus bubble untuk memisahkan area klik bubble dan waktu
                     el.innerHTML = `
-                        <div class="whatsapp-message-bubble">${msg.text}</div>
-                        <div class="whatsapp-message-time">10:00</div>
+                        <div class="whatsapp-message-bubble" data-id="${msg.id}">
+                            ${replyHtml}
+                            ${msg.text}
+                            ${timeHtml}
+                        </div>
                     `;
+                    
+                    // Event Listener untuk Menu
+                    const bubble = el.querySelector('.whatsapp-message-bubble');
+                    bubble.addEventListener('click', (e) => {
+                        // Hanya milik kita yang bisa diedit/dihapus (opsional, di sini semua pesan bisa diklik untuk menu)
+                        // if (isMe) ... (uncomment jika ingin batasi fitur edit/hapus hanya milik sendiri)
+                        this.showMenu(e, msg.id, bubble);
+                    });
+
                     bubbleContainer.appendChild(el);
                 });
-                container.scrollTop = container.scrollHeight;
+                
+                if (isAtBottom) {
+                    container.scrollTop = container.scrollHeight;
+                }
             },
 
             async sendMessage() {
@@ -909,16 +1202,35 @@
                 const text = input.value.trim();
                 if (!text || !this.state.activeChatId) return;
 
-                const newMsg = { text: text, senderId: auth.currentUser.uid, timestamp: new Date() };
+                // Siapkan objek pesan
+                const newMsg = { 
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9), // ID Unik
+                    text: text, 
+                    senderId: auth.currentUser.uid, 
+                    timestamp: new Date() 
+                };
+
+                // Jika sedang mode balas
+                if (this.state.replyingTo) {
+                    newMsg.replyTo = {
+                        id: this.state.replyingTo.id,
+                        text: this.state.replyingTo.text
+                    };
+                    this.closeReply();
+                }
+
+                // Update lokal langsung (optimistic UI)
                 this.state.messages[this.state.activeChatId].push(newMsg);
                 this.renderMessages(this.state.activeChatId);
+                
                 input.value = '';
                 document.getElementById('whatsapp-send-btn').style.display = 'none';
                 document.getElementById('whatsapp-mic-icon').style.display = 'block';
 
+                // Kirim ke Firebase
                 try {
                     await db.collection('chats').doc(this.state.activeChatId).set({
-                        messages: firebase.firestore.FieldValue.arrayUnion(newMsg),
+                        messages: this.state.messages[this.state.activeChatId],
                         lastUpdated: new Date()
                     }, { merge: true });
                 } catch (e) { console.error(e); }
@@ -928,7 +1240,6 @@
                 const list = document.getElementById('whatsapp-chat-list');
                 list.innerHTML = '';
                 
-                // Tampilan langsung kosong tanpa loading
                 if (this.state.chats.length === 0) {
                     list.innerHTML = '<p style="text-align:center; color:#667781; padding:20px; font-size:14px;">Belum ada percakapan.</p>';
                     return;
