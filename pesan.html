@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Pesan - BGT PRO</title>
     
     <!-- External Libraries -->
@@ -21,7 +21,6 @@
     <style>
         /* CSS Variables */
         :root {
-            --primary-color: #4285f4;
             --whatsapp-bg: #f0f2f5;
             --whatsapp-sidebar: #111b21;
             --whatsapp-chat-bg: #efeae2;
@@ -31,10 +30,9 @@
             --whatsapp-dark: #202c33;
             --whatsapp-header: #0b141a;
             --whatsapp-hover: #182229;
-            --whatsapp-filter-active: #8696a0;
         }
         
-        /* Global Styles */
+        /* Global Styles - NO MARGIN/PADDING */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -42,14 +40,16 @@
             background-color: #000; 
             color: var(--whatsapp-dark); 
             width: 100vw;
-            height: 100vh;
+            /* Layout Fleksibel Mengikuti Perangkat */
+            height: 100vh; 
+            height: 100dvh; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             overflow: hidden; 
         }
         
-        /* Phone Container - Full Screen */
+        /* Phone Container - FULL SIZE FLEKSIBEL */
         .phone-container { 
             width: 100%; 
             height: 100%; 
@@ -57,7 +57,6 @@
             position: relative; 
             overflow: hidden; 
             display: flex;
-            border-radius: 0;
         }
         
         .whatsapp-container {
@@ -96,7 +95,7 @@
         
         .whatsapp-chat-window.active {
             display: flex;
-            animation: slideIn 0.2s ease-out;
+            animation: slideIn 0.1s ease-out; /* Cepat */
         }
         
         @keyframes slideIn {
@@ -115,7 +114,7 @@
             left: 0;
             width: 100%;
             z-index: 30;
-            animation: fadeIn 0.2s;
+            animation: fadeIn 0.1s; /* Cepat */
         }
         
         .members-list.active {
@@ -152,9 +151,10 @@
             flex-grow: 1;
         }
         
-        /* FIX GAMBAR PROFIL: TIDAK BESAR, TETAP KECIL */
-        #whatsapp-chat-profile-img, 
-        #whatsapp-sidebar-profile-pic {
+        /* PASTIKAN FOTO PROFIL KECIL (TIDAK BESAR) */
+        .whatsapp-chat-header img, 
+        .whatsapp-user-profile img,
+        .whatsapp-profile-header img {
             width: 40px !important;
             height: 40px !important;
             border-radius: 50% !important;
@@ -165,7 +165,6 @@
             flex-shrink: 0;
         }
 
-        /* Gambar profil di halaman detail profil (bisa sedikit lebih besar) */
         #whatsapp-profile-pic-large {
             width: 100px !important;
             height: 100px !important;
@@ -367,6 +366,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
         
         .whatsapp-chat-input i {
@@ -505,8 +505,9 @@
             <aside class="whatsapp-sidebar" id="whatsapp-sidebar">
                 <header class="whatsapp-sidebar-header">
                     <div class="whatsapp-user-profile" id="whatsapp-user-profile">
-                        <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-sidebar-profile-pic">
-                        <span class="whatsapp-user-profile-name" id="whatsapp-sidebar-username">Memuat...</span>
+                        <!-- Placeholder Default (Agar tidak kosong/tidak loading) -->
+                        <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-sidebar-profile-pic">
+                        <span class="whatsapp-user-profile-name" id="whatsapp-sidebar-username">Pengguna</span>
                     </div>
                     <div class="icons">
                         <i class="fas fa-sign-out-alt" id="btn-logout"></i>
@@ -523,18 +524,18 @@
                     <input type="text" placeholder="Cari..." id="whatsapp-search-input">
                 </div>
                 
-                <!-- Chat List - Tanpa loading spinner, langsung kosong jika data belum ada -->
+                <!-- Chat List: KOSONG SAAT AWAL (Tanpa Loading) -->
                 <div class="whatsapp-chat-list" id="whatsapp-chat-list">
-                    <p style="text-align:center; color:#667781; padding:20px; font-size:14px;">Tidak ada percakapan baru</p>
+                    <!-- Akan diisi JS -->
                 </div>
             </aside>
 
             <!-- Chat Area -->
             <main class="whatsapp-chat-window" id="whatsapp-chat-window">
                 <header class="whatsapp-chat-header">
-                    <!-- Tombol Kembali: Menuju pesan.html -->
+                    <!-- Tombol Kembali: Refresh ke pesan.html -->
                     <i class="fas fa-arrow-left whatsapp-back-btn" id="whatsapp-back-btn"></i>
-                    <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-chat-profile-img">
+                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-chat-profile-img">
                     <div class="info">
                         <h3 id="whatsapp-chat-name">BGT PRO</h3>
                         <p id="whatsapp-chat-status">Aplikasi Pesan Real-Time</p>
@@ -558,10 +559,10 @@
                 <div class="whatsapp-messages whatsapp-profile-view" id="whatsapp-profile-view">
                     <div class="whatsapp-profile-content">
                         <div class="whatsapp-profile-header">
-                            <img src="https://picsum.photos/seed/loading/100/100.jpg" alt="Profile" id="whatsapp-profile-pic-large">
-                            <h2 id="whatsapp-profile-username">Memuat...</h2>
+                            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" id="whatsapp-profile-pic-large">
+                            <h2 id="whatsapp-profile-username">Pengguna</h2>
                             <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center; justify-content: center;">
-                                <p id="whatsapp-profile-role" style="color: #667781;">Memuat...</p>
+                                <p id="whatsapp-profile-role" style="color: #667781;">Anggota</p>
                                 <svg id="whatsapp-barcode"></svg>
                             </div>
                         </div>
@@ -602,7 +603,7 @@
                     <h3>Anggota Terdaftar</h3>
                 </header>
                 <div class="members-content" id="members-content">
-                    <p style="text-align:center; color:#667781; padding:20px;">Memuat anggota...</p>
+                    <!-- Akan diisi JS -->
                 </div>
             </div>
         </div>
@@ -635,11 +636,15 @@
             },
 
             init() {
-                // Cek session, langsung redirect jika tidak ada (tanpa loading)
+                // Cek session tanpa loading, langsung redirect jika tidak ada
                 if (localStorage.getItem('bgtProSession') !== 'active') {
                     window.location.href = 'dashboard_anggota.html';
                     return;
                 }
+
+                // Render state awal kosong (Instant view)
+                this.renderChatList();
+                this.renderMembersContent();
 
                 auth.onAuthStateChanged(user => {
                     if (user) {
@@ -674,8 +679,7 @@
                     this.generateSampleChats();
                 } catch (e) { 
                     console.error(e);
-                    // Jika error, kosongkan list
-                    this.renderChatList();
+                    this.renderChatList(); // Render ulang jika error
                 }
             },
 
@@ -696,12 +700,13 @@
             updateProfileUI() {
                 const user = this.state.currentUserData;
                 if (!user) return;
-                const imgUrl = user.profilePicUrl || 'https://picsum.photos/seed/default/100/100.jpg';
+                
+                const imgUrl = user.profilePicUrl || `https://ui-avatars.com/api/?name=${user.username || 'User'}&background=random`;
                 
                 document.getElementById('whatsapp-sidebar-profile-pic').src = imgUrl;
                 document.getElementById('whatsapp-profile-pic-large').src = imgUrl;
-                document.getElementById('whatsapp-sidebar-username').textContent = user.username || 'User';
-                document.getElementById('whatsapp-profile-username').textContent = user.username || 'User';
+                document.getElementById('whatsapp-sidebar-username').textContent = user.username || 'Pengguna';
+                document.getElementById('whatsapp-profile-username').textContent = user.username || 'Pengguna';
                 document.getElementById('whatsapp-profile-role').textContent = user.role || 'Anggota';
                 document.getElementById('whatsapp-detail-email').textContent = user.email || '-';
                 document.getElementById('whatsapp-detail-phone').textContent = user.phone || '-';
@@ -722,33 +727,23 @@
                 const sendBtn = document.getElementById('whatsapp-send-btn');
                 const micIcon = document.getElementById('whatsapp-mic-icon');
 
-                // 1. Profil Sidebar -> Profil View
-                userProfile.addEventListener('click', () => {
-                    this.showScreen('profile');
-                });
+                userProfile.addEventListener('click', () => this.showScreen('profile'));
 
-                // 2. Tombol Lihat Anggota -> List Anggota
-                viewMembersBtn.addEventListener('click', () => {
-                    this.showMembersListInstant();
-                });
+                viewMembersBtn.addEventListener('click', () => this.showMembersListInstant());
 
-                // 3. Back di Anggota -> Dashboard
                 membersBackBtn.addEventListener('click', () => {
                     window.location.href = 'dashboard_anggota.html';
                 });
 
-                // 4. Back di Chat -> Menuju ke pesan.html (Refresh Page)
                 chatBackBtn.addEventListener('click', () => {
                     window.location.href = 'pesan.html';
                 });
 
-                // Logout
                 logoutBtn.addEventListener('click', () => {
                     localStorage.removeItem('bgtProSession');
                     window.location.href = 'dashboard_anggota.html';
                 });
 
-                // Filter & Search
                 filterTabs.forEach(tab => {
                     tab.addEventListener('click', () => {
                         filterTabs.forEach(t => t.classList.remove('active'));
@@ -760,7 +755,6 @@
 
                 searchInput.addEventListener('input', (e) => this.renderChatList(e.target.value));
 
-                // Chat Input Logic
                 msgInput.addEventListener('input', (e) => {
                     if (e.target.value.trim()) {
                         sendBtn.style.display = 'flex';
@@ -828,8 +822,6 @@
                 const chatWindow = document.getElementById('whatsapp-chat-window');
                 document.getElementById('whatsapp-chat-name').textContent = chat.name;
                 document.getElementById('whatsapp-chat-status').textContent = 'Online';
-                
-                // Update gambar header chat
                 const imgElement = document.getElementById('whatsapp-chat-profile-img');
                 imgElement.src = chat.avatar;
 
@@ -843,13 +835,6 @@
                 this.state.activeChatId = chat.id;
                 this.loadMessages(chat.id);
                 setTimeout(() => document.getElementById('whatsapp-message-input').focus(), 300);
-            },
-
-            closeChat() {
-                const chatWindow = document.getElementById('whatsapp-chat-window');
-                chatWindow.classList.remove('active');
-                this.state.activeChatId = null;
-                this.showScreen('welcome');
             },
 
             showScreen(screenName) {
@@ -943,8 +928,9 @@
                 const list = document.getElementById('whatsapp-chat-list');
                 list.innerHTML = '';
                 
+                // Tampilan langsung kosong tanpa loading
                 if (this.state.chats.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#667781; padding:20px; font-size:14px;">Tidak ada percakapan</p>';
+                    list.innerHTML = '<p style="text-align:center; color:#667781; padding:20px; font-size:14px;">Belum ada percakapan.</p>';
                     return;
                 }
 
@@ -955,7 +941,7 @@
                 });
 
                 if (filtered.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#667781; padding:20px; font-size:14px;">Tidak ditemukan</p>';
+                    list.innerHTML = '<p style="text-align:center; color:#667781; padding:20px; font-size:14px;">Tidak ditemukan.</p>';
                     return;
                 }
 
