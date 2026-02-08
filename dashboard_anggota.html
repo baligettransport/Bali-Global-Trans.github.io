@@ -1514,7 +1514,7 @@
                     <div class="carousel-indicators" id="carouselIndicators"></div>
                 </div>
                 
-                <!-- Transport Cards Section - MODIFIED -->
+                <!-- Transport Cards Section - UPDATED -->
                 <div class="transport-section fade-in-up" style="animation-delay: 0.1s;">
                     <div class="transport-section-title">
                         <i class="fas fa-car"></i>
@@ -1791,7 +1791,7 @@
                 deferredPrompt: null
             },
             
-            // Transport Apps Configuration - FIXED FOR GRAB DRIVER
+            // Transport Apps Configuration - UPDATED WITH GRAB DRIVER URLS
             transportApps: {
                 grab: {
                     name: 'Grab',
@@ -1799,25 +1799,30 @@
                     packages: ['com.grabtaxi.passenger', 'com.grabtaxi.driver'],
                     // Multiple URL schemes to try
                     urls: ['grab://', 'grabtaxi://', 'grabdriver://'],
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.grabtaxi.passenger'
+                    // Multiple fallback URLs including Grab Driver pages
+                    fallbackUrls: [
+                        'https://play.google.com/store/apps/details?id=com.grabtaxi.passenger',
+                        'https://grab.com/driver/id-id',
+                        'https://help.grab.com/driver/id-id'
+                    ]
                 },
                 gojek: {
                     name: 'Gojek',
                     packages: ['com.gojek.app'],
                     urls: ['gojek://'],
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.gojek.app'
+                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.gojek.app']
                 },
                 maxim: {
                     name: 'Maxim',
                     packages: ['com.maxim.driver', 'com.maxim.passenger'],
                     urls: ['maxim://'],
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.maxim.driver'
+                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.maxim.driver']
                 },
                 indriver: {
                     name: 'inDriver',
                     packages: ['com.indriver'],
                     urls: ['indriver://'],
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.indriver'
+                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.indriver']
                 }
             },
             
@@ -2040,7 +2045,7 @@
                 this.loadActivityData();
             },
             
-            // Open Transport App - FIXED AND IMPROVED
+            // Open Transport App - ENHANCED WITH GRAB DRIVER URLS
             openTransportApp(appName) {
                 const app = this.transportApps[appName];
                 if (!app) {
@@ -2055,12 +2060,11 @@
                 let appOpened = false;
                 const startTime = Date.now();
                 
-                // Method 1: Try all URL schemes
+                // Method 1: Try all URL schemes with iframe
                 for (const url of app.urls) {
                     try {
                         console.log(`Trying URL scheme: ${url}`);
                         
-                        // Create a hidden iframe to try opening the app
                         const iframe = document.createElement('iframe');
                         iframe.style.display = 'none';
                         iframe.src = url;
@@ -2072,15 +2076,6 @@
                                 document.body.removeChild(iframe);
                             }
                         }, 1000);
-                        
-                        // Check if page lost focus (app opened)
-                        setTimeout(() => {
-                            if (document.hidden || document.webkitHidden) {
-                                console.log(`${app.name} opened successfully via ${url}`);
-                                appOpened = true;
-                                return;
-                            }
-                        }, 500);
                         
                     } catch (error) {
                         console.error(`Error with ${url}:`, error);
@@ -2114,12 +2109,20 @@
                     }
                 }, 300);
                 
-                // Method 4: Final fallback - open Play Store if app not opened
+                // Method 4: Final fallback - try all fallback URLs
                 setTimeout(() => {
                     if (!appOpened && !document.hidden && !document.webkitHidden) {
-                        console.log(`${app.name} not found, opening Play Store`);
-                        window.open(app.fallbackUrl, '_blank');
-                        this.showToast(`${app.name} tidak ditemukan. Membuka Play Store...`, 'warning');
+                        console.log(`${app.name} not found, trying fallback URLs`);
+                        
+                        // Try first fallback URL (usually Play Store)
+                        window.open(app.fallbackUrls[0], '_blank');
+                        
+                        // If it's Grab, also show option to open Grab Driver page
+                        if (appName === 'grab' && app.fallbackUrls.length > 1) {
+                            setTimeout(() => {
+                                this.showGrabDriverOptions(app.fallbackUrls);
+                            }, 1000);
+                        }
                     }
                 }, 1000);
                 
@@ -2137,6 +2140,38 @@
                 setTimeout(() => {
                     document.removeEventListener('visibilitychange', visibilityHandler);
                 }, 3000);
+            },
+            
+            // Show Grab Driver Options - NEW FUNCTION
+            showGrabDriverOptions(urls) {
+                const modal = document.getElementById('modal');
+                document.getElementById('modalTitle').textContent = 'Grab Driver Tidak Ditemukan';
+                document.getElementById('modalDetailTitle').textContent = 'Pilih Opsi:';
+                
+                let optionsHTML = '';
+                urls.forEach((url, index) => {
+                    if (index === 0) {
+                        optionsHTML += `<button class="btn btn-primary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
+                            <i class="fas fa-download"></i> Install dari Play Store
+                        </button>`;
+                    } else if (url.includes('grab.com/driver')) {
+                        optionsHTML += `<button class="btn btn-secondary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
+                            <i class="fas fa-globe"></i> Buka Halaman Grab Driver
+                        </button>`;
+                    } else if (url.includes('help.grab.com')) {
+                        optionsHTML += `<button class="btn btn-secondary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
+                            <i class="fas fa-question-circle"></i> Bantuan Grab Driver
+                        </button>`;
+                    }
+                });
+                
+                document.getElementById('modalDetailDesc').innerHTML = optionsHTML;
+                
+                // Hide modal action button
+                document.querySelector('.modal-action').style.display = 'none';
+                
+                modal.classList.add('active');
+                document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
             // Load Kas Data
@@ -3637,6 +3672,8 @@
             closeModal() {
                 document.getElementById('modal').classList.remove('active');
                 document.querySelector('.app-container').style.overflow = 'auto';
+                // Restore modal action button visibility
+                document.querySelector('.modal-action').style.display = 'block';
             },
             
             // Handle Modal Action
