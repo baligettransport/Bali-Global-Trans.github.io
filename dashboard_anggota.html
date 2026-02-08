@@ -1791,35 +1791,33 @@
                 deferredPrompt: null
             },
             
-            // Transport Apps Configuration - UPDATED
+            // Transport Apps Configuration - FIXED FOR GRAB DRIVER
             transportApps: {
                 grab: {
                     name: 'Grab',
-                    package: 'com.grabtaxi.passenger',
-                    url: 'grab://',
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.grabtaxi.passenger',
-                    alternativeUrl: 'https://grab.com'
+                    // Multiple package names to try
+                    packages: ['com.grabtaxi.passenger', 'com.grabtaxi.driver'],
+                    // Multiple URL schemes to try
+                    urls: ['grab://', 'grabtaxi://', 'grabdriver://'],
+                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.grabtaxi.passenger'
                 },
                 gojek: {
                     name: 'Gojek',
-                    package: 'com.gojek.app',
-                    url: 'gojek://',
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.gojek.app',
-                    alternativeUrl: 'https://gojek.com'
+                    packages: ['com.gojek.app'],
+                    urls: ['gojek://'],
+                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.gojek.app'
                 },
                 maxim: {
                     name: 'Maxim',
-                    package: 'com.maxim.driver',
-                    url: 'maxim://',
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.maxim.driver',
-                    alternativeUrl: 'https://maxim.com'
+                    packages: ['com.maxim.driver', 'com.maxim.passenger'],
+                    urls: ['maxim://'],
+                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.maxim.driver'
                 },
                 indriver: {
                     name: 'inDriver',
-                    package: 'com.indriver',
-                    url: 'indriver://',
-                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.indriver',
-                    alternativeUrl: 'https://indriver.com'
+                    packages: ['com.indriver'],
+                    urls: ['indriver://'],
+                    fallbackUrl: 'https://play.google.com/store/apps/details?id=com.indriver'
                 }
             },
             
@@ -2042,7 +2040,7 @@
                 this.loadActivityData();
             },
             
-            // Open Transport App - IMPROVED
+            // Open Transport App - FIXED AND IMPROVED
             openTransportApp(appName) {
                 const app = this.transportApps[appName];
                 if (!app) {
@@ -2050,63 +2048,95 @@
                     return;
                 }
                 
-                console.log(`Attempting to open ${app.name}...`);
+                console.log(`Opening ${app.name}...`);
                 this.showToast(`Membuka ${app.name}...`, 'info');
                 
-                // Store the current time to check if app was opened
-                const startTime = new Date().getTime();
+                // Track if app was opened
+                let appOpened = false;
+                const startTime = Date.now();
                 
-                // Method 1: Try direct URL scheme
-                try {
-                    console.log(`Trying URL scheme: ${app.url}`);
-                    window.location.href = app.url;
-                    
-                    // Method 2: After a short delay, try intent for Android
-                    setTimeout(() => {
-                        // Check if page lost focus (app might have opened)
-                        if (document.hidden || document.webkitHidden) {
-                            console.log(`${app.name} opened successfully via URL scheme`);
-                            return;
-                        }
+                // Method 1: Try all URL schemes
+                for (const url of app.urls) {
+                    try {
+                        console.log(`Trying URL scheme: ${url}`);
                         
-                        // Try Android intent
-                        console.log(`Trying intent for ${app.package}`);
-                        const intentUrl = `intent://${app.package}#Intent;package=${app.package};scheme=${app.url.replace('://', '')};end;`;
-                        window.location.href = intentUrl;
+                        // Create a hidden iframe to try opening the app
+                        const iframe = document.createElement('iframe');
+                        iframe.style.display = 'none';
+                        iframe.src = url;
+                        document.body.appendChild(iframe);
                         
-                        // Method 3: Final fallback - check again and open Play Store if needed
+                        // Remove iframe after a short time
                         setTimeout(() => {
-                            if (!document.hidden && !document.webkitHidden) {
-                                console.log(`${app.name} not found, opening Play Store`);
-                                window.open(app.fallbackUrl, '_blank');
-                                this.showToast(`${app.name} tidak ditemukan. Membuka Play Store...`, 'warning');
+                            if (iframe.parentNode) {
+                                document.body.removeChild(iframe);
                             }
                         }, 1000);
-                    }, 500);
-                    
-                } catch (error) {
-                    console.error(`Error opening ${app.name}:`, error);
-                    // Fallback to Play Store
-                    window.open(app.fallbackUrl, '_blank');
-                    this.showToast(`Gagal membuka ${app.name}. Membuka Play Store...`, 'warning');
+                        
+                        // Check if page lost focus (app opened)
+                        setTimeout(() => {
+                            if (document.hidden || document.webkitHidden) {
+                                console.log(`${app.name} opened successfully via ${url}`);
+                                appOpened = true;
+                                return;
+                            }
+                        }, 500);
+                        
+                    } catch (error) {
+                        console.error(`Error with ${url}:`, error);
+                    }
                 }
                 
-                // Alternative method using iframe (more reliable in some cases)
-                try {
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.src = app.url;
-                    document.body.appendChild(iframe);
-                    
-                    // Clean up iframe after attempt
-                    setTimeout(() => {
-                        if (iframe.parentNode) {
-                            document.body.removeChild(iframe);
+                // Method 2: Try window.location directly
+                setTimeout(() => {
+                    if (!appOpened) {
+                        try {
+                            console.log(`Trying window.location with ${app.urls[0]}`);
+                            window.location.href = app.urls[0];
+                        } catch (error) {
+                            console.error('Window location failed:', error);
                         }
-                    }, 2000);
-                } catch (error) {
-                    console.error('Iframe method failed:', error);
-                }
+                    }
+                }, 100);
+                
+                // Method 3: Try Android Intent for all packages
+                setTimeout(() => {
+                    if (!appOpened) {
+                        for (const pkg of app.packages) {
+                            try {
+                                console.log(`Trying intent for ${pkg}`);
+                                const intentUrl = `intent://${pkg}#Intent;package=${pkg};scheme=${app.urls[0].replace('://', '')};end;`;
+                                window.location.href = intentUrl;
+                            } catch (error) {
+                                console.error(`Intent failed for ${pkg}:`, error);
+                            }
+                        }
+                    }
+                }, 300);
+                
+                // Method 4: Final fallback - open Play Store if app not opened
+                setTimeout(() => {
+                    if (!appOpened && !document.hidden && !document.webkitHidden) {
+                        console.log(`${app.name} not found, opening Play Store`);
+                        window.open(app.fallbackUrl, '_blank');
+                        this.showToast(`${app.name} tidak ditemukan. Membuka Play Store...`, 'warning');
+                    }
+                }, 1000);
+                
+                // Listen for visibility change to detect if app opened
+                const visibilityHandler = () => {
+                    if (document.hidden || document.webkitHidden) {
+                        appOpened = true;
+                        console.log(`${app.name} opened successfully`);
+                        document.removeEventListener('visibilitychange', visibilityHandler);
+                    }
+                };
+                document.addEventListener('visibilitychange', visibilityHandler);
+                
+                // Clean up after 3 seconds
+                setTimeout(() => {
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                }, 3000);
             },
             
             // Load Kas Data
