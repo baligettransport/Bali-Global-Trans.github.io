@@ -1791,19 +1791,18 @@
                 deferredPrompt: null
             },
             
-            // Transport Apps Configuration - UPDATED WITH GRAB DRIVER URLS
+            // Transport Apps Configuration - UPDATED WITH NEW GRAB LINK
             transportApps: {
                 grab: {
                     name: 'Grab',
-                    // Multiple package names to try
-                    packages: ['com.grabtaxi.passenger', 'com.grabtaxi.driver'],
-                    // Multiple URL schemes to try
-                    urls: ['grab://', 'grabtaxi://', 'grabdriver://'],
-                    // Multiple fallback URLs including Grab Driver pages
+                    // Prioritize driver package
+                    packages: ['com.grabtaxi.driver'], 
+                    // Try to open driver intent directly (extracted from af_dp param in URL)
+                    urls: ['grabdriver://open'], 
+                    // Fallback to the new OneLink provided by user if direct intent fails
                     fallbackUrls: [
-                        'https://play.google.com/store/apps/details?id=com.grabtaxi.passenger',
-                        'https://grab.com/driver/id-id',
-                        'https://help.grab.com/driver/id-id'
+                        'https://grabdriver.onelink.me/iF8S?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=grab_website&af_sub1=open_app&af_dp=grabdriver%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
+                        'https://play.google.com/store/apps/details?id=com.grabtaxi.driver'
                     ]
                 },
                 gojek: {
@@ -2045,7 +2044,7 @@
                 this.loadActivityData();
             },
             
-            // Open Transport App - ENHANCED WITH GRAB DRIVER URLS
+            // Open Transport App - LOGIC UPDATED TO HANDLE NEW LINK
             openTransportApp(appName) {
                 const app = this.transportApps[appName];
                 if (!app) {
@@ -2114,15 +2113,8 @@
                     if (!appOpened && !document.hidden && !document.webkitHidden) {
                         console.log(`${app.name} not found, trying fallback URLs`);
                         
-                        // Try first fallback URL (usually Play Store)
+                        // Try first fallback URL (For Grab, this is now the OneLink)
                         window.open(app.fallbackUrls[0], '_blank');
-                        
-                        // If it's Grab, also show option to open Grab Driver page
-                        if (appName === 'grab' && app.fallbackUrls.length > 1) {
-                            setTimeout(() => {
-                                this.showGrabDriverOptions(app.fallbackUrls);
-                            }, 1000);
-                        }
                     }
                 }, 1000);
                 
@@ -2142,7 +2134,7 @@
                 }, 3000);
             },
             
-            // Show Grab Driver Options - NEW FUNCTION
+            // Show Grab Driver Options
             showGrabDriverOptions(urls) {
                 const modal = document.getElementById('modal');
                 document.getElementById('modalTitle').textContent = 'Grab Driver Tidak Ditemukan';
@@ -2151,10 +2143,15 @@
                 let optionsHTML = '';
                 urls.forEach((url, index) => {
                     if (index === 0) {
+                        // Option 1 is the OneLink
                         optionsHTML += `<button class="btn btn-primary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
-                            <i class="fas fa-download"></i> Install dari Play Store
+                            <i class="fas fa-external-link-alt"></i> Buka via Grab Driver Link
                         </button>`;
-                    } else if (url.includes('grab.com/driver')) {
+                    } else if (url.includes('play.google.com')) {
+                        optionsHTML += `<button class="btn btn-secondary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
+                            <i class="fab fa-google-play"></i> Install dari Play Store
+                        </button>`;
+                    } else if (url.includes('grab.com')) {
                         optionsHTML += `<button class="btn btn-secondary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
                             <i class="fas fa-globe"></i> Buka Halaman Grab Driver
                         </button>`;
