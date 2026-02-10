@@ -1809,19 +1809,25 @@
                     name: 'Gojek',
                     packages: ['com.gojek.app'],
                     urls: ['gojek://'],
-                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.gojek.app']
+                    fallbackUrls: [
+                        'https://gojek.onelink.me/1234567890?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=gojek_website&af_sub1=open_app&af_dp=gojek%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
+                        'https://play.google.com/store/apps/details?id=com.gojek.app']
                 },
                 maxim: {
                     name: 'Maxim',
                     packages: ['com.maxim.driver', 'com.maxim.passenger'],
                     urls: ['maxim://'],
-                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.maxim.driver']
+                    fallbackUrls: [
+                        'https://maxim.onelink.me/1234567890?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=maxim_website&af_sub1=open_app&af_dp=maxim%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
+                        'https://play.google.com/store/apps/details?id=com.maxim.driver']
                 },
                 indriver: {
                     name: 'inDriver',
                     packages: ['com.indriver'],
                     urls: ['indriver://'],
-                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.indriver']
+                    fallbackUrls: [
+                        'https://indriver.onelink.me/1234567890?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=indriver_website&af_sub1=open_app&af_dp=indriver%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
+                        'https://play.google.com/store/apps/details?id=com.indriver']
                 }
             },
             
@@ -2171,7 +2177,7 @@
                 document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
-            // Load Kas Data
+            // Load Kas Data - FIXED LOGIC
             async loadKasData() {
                 const kasContent = document.getElementById('kasContent');
                 try {
@@ -2183,11 +2189,15 @@
                         const data = doc.data();
                         totalKas += data.amount || 0;
                         transactions.push({
+                            id: doc.id,
                             description: data.description || 'Transaksi',
                             amount: data.amount || 0,
                             timestamp: data.timestamp ? data.timestamp.toDate() : new Date()
                         });
                     });
+                    
+                    // PERBAIKAN: Urutkan transaksi dari yang terbaru ke terlama
+                    transactions.sort((a, b) => b.timestamp - a.timestamp);
                     
                     kasContent.innerHTML = `
                         <div class="card">
@@ -2218,8 +2228,11 @@
                             <div class="list-group">
                                 ${transactions.slice(0, 5).map(t => `
                                     <div class="list-item">
-                                        <div class="list-item-title">${t.description}</div>
-                                        <div class="list-item-subtitle">Rp ${Math.abs(t.amount).toLocaleString('id-ID')} - ${t.timestamp.toLocaleDateString('id-ID')}</div>
+                                        <div class="list-item-title" style="color: ${t.amount >= 0 ? 'var(--success-color)' : 'var(--danger-color)'};">
+                                            ${t.amount >= 0 ? '+' : ''} Rp ${Math.abs(t.amount).toLocaleString('id-ID')}
+                                        </div>
+                                        <div class="list-item-title" style="font-size: 14px; margin-top: 2px;">${t.description}</div>
+                                        <div class="list-item-subtitle">${t.timestamp.toLocaleDateString('id-ID')} ${t.timestamp.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</div>
                                     </div>
                                 `).join('')}
                                 ${transactions.length === 0 ? '<div class="list-item"><div class="list-item-subtitle">Belum ada transaksi</div></div>' : ''}
@@ -2235,6 +2248,88 @@
                             <p>Terjadi kesalahan saat mengambil data kas</p>
                         </div>
                     `;
+                }
+            },
+            
+            // PERBAIKAN: Fungsi untuk menampilkan modal tambah transaksi (Sebelumnya tidak ada)
+            showAddTransactionModal() {
+                const modal = document.getElementById('modal');
+                
+                // Set judul modal
+                document.getElementById('modalTitle').textContent = 'Tambah Transaksi';
+                document.getElementById('modalDetailTitle').textContent = '';
+                
+                // Sembunyikan gambar modal
+                document.getElementById('modalImage').style.display = 'none';
+                
+                // Inject Form HTML ke dalam modal
+                document.getElementById('modalDetailDesc').innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Jenis Transaksi</label>
+                        <select id="kasTypeInput" class="form-control">
+                            <option value="in">Pemasukan (Kas Masuk)</option>
+                            <option value="out">Pengeluaran (Kas Keluar)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Jumlah (Rp)</label>
+                        <input type="number" id="kasAmountInput" class="form-control" placeholder="Contoh: 50000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Keterangan</label>
+                        <input type="text" id="kasDescInput" class="form-control" placeholder="Contoh: Iuran Bulanan">
+                    </div>
+                    <button class="btn btn-primary btn-block" style="margin-top: 15px;" onclick="app.saveTransaction()">
+                        <i class="fas fa-save"></i> Simpan Transaksi
+                    </button>
+                `;
+                
+                // Sembunyikan tombol modal action default
+                document.querySelector('.modal-action').style.display = 'none';
+                
+                // Tampilkan modal
+                modal.classList.add('active');
+                document.querySelector('.app-container').style.overflow = 'hidden';
+            },
+            
+            // PERBAIKAN: Fungsi untuk menyimpan transaksi ke Firebase (Sebelumnya tidak ada)
+            async saveTransaction() {
+                const type = document.getElementById('kasTypeInput').value;
+                const amount = parseInt(document.getElementById('kasAmountInput').value);
+                const desc = document.getElementById('kasDescInput').value;
+                
+                // Validasi input
+                if (!amount || amount <= 0) {
+                    this.showToast('Masukkan jumlah yang valid', 'warning');
+                    return;
+                }
+                
+                if (!desc) {
+                    this.showToast('Masukkan keterangan transaksi', 'warning');
+                    return;
+                }
+                
+                try {
+                    // Tentukan nilai amount berdasarkan tipe
+                    const finalAmount = type === 'out' ? -Math.abs(amount) : Math.abs(amount);
+                    
+                    // Simpan ke Firestore
+                    await this.db.collection('kas').add({
+                        amount: finalAmount,
+                        description: desc,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        userId: this.auth.currentUser.uid
+                    });
+                    
+                    this.showToast('Transaksi berhasil disimpan!', 'success');
+                    this.closeModal();
+                    
+                    // Refresh data kas
+                    this.loadKasData();
+                    
+                } catch (error) {
+                    console.error("Error saving transaction:", error);
+                    this.showToast('Gagal menyimpan transaksi', 'error');
                 }
             },
             
