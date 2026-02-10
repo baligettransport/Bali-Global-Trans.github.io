@@ -14,7 +14,7 @@
     <meta name="msapplication-TileColor" content="#4285f4">
     
     <!-- Manifest untuk PWA -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJHVCBQUk8iLAogICJzaG9ydF9uYW1lIjogIkJHVCBQUk8iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM0Mjg1ZjQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL3BpY3N1bS5waG90b3Mvc2VlZC9iZ3Rwcm8taWNvbi8xOTIvMTkyLmpwZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9waWNzdW0ucGhvdG9zL3NlZWQvYmd0cHJvLWljb24vNTEyLzUxMi5qcGciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL2pwZWciCiAgICB9CiAgXQp9">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJHVCBQUk8iLAogICJzaG9ydF9uYW1lIjogIkJHVCBQUk8iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM0Mjg1ZjQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL3BpY3N1bS5waG90b3Mvc2VlZC9iZ3Rwcm8taWNvbi8xOTIvMTkyLmpwZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvanBlZyIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9waWNzdW0ucGhvdG9zL3NlZWQvYmd0cHJvLWljb24vNTEyLzUxMi5qcGciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL2pwZWciCiAgICB9CiAgIF0p9">
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" sizes="192x192" href="https://picsum.photos/seed/bgtpro-icon/192/192.jpg">
@@ -551,6 +551,138 @@
             text-align: center;
         }
         
+        /* Kas Category Grid Style - NEW */
+        .kas-category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .kas-category-card {
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-color));
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .kas-category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--shadow-color);
+        }
+        
+        .kas-category-card.active {
+            border: 2px solid var(--primary-color);
+            background: linear-gradient(135deg, #e8f0fe, #fff);
+        }
+        
+        .kas-category-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            opacity: 0.8;
+        }
+        
+        .kas-category-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+        
+        .kas-category-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        /* Promo Modal Style - UPDATED */
+        .modal-promo-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .promo-main-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background-color: var(--bg-color);
+            transition: opacity var(--transition-normal);
+        }
+
+        .promo-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .promo-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-line;
+            flex-grow: 1;
+        }
+
+        .promo-thumbs-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 15px;
+        }
+
+        /* Hide scrollbar for thumbs */
+        .promo-thumbs-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .promo-thumbs-container::-webkit-scrollbar-thumb {
+            background: var(--text-secondary);
+            border-radius: 2px;
+        }
+
+        .promo-thumb {
+            flex: 0 0 auto;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition-normal);
+            opacity: 0.6;
+        }
+
+        .promo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .promo-thumb:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .promo-thumb.active {
+            border-color: var(--primary-color);
+            opacity: 1;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 2px var(--bg-color);
+        }
+        
         /* Bottom Navigation */
         .bottom-nav { 
             position: absolute; 
@@ -666,7 +798,9 @@
         .modal-body { 
             padding: 18px; 
             max-height: 60vh; 
-            overflow-y: auto; 
+            overflow: hidden; /* Changed to hidden to handle internal scroll */
+            display: flex;
+            flex-direction: column;
         }
         
         .modal-image { 
@@ -677,6 +811,7 @@
         
         .modal-details { 
             color: var(--text-color); 
+            overflow-y: auto;
         }
         
         .modal-details h3 { 
@@ -1570,7 +1705,7 @@
                 </div>
             </div>
 
-            <!-- Halaman Kas -->
+            <!-- Halaman Kas - UPDATED UI -->
             <div id="kas-page" class="page-view">
                 <div class="profile-header">
                     <h2>Manajemen Kas</h2>
@@ -1731,13 +1866,8 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <img id="modalImage" class="modal-image" src="" alt="" style="display:none;">
-                    <div class="modal-details">
-                        <h3 id="modalDetailTitle"></h3>
-                        <p id="modalDetailDesc"></p>
-                        <button class="modal-action" onclick="app.handleModalAction()">Tutup</button>
-                    </div>
+                <div class="modal-body" id="modalBodyContent">
+                    <!-- Dynamic Content will be injected here -->
                 </div>
             </div>
         </div>
@@ -1799,7 +1929,7 @@
                     packages: ['com.grabtaxi.driver'], 
                     // Try to open driver intent directly (extracted from af_dp param in URL)
                     urls: ['grabdriver://open'], 
-                    // Fallback to the new OneLink provided by user if direct intent fails
+                    // Fallback to new OneLink provided by user if direct intent fails
                     fallbackUrls: [
                         'https://grabdriver.onelink.me/iF8S?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=grab_website&af_sub1=open_app&af_dp=grabdriver%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
                         'https://play.google.com/store/apps/details?id=com.grabtaxi.driver'
@@ -1808,10 +1938,8 @@
                 gojek: {
                     name: 'Gojek',
                     packages: ['com.gojek.app'],
-                    urls: ['gojek://open'],
-                    fallbackUrls: [
-                        'https://gojek.onelink.me/1234567890?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=gojek_website&af_sub1=open_app&af_dp=gojek%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
-                        'https://play.google.com/store/apps/details?id=com.gojek.app']
+                    urls: ['gojek://'],
+                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.gojek.app']
                 },
                 maxim: {
                     name: 'Maxim',
@@ -1823,9 +1951,7 @@
                     name: 'inDriver',
                     packages: ['com.indriver'],
                     urls: ['indriver://'],
-                    fallbackUrls: [
-                        'https://indriver.onelink.me/1234567890?af_js_web=true&af_ss_ver=2_7_3&pid=organic_web&c=organic_web&af_channel=smart_banner_dax&af_ad=%2Fid%2Fdriver%2Fdrive%2F&af_adset=indriver_website&af_sub1=open_app&af_dp=indriver%3A%2F%2Fopen&af_sub5=organic&af_banner=true&is_retargeting=true',
-                        'https://apps.apple.com/us/app/taxsee-driver/id724279766']
+                    fallbackUrls: ['https://play.google.com/store/apps/details?id=com.indriver']
                 }
             },
             
@@ -1842,7 +1968,10 @@
                 map: null,
                 userMarker: null,
                 locationMarkers: {},
-                locationListener: null
+                locationListener: null,
+                selectedKasCategory: null, // Menyimpan kategori yang dipilih
+                promosList: [], // Menyimpan daftar promo yang sudah diload URLnya
+                activePromoId: null // Menyimpan ID promo yang sedang aktif di modal
             },
             
             // Initialize Application
@@ -2147,7 +2276,7 @@
                 let optionsHTML = '';
                 urls.forEach((url, index) => {
                     if (index === 0) {
-                        // Option 1 is the OneLink
+                        // Option 1 is OneLink
                         optionsHTML += `<button class="btn btn-primary btn-block" style="margin-bottom: 10px;" onclick="window.open('${url}', '_blank'); app.closeModal();">
                             <i class="fas fa-external-link-alt"></i> Buka via Grab Driver Link
                         </button>`;
@@ -2175,65 +2304,106 @@
                 document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
-            // Load Kas Data - FIXED LOGIC
+            // Load Kas Data - REVISED UI (4 Categories, No Input)
             async loadKasData() {
                 const kasContent = document.getElementById('kasContent');
+                
+                // Daftar kategori yang diinginkan (Kode Admin)
+                const categories = ['Iuran', 'Kas', 'Pengeluaran', 'Hutang'];
+                
+                // Jika belum ada yang dipilih, pilih yang pertama atau semua
+                if (!this.state.selectedKasCategory) {
+                    this.state.selectedKasCategory = 'All';
+                }
+
                 try {
                     const snapshot = await this.db.collection('kas').get();
                     let totalKas = 0;
                     const transactions = [];
+                    const categoryTotals = { 'Iuran': 0, 'Kas': 0, 'Pengeluaran': 0, 'Hutang': 0 };
                     
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        totalKas += data.amount || 0;
+                        const amount = data.amount || 0;
+                        totalKas += amount;
+                        
+                        // Asumsi: Data memiliki field 'kategori' atau 'category'.
+                        // Jika tidak ada, kita hanya hitung totalnya saja.
+                        const cat = data.kategori || data.category || 'Uncategorized';
+                        
+                        // Cek apakah kategori cocok dengan yang ada di daftar
+                        if (categoryTotals[cat] !== undefined) {
+                            categoryTotals[cat] += amount;
+                        }
+
                         transactions.push({
                             id: doc.id,
                             description: data.description || 'Transaksi',
-                            amount: data.amount || 0,
+                            amount: amount,
+                            category: cat, // Simpan kategori untuk filter
                             timestamp: data.timestamp ? data.timestamp.toDate() : new Date()
                         });
                     });
                     
-                    // PERBAIKAN: Urutkan transaksi dari yang terbaru ke terlama
+                    // Urutkan transaksi dari yang terbaru ke terlama
                     transactions.sort((a, b) => b.timestamp - a.timestamp);
-                    
+
+                    // Filter transaksi berdasarkan kategori yang dipilih
+                    const filteredTransactions = this.state.selectedKasCategory === 'All' 
+                        ? transactions 
+                        : transactions.filter(t => t.category === this.state.selectedKasCategory);
+
+                    // Generate HTML Kategori
+                    const categoriesHTML = categories.map(cat => `
+                        <div class="kas-category-card ${this.state.selectedKasCategory === cat ? 'active' : ''}" onclick="app.filterKasByCategory('${cat}')">
+                            <div class="kas-category-icon">
+                                ${this.getCategoryIcon(cat)}
+                            </div>
+                            <div class="kas-category-name">${cat}</div>
+                            <div class="kas-category-amount" style="color: ${categoryTotals[cat] >= 0 ? 'var(--success-color)' : 'var(--danger-color)'};">
+                                Rp ${Math.abs(categoryTotals[cat]).toLocaleString('id-ID')}
+                            </div>
+                        </div>
+                    `).join('');
+
                     kasContent.innerHTML = `
                         <div class="card">
                             <div class="card-header">
                                 <div class="card-title">
                                     <i class="fas fa-wallet"></i>
-                                    Total Kas
+                                    Total Saldo Kas
                                 </div>
                                 <div style="font-size: 20px; font-weight: 700; color: var(--success-color);">
                                     Rp ${totalKas.toLocaleString('id-ID')}
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p>Total kas komunitas saat ini</p>
-                                <button class="btn btn-primary btn-block" style="margin-top: 15px;" onclick="app.showAddTransactionModal()">
-                                    <i class="fas fa-plus"></i> Tambah Transaksi
-                                </button>
+                                <p>Ringkasan keuangan komunitas</p>
                             </div>
+                        </div>
+                        
+                        <div class="kas-category-grid">
+                            ${categoriesHTML}
                         </div>
                         
                         <div class="card">
                             <div class="card-header">
                                 <div class="card-title">
                                     <i class="fas fa-history"></i>
-                                    Transaksi Terakhir
+                                    Transaksi: <span style="font-weight:400; font-size: 14px; margin-left: 5px;">${this.state.selectedKasCategory === 'All' ? 'Semua' : this.state.selectedKasCategory}</span>
                                 </div>
                             </div>
                             <div class="list-group">
-                                ${transactions.slice(0, 5).map(t => `
+                                ${filteredTransactions.slice(0, 10).map(t => `
                                     <div class="list-item">
                                         <div class="list-item-title" style="color: ${t.amount >= 0 ? 'var(--success-color)' : 'var(--danger-color)'};">
                                             ${t.amount >= 0 ? '+' : ''} Rp ${Math.abs(t.amount).toLocaleString('id-ID')}
                                         </div>
-                                        <div class="list-item-title" style="font-size: 14px; margin-top: 2px;">${t.description}</div>
+                                        <div class="list-item-title" style="font-size: 14px; margin-top: 2px;">${t.description} <span style="font-size: 10px; background: var(--border-color); padding: 2px 5px; border-radius: 4px; margin-left: 5px;">${t.category}</span></div>
                                         <div class="list-item-subtitle">${t.timestamp.toLocaleDateString('id-ID')} ${t.timestamp.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</div>
                                     </div>
                                 `).join('')}
-                                ${transactions.length === 0 ? '<div class="list-item"><div class="list-item-subtitle">Belum ada transaksi</div></div>' : ''}
+                                ${filteredTransactions.length === 0 ? '<div class="list-item"><div class="list-item-subtitle">Tidak ada transaksi di kategori ini</div></div>' : ''}
                             </div>
                         </div>
                     `;
@@ -2249,86 +2419,21 @@
                 }
             },
             
-            // PERBAIKAN: Fungsi untuk menampilkan modal tambah transaksi (Sebelumnya tidak ada)
-            showAddTransactionModal() {
-                const modal = document.getElementById('modal');
-                
-                // Set judul modal
-                document.getElementById('modalTitle').textContent = 'Tambah Transaksi';
-                document.getElementById('modalDetailTitle').textContent = '';
-                
-                // Sembunyikan gambar modal
-                document.getElementById('modalImage').style.display = 'none';
-                
-                // Inject Form HTML ke dalam modal
-                document.getElementById('modalDetailDesc').innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label">Jenis Transaksi</label>
-                        <select id="kasTypeInput" class="form-control">
-                            <option value="in">Pemasukan (Kas Masuk)</option>
-                            <option value="out">Pengeluaran (Kas Keluar)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Jumlah (Rp)</label>
-                        <input type="number" id="kasAmountInput" class="form-control" placeholder="Contoh: 50000">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Keterangan</label>
-                        <input type="text" id="kasDescInput" class="form-control" placeholder="Contoh: Iuran Bulanan">
-                    </div>
-                    <button class="btn btn-primary btn-block" style="margin-top: 15px;" onclick="app.saveTransaction()">
-                        <i class="fas fa-save"></i> Simpan Transaksi
-                    </button>
-                `;
-                
-                // Sembunyikan tombol modal action default
-                document.querySelector('.modal-action').style.display = 'none';
-                
-                // Tampilkan modal
-                modal.classList.add('active');
-                document.querySelector('.app-container').style.overflow = 'hidden';
+            // Helper untuk Icon Kategori
+            getCategoryIcon(cat) {
+                switch(cat) {
+                    case 'Iuran': return '<i class="fas fa-hand-holding-usd"></i>';
+                    case 'Kas': return '<i class="fas fa-coins"></i>';
+                    case 'Pengeluaran': return '<i class="fas fa-shopping-cart"></i>';
+                    case 'Hutang': return '<i class="fas fa-file-invoice-dollar"></i>';
+                    default: return '<i class="fas fa-question"></i>';
+                }
             },
-            
-            // PERBAIKAN: Fungsi untuk menyimpan transaksi ke Firebase (Sebelumnya tidak ada)
-            async saveTransaction() {
-                const type = document.getElementById('kasTypeInput').value;
-                const amount = parseInt(document.getElementById('kasAmountInput').value);
-                const desc = document.getElementById('kasDescInput').value;
-                
-                // Validasi input
-                if (!amount || amount <= 0) {
-                    this.showToast('Masukkan jumlah yang valid', 'warning');
-                    return;
-                }
-                
-                if (!desc) {
-                    this.showToast('Masukkan keterangan transaksi', 'warning');
-                    return;
-                }
-                
-                try {
-                    // Tentukan nilai amount berdasarkan tipe
-                    const finalAmount = type === 'out' ? -Math.abs(amount) : Math.abs(amount);
-                    
-                    // Simpan ke Firestore
-                    await this.db.collection('kas').add({
-                        amount: finalAmount,
-                        description: desc,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        userId: this.auth.currentUser.uid
-                    });
-                    
-                    this.showToast('Transaksi berhasil disimpan!', 'success');
-                    this.closeModal();
-                    
-                    // Refresh data kas
-                    this.loadKasData();
-                    
-                } catch (error) {
-                    console.error("Error saving transaction:", error);
-                    this.showToast('Gagal menyimpan transaksi', 'error');
-                }
+
+            // Fungsi Filter saat kartu diklik
+            filterKasByCategory(category) {
+                this.state.selectedKasCategory = category;
+                this.loadKasData(); // Reload data dengan filter baru
             },
             
             // Load Peta Data
@@ -3049,8 +3154,11 @@
                 // Listen for kas changes
                 this.db.collection('kas').onSnapshot((snapshot) => {
                     if (!snapshot.metadata.hasPendingWrites) {
-                        this.updateBalanceFromFirebase();
-                        this.showRealtimeIndicator();
+                        // Cek jika sedang di halaman kas
+                        const kasPage = document.getElementById('kas-page');
+                        if (kasPage && kasPage.classList.contains('active')) {
+                            this.loadKasData();
+                        }
                     }
                 }, (error) => {
                     console.error("Error in kas listener:", error);
@@ -3363,7 +3471,7 @@
                 document.querySelector('.app-container').style.overflow = 'hidden';
             },
             
-            // Load Banners from Firebase
+            // Load Banners from Firebase - UPDATED FOR NAVIGABLE PROMO MODAL
             async loadBannersFromFirebase() {
                 const container = document.getElementById('adminCarousel');
                 const indicators = document.getElementById('carouselIndicators');
@@ -3382,9 +3490,13 @@
                                 </div>
                             </div>
                         `;
+                        // Clear state list
+                        this.state.promosList = [];
                         return;
                     }
                     
+                    // Reset state list
+                    this.state.promosList = [];
                     const banners = [];
                     snapshot.forEach(doc => {
                         banners.push({ id: doc.id, ...doc.data() });
@@ -3392,18 +3504,29 @@
                     
                     for (let index = 0; index < banners.length; index++) {
                         const banner = banners[index];
+                        
+                        // Resolve GS URL to HTTP immediately so we can use it easily in Modal List later
+                        let imageUrl = banner.imageUrl || '';
+                        if (imageUrl.startsWith('gs://')) {
+                            try {
+                                const storageRef = this.storage.refFromURL(imageUrl);
+                                imageUrl = await storageRef.getDownloadURL();
+                            } catch (e) {
+                                console.error("Error getting banner URL", e);
+                                imageUrl = ''; // Fallback
+                            }
+                        }
+                        
+                        // Update banner object with resolved URL
+                        banner.imageUrl = imageUrl;
+                        this.state.promosList.push(banner);
+
                         const slideDiv = document.createElement('div');
                         slideDiv.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
                         
-                        const imageUrl = banner.imageUrl || '';
                         let imageHtml = '';
-                        
                         if (imageUrl) {
-                            if (imageUrl.startsWith('data:image') || imageUrl.startsWith('http')) {
-                                imageHtml = `<img src="${imageUrl}" alt="${banner.title}">`;
-                            } else if (imageUrl.startsWith('gs://')) {
-                                imageHtml = `<img src="" alt="${banner.title}" data-firebase-url="${imageUrl}">`;
-                            }
+                             imageHtml = `<img src="${imageUrl}" alt="${banner.title}">`;
                         }
                         
                         if (imageHtml) {
@@ -3419,15 +3542,9 @@
                             `;
                         }
                         
-                        // Store banner data for modal
-                        slideDiv.bannerData = {
-                            title: banner.title,
-                            description: banner.description,
-                            imageUrl: imageUrl
-                        };
-                        
+                        // Pass ID to click handler
                         slideDiv.onclick = () => {
-                            this.showBannerModal(slideDiv.bannerData);
+                            this.showBannerModal(banner.id);
                         };
                         
                         container.appendChild(slideDiv);
@@ -3436,36 +3553,6 @@
                         indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
                         indicator.onclick = () => this.goToSlide(index);
                         indicators.appendChild(indicator);
-                        
-                        // Handle Firebase Storage images
-                        const firebaseImage = slideDiv.querySelector('img[data-firebase-url]');
-                        if (firebaseImage) {
-                            const firebaseUrl = firebaseImage.getAttribute('data-firebase-url');
-                            this.getValidImageUrl(firebaseUrl).then(url => {
-                                if (url) {
-                                    firebaseImage.src = url;
-                                } else {
-                                    firebaseImage.parentElement.innerHTML = `
-                                        <div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg, var(--primary-color), var(--primary-dark));color:white;text-align:center;padding:20px; position: relative; z-index: 3;">
-                                            <div>
-                                                <h2 style="margin-bottom:10px;">${banner.title}</h2>
-                                                <p>${banner.description}</p>
-                                            </div>
-                                        </div>
-                                    `;
-                                }
-                            }).catch(error => {
-                                console.error("Error loading Firebase image:", error);
-                                firebaseImage.parentElement.innerHTML = `
-                                    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg, var(--primary-color), var(--primary-dark));color:white;text-align:center;padding:20px; position: relative; z-index: 3;">
-                                        <div>
-                                            <h2 style="margin-bottom:10px;">${banner.title}</h2>
-                                            <p>${banner.description}</p>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                        }
                     }
                     
                     if (banners.length > 1) {
@@ -3479,47 +3566,75 @@
                 }
             },
             
-            // Show Banner Modal
-            showBannerModal(bannerData) {
+            // Show Banner Modal - UPDATED: ACTIVE ITEM VIEW WITH NAVIGATION
+            showBannerModal(clickedId) {
                 const modal = document.getElementById('modal');
-                document.getElementById('modalTitle').textContent = 'Detail Promo';
-                document.getElementById('modalDetailTitle').textContent = bannerData.title;
-                document.getElementById('modalDetailDesc').textContent = bannerData.description;
+                const modalBody = document.getElementById('modalBodyContent');
                 
-                const modalImage = document.getElementById('modalImage');
-                if (bannerData.imageUrl) {
-                    if (bannerData.imageUrl.startsWith('data:image') || bannerData.imageUrl.startsWith('http')) {
-                        modalImage.src = bannerData.imageUrl;
-                        modalImage.style.display = 'block';
-                    } else if (bannerData.imageUrl.startsWith('gs://')) {
-                        this.getValidImageUrl(bannerData.imageUrl).then(url => {
-                            if (url) {
-                                modalImage.src = url;
-                                modalImage.style.display = 'block';
-                            } else {
-                                modalImage.style.display = 'none';
-                            }
-                        }).catch(error => {
-                            console.error("Error loading modal image:", error);
-                            modalImage.style.display = 'none';
-                        });
-                    }
-                } else {
-                    modalImage.style.display = 'none';
+                // Set active ID to the one clicked
+                this.state.activePromoId = clickedId;
+                
+                // Find the active data
+                const activePromo = this.state.promosList.find(p => p.id === this.state.activePromoId);
+                
+                if (!activePromo) {
+                    console.error("Active promo not found:", clickedId);
+                    this.closeModal();
+                    return;
                 }
                 
-                modalImage.onerror = function() { 
-                    this.onerror = null; 
-                    this.style.display = 'none'; 
-                };
+                // Render the Modal Content
+                modalBody.innerHTML = `
+                    <div class="modal-promo-view">
+                        <!-- Main Image Area -->
+                        <img src="${activePromo.imageUrl || ''}" 
+                             alt="${activePromo.title}" 
+                             class="promo-main-image">
+                        
+                        <!-- Title -->
+                        <h2 class="promo-title">${activePromo.title}</h2>
+                        
+                        <!-- Description -->
+                        <div class="promo-desc">${activePromo.description || 'Tidak ada deskripsi tersedia.'}</div>
+                        
+                        <!-- Navigation Thumbnails (Dots) -->
+                        <div class="promo-thumbs-container">
+                            ${this.state.promosList.map(promo => {
+                                const isActive = promo.id === this.state.activePromoId;
+                                return `
+                                    <div class="promo-thumb ${isActive ? 'active' : ''}" 
+                                         onclick="app.switchActivePromo('${promo.id}')">
+                                        <img src="${promo.imageUrl}" alt="${promo.title}">
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
                 
+                document.getElementById('modalTitle').textContent = 'Detail Promo';
+                
+                // Hide default modal detail elements (since we are using custom body)
+                const defaultDetails = document.querySelector('.modal-details');
+                if (defaultDetails) defaultDetails.style.display = 'none';
+                
+                const defaultModalImage = document.getElementById('modalImage');
+                if (defaultModalImage) defaultModalImage.style.display = 'none';
+
                 modal.classList.add('active');
                 document.querySelector('.app-container').style.overflow = 'hidden';
+            },
+
+            // Switch Active Promo in Modal (Navigasi)
+            switchActivePromo(id) {
+                this.state.activePromoId = id;
+                // Re-render modal body with new active ID
+                this.showBannerModal(id);
             },
             
             // Update Balance from Firebase
             updateBalanceFromFirebase() {
-                // Balance update logic here
+                // Logic ini sudah dihandle oleh listener di setupRealtimeListeners
             },
             
             // Show Realtime Indicator
@@ -3528,7 +3643,7 @@
                 indicator.classList.add('active');
                 setTimeout(() => { 
                     indicator.classList.remove('active'); 
-                }, 2000);
+                },2000);
             },
             
             // Next Slide (for admin carousel)
@@ -3662,6 +3777,9 @@
             handleMenuClick(item) {
                 if (item === 'Kas') {
                     this.showPage('kas-page');
+                    // Reset filter saat masuk halaman kas
+                    this.state.selectedKasCategory = 'All';
+                    this.loadKasData();
                 } else if (item === 'Peta') {
                     this.showPage('peta-page');
                 } else if (item === 'Pesan') {
@@ -3842,8 +3960,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
